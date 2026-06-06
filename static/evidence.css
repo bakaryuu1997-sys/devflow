@@ -1,0 +1,79 @@
+.evidence-toolbar {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #dbe5f3;
+  border-left: 5px solid #7c3aed;
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+
+.evidence-toolbar p {
+  margin: 4px 0 0;
+  color: #64748b;
+}
+
+.evidence-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.evidence-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.evidence-card {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #dbe5f3;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.evidence-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.evidence-card-head h4 {
+  margin: 0;
+}
+
+.evidence-card-head span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.evidence-card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.evidence-card li {
+  margin: 7px 0;
+  color: #334155;
+}
+
+.empty-inline {
+  color: #64748b;
+  margin: 0;
+}
+
+@media(max-width: 760px) {
+  .evidence-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

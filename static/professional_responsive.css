@@ -1,0 +1,13 @@
+@media(max-width:1060px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .topbar { align-items: flex-start; flex-direction: column; }
+  .topbar h2 { font-size: 30px; }
+}
+
+@media(max-width:760px) {
+  .main { padding: 18px; }
+  .topbar { padding: 20px; }
+  .top-actions,.action-row { width: 100%; }
+  .top-actions button,.action-row button,.action-row a { width: 100%; }
+}

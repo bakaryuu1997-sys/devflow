@@ -1,0 +1,6 @@
+<testsuite name="auth" tests="3" failures="1" errors="0">
+  <testcase classname="AuthTest" name="test_login_success"/>
+  <testcase classname="AuthTest" name="test_login_phone">
+    <failure message="expected 200 got 500">Login phone failed</failure>
+  </testcase>
+</testsuite>

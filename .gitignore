@@ -1,0 +1,30 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local config and secrets
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Local databases and runtime state
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Node artifacts if added later
+node_modules/
+dist/
+build/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

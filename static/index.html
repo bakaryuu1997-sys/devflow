@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DevFlow Guard</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/flow.css" />
+  <link rel="stylesheet" href="/static/results.css" />
+  <link rel="stylesheet" href="/static/evidence.css" />
+  <link rel="stylesheet" href="/static/professional.css" />
+  <link rel="stylesheet" href="/static/professional_responsive.css" />
+  <link rel="stylesheet" href="/static/context_selector.css" />
+  <link rel="stylesheet" href="/static/workitem_ui.css" />
+  <link rel="stylesheet" href="/static/requirement_ui.css" />
+</head>
+<body>
+  <!-- Full Screen Login Overlay -->
+  <div id="loginOverlay" class="login-overlay login-command-center">
+    <section class="login-stage" aria-label="DevFlow access overview">
+      <div class="login-stage-brand">
+        <div class="brand-mark">DG</div>
+        <div>
+          <span class="login-eyebrow">Production control room</span>
+          <h1>DevFlow Governance OS</h1>
+        </div>
+      </div>
+      <p class="login-stage-copy">Run release governance, evidence checks, traceability review, and audit history from one operator workspace.</p>
+      <div class="login-proof-grid">
+        <div><strong>6</strong><span>governance steps</span></div>
+        <div><strong>Live</strong><span>risk and evidence gates</span></div>
+        <div><strong>Audit</strong><span>history ledger visible</span></div>
+      </div>
+      <div class="login-stage-footer">
+        <span class="status-dot"></span>
+        <span>Protected API session required before operational actions.</span>
+      </div>
+    </section>
+
+    <section class="login-card production-login-card" aria-label="Authentication form">
+      <div class="login-card-header">
+        <span class="auth-chip">Secure access</span>
+        <h2 id="authTitle" data-i18n="login_title">Sign in to DevFlow</h2>
+        <p>Sign in with your account, or fill local demo credentials only when running demo QA.</p>
+      </div>
+      <div class="login-form">
+        <div class="input-group">
+          <label data-i18n="login_email">Email address</label>
+          <input id="email" type="email" placeholder="admin@example.com" autocomplete="email" />
+        </div>
+        <div class="input-group">
+          <label data-i18n="login_password">Password</label>
+          <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" />
+        </div>
+        <button id="authButton" onclick="login()" data-i18n="login_submit">Sign In</button>
+      </div>
+      <div class="login-quick-actions">
+        <button type="button" class="ghost-btn" onclick="fillDemoLogin()">Use demo admin</button>
+        <span>Public registration is viewer-only.</span>
+      </div>
+      <div class="auth-toggle-text" id="authToggleLink" onclick="toggleAuthMode()" data-i18n="login_toggle_register">
+        Don't have an account? <span class="link-highlight">Register</span>
+      </div>
+    </section>
+  </div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">DG</div>
+        <div><h1 data-i18n="sidebar_title">DevFlow Guard</h1><p data-i18n="sidebar_subtitle">Release Risk OS</p></div>
+      </div>
+
+      <!-- Workspace Context Group -->
+      <details class="sidebar-group" open>
+        <summary data-i18n="sidebar_workspace_context">Workspace Context</summary>
+        <div class="sidebar-group-content">
+          <label class="compact-label"><span data-i18n="sidebar_project">Project</span><select id="projectSelect" onchange="changeProject()"></select></label>
+          <label class="compact-label"><span data-i18n="sidebar_release">Release</span><select id="releaseSelect" onchange="changeRelease()"></select></label>
+        </div>
+      </details>
+
+      <!-- Create Project / Release Group -->
+      <details class="sidebar-group">
+        <summary data-i18n="sidebar_create_workspace">Create Workspace</summary>
+        <div class="sidebar-group-content">
+          <input id="newProjectName" placeholder="New project name" />
+          <input id="newProjectDescription" placeholder="Project description" />
+          <button class="soft-wide" onclick="createProjectFromSidebar()" data-i18n="sidebar_create_project_btn">Create project</button>
+          <input id="newReleaseVersion" placeholder="New release version" />
+          <button class="soft-wide" onclick="createReleaseFromSidebar()" data-i18n="sidebar_create_release_btn">Create release</button>
+        </div>
+      </details>
+
+      <div class="progress-box">
+        <span class="progress-label" data-i18n="sidebar_flow_label">Recommended flow</span>
+        <ol>
+          <li>Reset demo</li><li>Upload artifacts</li><li>Traceability</li>
+          <li>Impact</li><li>Release gate</li><li>Evidence</li>
+        </ol>
+      </div>
+      <a class="soft-wide workspace-link" href="/static/workspace.html" data-i18n="sidebar_workspace_link">Open Operations Workspace</a>
+      <button class="soft-wide" onclick="loadOperationalHistory()">View history timeline</button>
+      <div class="sidebar-note"><strong data-i18n="sidebar_why_title">Why it matters</strong><span data-i18n="sidebar_why_desc">Jira tracks work. This checks release risk, gaps, evidence and safety.</span></div>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div class="topbar-info">
+          <span class="eyebrow" data-i18n="topbar_eyebrow">DevFlow Governance OS</span>
+          <h2 data-i18n="topbar_title">Release Compliance Control Center</h2>
+        </div>
+        <div class="topbar-actions-auth">
+          <div class="header-auth">
+            <button id="langBtn" class="ghost" onclick="toggleLanguage()" style="margin-right: 16px; font-weight: 600;">🌐 EN</button>
+            <!-- If logged in: user profile avatar and logout -->
+            <div class="auth-logged-in hidden" id="authLoggedIn">
+              <span id="loginStatus" class="status-chip neutral">Checking session...</span>
+              <button onclick="logout()" class="ghost" data-i18n="topbar_logout">Logout</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stepper">
+        <button id="stepBtn1" class="step active" onclick="goStep(1)"><b>1</b><span>Start</span></button>
+        <button id="stepBtn2" class="step" onclick="goStep(2)"><b>2</b><span>Artifacts</span></button>
+        <button id="stepBtn3" class="step" onclick="goStep(3)"><b>3</b><span>Traceability</span></button>
+        <button id="stepBtn4" class="step" onclick="goStep(4)"><b>4</b><span>Impact</span></button>
+        <button id="stepBtn5" class="step" onclick="goStep(5)"><b>5</b><span>Gate</span></button>
+        <button id="stepBtn6" class="step" onclick="goStep(6)"><b>6</b><span>Report</span></button>
+      </section>
+
+      <section class="metrics-grid">
+        <article class="metric metric-gate"><span data-i18n="metric_step">Current step</span><strong id="metricStep">1 / 6</strong><small id="metricStepText" data-i18n="step1_desc">Start with demo data</small></article>
+        <article class="metric metric-danger"><span data-i18n="metric_blockers">Blockers</span><strong id="metricBlockers">—</strong><small>From guards/readiness</small></article>
+        <article class="metric metric-info"><span data-i18n="metric_traceability">Traceability</span><strong id="metricTrace">Not run</strong><small>Requirement links</small></article>
+        <article class="metric metric-success"><span data-i18n="metric_mode">Mode</span><strong id="metricModeVal" data-i18n="metric_mode_val">Offline</strong><small>Runs locally</small></article>
+      </section>
+
+      <section id="step1" class="flow-section">
+        <article class="panel accent-blue">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Step 1</span>
+              <h3 data-i18n="step1_title">Workspace Initialization & Governance Control</h3>
+              <p data-i18n="step1_desc">Deploy compliance parameters, register workspace tracks, and seed admin parameters.</p>
+            </div>
+          </div>
+          <div class="action-row">
+            <button class="primary" onclick="resetDemo()" data-i18n="step1_btn_init">Initialize Workspace (Seed Data)</button>
+            <button onclick="loadDashboard()" data-i18n="step1_btn_refresh">Refresh Workspace Dashboard</button>
+            <button onclick="loadToday()" data-i18n="step1_btn_today">View Today's Focus</button>
+            <button onclick="verifyLedgerIntegrity()" data-i18n="step1_btn_verify">Verify Audit Integrity</button>
+            <button onclick="runNextAction()" data-i18n="step1_btn_next">Next Step Guide</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="step2" class="flow-section hidden-section">
+        <article class="panel accent-red">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Step 2</span>
+              <h3 data-i18n="step2_title">Upload and Scan Release Artifacts</h3>
+              <p data-i18n="step2_desc">Use examples/ or real project files.</p>
+            </div>
+          </div>
+          <div class="upload-grid">
+            <div class="upload-card danger-card"><div class="upload-icon">SQL</div><h4>SQL Migration</h4><p>Find destructive database changes.</p><input id="sqlFile" type="file" /><button class="danger-btn" onclick="uploadGuard('sqlFile','/guards/sql')" data-i18n="step2_btn_sql">Scan SQL</button></div>
+            <div class="upload-card warn-card"><div class="upload-icon">LOG</div><h4>Logs</h4><p>Find errors, exceptions, timeouts.</p><input id="logFile" type="file" /><button class="warn-btn" onclick="uploadGuard('logFile','/guards/logs')" data-i18n="step2_btn_logs">Scan Logs</button></div>
+            <div class="upload-card success-card"><div class="upload-icon">TST</div><h4>Tests</h4><p>Find failed tests and errors.</p><input id="testFile" type="file" /><button class="success-btn" onclick="uploadGuard('testFile','/guards/tests')" data-i18n="step2_btn_tests">Scan Tests</button></div>
+            <div class="upload-card info-card"><div class="upload-icon">API</div><h4>API Diff</h4><p>Find removed OpenAPI paths.</p><input id="apiBefore" type="file" /><input id="apiAfter" type="file" /><button class="info-btn" onclick="uploadApiDiff()" data-i18n="step2_btn_api">Scan API Diff</button></div>
+          </div>
+          <div class="action-row">
+            <button onclick="loadGuards()" data-i18n="step2_btn_review">Review Guard Findings</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="step3" class="flow-section hidden-section">
+        <article class="panel accent-purple">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Step 3</span>
+              <h3 data-i18n="step3_title">Traceability Matrix & Release Governance</h3>
+              <p data-i18n="step3_desc">Check links, analyze risk profiles, and audit recovery policies.</p>
+            </div>
+          </div>
+          
+          <input type="text" class="action-search-bar" placeholder="🔍 Search step 3 actions (e.g. sql, verify, v11)..." oninput="filterActions(this, 'step3-groups')">
+          
+          <div id="step3-groups">
+            <!-- Group 1: Core Traceability & Risk Audit -->
+            <details class="action-group" open>
+              <summary>🔬 Core Analysis & Risk Audit</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Analyze traceability matrix, scan for bugs, and view requirements risk profiles.</p>
+                <div class="action-row">
+                  <button class="primary" onclick="loadTraceability()" data-i18n="step3_btn_trace">Run Traceability</button>
+                  <button onclick="runRiskScan()" data-i18n="step3_btn_risk">Risk Scan</button>
+                  <button onclick="loadBugPatterns()">Bug Patterns</button>
+                  <button onclick="loadReleaseRiskDashboard()">Risk Dashboard by Requirement</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 2: Planning & Analytics Control -->
+            <details class="action-group">
+              <summary>📈 Planning & Analytics Control</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">View historical metrics, burndown rates, prevention logs, and timeline forecasts.</p>
+                <div class="action-row">
+                  <button onclick="loadReleaseSnapshotAnalytics()">Snapshot Analytics</button>
+                  <button onclick="loadReleaseRiskDeltaAnalytics()">Risk Delta</button>
+                  <button onclick="loadRecurringRiskTrends()">Recurring Risk Trends</button>
+                  <button onclick="loadRiskPreventionBacklog()">Risk Prevention Backlog</button>
+                  <button onclick="loadNextReleaseReadiness()">Next Release Readiness</button>
+                  <button onclick="loadPreventionExecutionBoard()">Prevention Execution Board</button>
+                  <button onclick="loadOverdueRiskEscalations()">Overdue Escalations</button>
+                  <button onclick="loadPreventionBurndownAnalytics()">Prevention Burndown</button>
+                  <button onclick="loadOwnerWorkloadBalance()">Owner Workload Balance</button>
+                  <button onclick="loadPreventionCalendarView()">Prevention Calendar</button>
+                  <button onclick="loadReleaseReadinessTimeline()">Readiness Timeline</button>
+                  <button onclick="loadReleaseReadinessScenarios()">Scenario Planning</button>
+                  <button onclick="loadReleasePlanRecommendation()">Plan Recommendation</button>
+                  <button onclick="loadScopeDecisionAudit()">Scope Audit</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 3: Database & Migration Governance -->
+            <details class="action-group">
+              <summary>🗄️ Database & Migration Governance</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Verify local schema health, review checklist protocols, and check migration safety.</p>
+                <div class="action-row">
+                  <button onclick="loadMigrationNotes()">Migration Notes</button>
+                  <button onclick="loadLocalMigrationCheck()">Migration Check</button>
+                  <button onclick="loadUpgradeSafetyReport()">Upgrade Safety</button>
+                  <button onclick="loadDryRunSqlMigration()">Dry-run SQL</button>
+                  <button onclick="loadBackupChecklist()">Backup Checklist</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 4: Signature & Cryptography Gates -->
+            <details class="action-group">
+              <summary>🔐 Signature & Cryptography Gates</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Verify package integrity adapters and run local public key dry-run decoders.</p>
+                <div class="action-row">
+                  <button onclick="loadPolicyBasedVerificationChecklist()">Verification Policy</button>
+                  <button onclick="loadSignatureVerificationAdapterStubs()">Signature Adapters</button>
+                  <button onclick="loadSignatureAdapterContractTests()">Adapter Contracts</button>
+                  <button onclick="loadSampleSignatureFixtures()">Sample Fixtures</button>
+                  <button onclick="loadPublicKeyVerifierReadiness()">Public-key Verifier</button>
+                  <button onclick="runPublicKeyVerifierDryRun()">Real Verify Dry-run</button>
+                  <button onclick="loadPublicVerifierEvidencePackage()">Verifier Evidence</button>
+                  <button onclick="loadVerifiedSignatureApprovalGate()">Verified Gate</button>
+                  <button onclick="loadVerifiedEvidenceManifestGate()">Hardened Evidence Gate</button>
+                  <button onclick="loadExternalVerifierProfiles()">Verifier Profiles</button>
+                  <button onclick="loadOperatorPolicyPresets()">Policy Presets</button>
+                  <button onclick="loadFinalSignedEvidenceBundle()">Final Signed Evidence</button>
+                  <button onclick="loadEndToEndGovernanceRehearsal()">E2E Governance Rehearsal</button>
+                  <button onclick="runSignatureAdapterDryRun()">Adapter Dry-run</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 5: Releases & Approval History -->
+            <details class="action-group">
+              <summary>📋 Releases & Approval History</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Inspect final approval signatures, review retrospectives, and track audit trails.</p>
+                <div class="action-row">
+                  <button onclick="loadReleaseReviewChecklist()">Export Release Review Checklist</button>
+                  <button onclick="loadReleaseReviewCompletion()">Release Review Completion</button>
+                  <button onclick="loadReleaseSignoffSnapshot()">Final Sign-off Snapshot</button>
+                  <button onclick="loadReleaseSignoffs()">Approval Records</button>
+                  <button onclick="compareReleaseApprovalHistory()">Compare Approvals</button>
+                  <button onclick="loadReleaseRetrospectives()">Retrospectives</button>
+                  <button onclick="loadReleaseLearningLoop()">Learning Loop</button>
+                  <button onclick="loadReleaseGovernanceReadiness()">Governance Readiness</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 6: Recovery Runbook Milestones (v10 - v12) -->
+            <details class="action-group">
+              <summary>🛠️ Developer Rehearsals & Milestone Verification (v10 - v12)</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Inspect runbooks and build package assets for milestone versions (v10.0 to v12.0).</p>
+                <div class="action-row">
+                  <button onclick="loadV10StableMilestoneReport()">Stable Milestone</button>
+                  <button onclick="loadV10InstallerChecklist()">Installer Checklist</button>
+                  <button onclick="loadV101UsabilityWalkthrough()">v10.1 Walkthrough</button>
+                  <button onclick="loadV101SampleDemoScript()">v10.1 Demo Script</button>
+                  <button onclick="loadV101OptionalDeploymentGuide()">v10.1 Deployment Guide</button>
+                  <button onclick="loadV101OperatorQuickstartPackage()">v10.1 Quickstart</button>
+                  <button onclick="loadV102FirstRunWizard()">v10.2 First-run Wizard</button>
+                  <button onclick="loadV102DemoResetSafetyCheck()">v10.2 Reset Safety</button>
+                  <button onclick="loadV102DemoResetPlan()">v10.2 Reset Plan</button>
+                  <button onclick="loadV102OperatorFirstRunPackage()">v10.2 First-run Package</button>
+                  <button onclick="loadV103DemoDataProfiles()">v10.3 Demo Profiles</button>
+                  <button onclick="loadV103DemoProfileResetPlan()">v10.3 Profile Plan</button>
+                  <button onclick="loadV103TutorialProgress()">v10.3 Tutorial Progress</button>
+                  <button onclick="completeV103TutorialStep()">v10.3 Mark Profile Done</button>
+                  <button onclick="loadV103OperatorTutorialPackage()">v10.3 Tutorial Package</button>
+                  <button onclick="loadV104SampleProjectBuilder()">v10.4 Sample Builder</button>
+                  <button onclick="buildV104SampleProject()">v10.4 Build Sample</button>
+                  <button onclick="loadV104TutorialCompletionBadge()">v10.4 Completion Badge</button>
+                  <button onclick="loadV104OperatorSampleBuilderPackage()">v10.4 Builder Package</button>
+                  <button onclick="loadV105ProfileResetPlan()">v10.5 Reset Plan</button>
+                  <button onclick="executeV105ProfileReset()">v10.5 Execute Reset</button>
+                  <button onclick="loadV105OperatorResetPackage()">v10.5 Reset Package</button>
+                  <button onclick="loadV106RollbackSnapshot()">v10.6 Rollback Snapshot</button>
+                  <button onclick="executeV106ProfileReset()">v10.6 Reset With Audit</button>
+                  <button onclick="loadV106ProfileResetAuditTrail()">v10.6 Audit Trail</button>
+                  <button onclick="loadV106OperatorRollbackPackage()">v10.6 Rollback Package</button>
+                  <button onclick="loadV107RollbackImportRehearsal()">v10.7 Import Rehearsal</button>
+                  <button onclick="loadV107RestoreChecklist()">v10.7 Restore Checklist</button>
+                  <button onclick="loadV107OperatorRestorePackage()">v10.7 Restore Package</button>
+                  <button onclick="loadV108GuardedRestorePlan()">v10.8 Restore Plan</button>
+                  <button onclick="executeV108GuardedManualRestore()">v10.8 Execute Restore</button>
+                  <button onclick="loadV108RestoreAuditTrail()">v10.8 Restore Audit</button>
+                  <button onclick="loadV108OperatorRestoreExecutionPackage()">v10.8 Restore Package</button>
+                  <button onclick="loadV109RestoreConflictReport()">v10.9 Conflict Report</button>
+                  <button onclick="loadV109GuardedRestorePlan()">v10.9 Digest Plan</button>
+                  <button onclick="executeV109GuardedManualRestore()">v10.9 Execute Restore</button>
+                  <button onclick="loadV109RestoreDigestLockAuditTrail()">v10.9 Digest Audit</button>
+                  <button onclick="loadV109OperatorRestoreConflictPackage()">v10.9 Restore Package</button>
+                  <button onclick="loadV110RestoreGovernanceStabilityReport()">v11.0 Recovery Stability</button>
+                  <button onclick="loadV110FinalOperatorRecoveryRunbook()">v11.0 Recovery Runbook</button>
+                  <button onclick="loadV110OperatorRecoveryPackage()">v11.0 Recovery Package</button>
+                  <button onclick="loadV111RecoveryUxSummary()">v11.1 Recovery UX</button>
+                  <button onclick="loadV111ExportFixtureExample()">v11.1 Export Fixture</button>
+                  <button onclick="loadV111ImportFixtureExample()">v11.1 Import Fixture</button>
+                  <button onclick="loadV111OperatorFixturePackage()">v11.1 Fixture Package</button>
+                  <button onclick="loadV112FixtureValidationReport()">v11.2 Fixture Validation</button>
+                  <button onclick="loadV112SampleOperatorWalkthrough()">v11.2 Walkthrough</button>
+                  <button onclick="loadV112OperatorWalkthroughPackage()">v11.2 Walkthrough Package</button>
+                  <button onclick="loadV113RecoverySmokeTestAutomation()">v11.3 Smoke Test</button>
+                  <button onclick="loadV113PostRestoreVerificationReport()">v11.3 Post-Restore Verify</button>
+                  <button onclick="loadV113OperatorSmokeVerificationPackage()">v11.3 Smoke Package</button>
+                  <button onclick="loadV114RecoveryEvidenceBundle()">v11.4 Evidence Bundle</button>
+                  <button onclick="loadV114FinalDemoHandoffPolish()">v11.4 Demo Handoff</button>
+                  <button onclick="loadV114OperatorDemoHandoffPackage()">v11.4 Handoff Package</button>
+                  <button onclick="loadV115DemoReleaseCandidateFreeze()">v11.5 RC Freeze</button>
+                  <button onclick="loadV115OperatorAcceptanceChecklist()">v11.5 Acceptance</button>
+                  <button onclick="loadV115OperatorReleaseCandidatePackage()">v11.5 RC Package</button>
+                  <button onclick="loadV116FinalPackagingCleanup()">v11.6 Packaging Cleanup</button>
+                  <button onclick="loadV116BeginnerInstallVerification()">v11.6 Install Verify</button>
+                  <button onclick="loadV116OperatorFinalPackage()">v11.6 Final Package</button>
+                  <button onclick="loadV117ArchiveIntegrityManifest()">v11.7 Archive Manifest</button>
+                  <button onclick="loadV117ReleaseNotesPolish()">v11.7 Release Notes</button>
+                  <button onclick="loadV117OperatorReleasePackage()">v11.7 Release Package</button>
+                  <button onclick="loadV118SignedArchiveChecksumHandoff()">v11.8 Checksum Handoff</button>
+                  <button onclick="loadV118FinalUserFacingQuickstart()">v11.8 Quickstart</button>
+                  <button onclick="loadV118OperatorChecksumQuickstartPackage()">v11.8 Checksum Package</button>
+                  <button onclick="loadV119FinalReleaseTagPreparation()">v11.9 Release Tag</button>
+                  <button onclick="loadV119PortfolioDemoScript()">v11.9 Portfolio Script</button>
+                  <button onclick="loadV119OperatorFinalReleasePackage()">v11.9 Final Package</button>
+                  <button onclick="loadV120BaselineFreezeSummary()">v12.0 Baseline Freeze</button>
+                  <button onclick="loadV120ProductionDeploymentChecklist()">v12.0 Deploy Checklist</button>
+                  <button onclick="loadV120OperatorDeploymentPackage()">v12.0 Deploy Package</button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+<article class="panel accent-purple requirement-panel">
+  <div class="section-title"><div><span class="panel-kicker">Quick Requirements</span><h3>Requirement Management</h3><p>Create and review requirements for the selected project.</p></div></div>
+  <div class="requirement-form">
+    <label>Key<input id="requirementKey" placeholder="REQ-LOGIN-001" /></label>
+    <label>Title<input id="requirementTitle" placeholder="Login with email or phone number" /></label>
+    <label>Priority<select id="requirementPriority"></select></label>
+    <label>Status<select id="requirementStatus"></select></label>
+    <button onclick="createRequirementFromUi()">Create</button>
+  </div>
+  <div class="action-row"><button onclick="loadRequirements()">Refresh Requirements</button><button onclick="loadTraceability()">Refresh Traceability</button></div>
+  <div id="requirementList" class="requirement-list"></div>
+</article>
+</section>
+
+      <section id="step4" class="flow-section hidden-section">
+        <article class="panel accent-orange">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Step 4</span>
+              <h3 data-i18n="step4_title">Requirement Change Impact</h3>
+              <p data-i18n="step4_desc">Record a requirement change and see affected items.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <label>Requirement key<input id="changeReqKey" value="REQ-001" /></label>
+            <label>Old requirement<textarea id="oldReqText">Login by email</textarea></label>
+            <label>New requirement<textarea id="newReqText">Login by email or phone number</textarea></label>
+          </div>
+          <div class="action-row">
+            <button onclick="recordRequirementChange()" data-i18n="step4_btn_record">Record Change</button>
+            <button class="primary" onclick="runImpact()" data-i18n="step4_btn_impact">Run Impact</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="step5" class="flow-section hidden-section">
+        <article class="panel accent-red">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Step 5</span>
+              <h3 data-i18n="step5_title">Advanced Release Gate</h3>
+              <p data-i18n="step5_desc">Analyze code paths, environment config and final readiness.</p>
+            </div>
+          </div>
+          <div class="form-grid two">
+            <label>Changed files<textarea id="changedFiles">src/auth/login.py
+migrations/20260602_add_phone.sql
+static/styles.css</textarea></label>
+            <label>Environment config<textarea id="envContent">DATABASE_URL=sqlite:///devflow.db
+JWT_SECRET_KEY=change-me
+APP_DEBUG=true</textarea></label>
+          </div>
+          <div class="action-row">
+            <button onclick="analyzeCodeRisk()" data-i18n="step5_btn_code">Code Risk</button>
+            <button onclick="analyzeEnvGuard()" data-i18n="step5_btn_env">Env Guard</button>
+            <button class="danger-btn" onclick="loadAdvancedReadiness()" data-i18n="step5_btn_ready">Readiness</button>
+            <button onclick="fixDemo()" data-i18n="step5_btn_fix">Fix Demo Blockers</button>
+          </div>
+        </article>
+<article class="panel accent-blue workitem-panel">
+  <div class="section-title"><div><span class="panel-kicker">Quick Work Items</span><h3>Task / Test / Bug Management</h3><p>Create and update work items for the selected project.</p></div></div>
+  <div class="workitem-form">
+    <label>Kind<select id="workItemKind"></select></label>
+    <label>Status<select id="workItemStatus"></select></label>
+    <label>Severity<select id="workItemSeverity"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></label>
+    <label>Requirement<select id="workItemRequirement"></select></label>
+    <label>Title<input id="workItemTitle" placeholder="e.g. Add login regression test" /></label>
+    <button onclick="createWorkItemFromUi()">Create</button>
+  </div>
+  <div class="action-row"><label class="inline-filter">Filter by requirement <select id="workItemRequirementFilter" onchange="loadWorkItems()"></select></label><button onclick="loadWorkItems()">Refresh Work Items</button></div>
+  <div id="workItemList" class="workitem-list"></div>
+</article>
+<article class="panel accent-purple"><div class="section-title"><div><span class="panel-kicker">Goal Completion</span><h3>Git, Requirement Diff, Deep API, Workload</h3><p>Extra deterministic project-risk checks.</p></div></div><div class="form-grid two"><label>Git/PR CSV<textarea id="gitCsv">ref,title,author,status,changed_files
+abc123,TASK-LOGIN-API update auth flow,Long,merged,src/auth/login.py;migrations/20260602_add_phone.sql</textarea></label><label>Old requirement CSV<textarea id="oldReqCsv">key,title,priority
+REQ-001,Login by email,Critical</textarea></label><label>New requirement CSV<textarea id="newReqCsv">key,title,priority
+REQ-001,Login by email or phone,Critical</textarea></label><label>OpenAPI before/after JSON<textarea id="deepApiBefore">{&quot;paths&quot;:{&quot;/users&quot;:{&quot;get&quot;:{&quot;parameters&quot;:[],&quot;responses&quot;:{&quot;200&quot;:{}}}}}}</textarea><textarea id="deepApiAfter">{&quot;paths&quot;:{&quot;/users&quot;:{&quot;get&quot;:{&quot;parameters&quot;:[{&quot;name&quot;:&quot;phone&quot;,&quot;required&quot;:true}],&quot;responses&quot;:{&quot;200&quot;:{}}}}}}</textarea></label></div><div class="action-row"><button onclick="importGitCsv()">Import Git</button><button onclick="runRequirementDiff()">Compare Req</button><button onclick="runDeepOpenApiDiff()">Deep API</button><button onclick="loadWorkload()">Workload</button></div></article></section>
+
+      <section id="step6" class="flow-section hidden-section">
+        <article class="panel accent-green">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Step 6</span>
+              <h3 data-i18n="step6_title">Evidence Report & Production Release</h3>
+              <p data-i18n="step6_desc">Export evidence package, verify audit signatures, and deploy release.</p>
+            </div>
+          </div>
+          
+          <input type="text" class="action-search-bar" placeholder="🔍 Search step 6 actions (e.g. signoff, deploy, manifest)..." oninput="filterActions(this, 'step6-groups')">
+          
+          <div id="step6-groups">
+            <!-- Group 1: Core Evidence Preview & Export -->
+            <details class="action-group" open>
+              <summary>📋 Core Evidence Preview & Export</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Preview release evidence report, compile notes, and review operators sign-offs.</p>
+                <div class="action-row">
+                  <button class="primary" onclick="loadEvidence()" data-i18n="step6_btn_prev">Preview Evidence</button>
+                  <button onclick="openEvidenceMarkdown()" data-i18n="step6_btn_download">Download Evidence</button>
+                  <button onclick="openReleaseNotes()" data-i18n="step6_btn_notes">Release Notes</button>
+                  <button onclick="loadReleaseSignoffSnapshot()">Final Sign-off</button>
+                  <button onclick="loadOperatorSignoffChecklist()">Operator Sign-off</button>
+                  <button onclick="loadEvidenceManifest()">Evidence Manifest</button>
+                  <button onclick="loadExportBundleIntegrityCheck()">Bundle Integrity</button>
+                  <a href="/docs" target="_blank">API Docs</a>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 2: Database & Migration Handoff -->
+            <details class="action-group">
+              <summary>🗄️ Database & Migration Handoff</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Audit SQL migration plans, dry-run transactions, and run deployment upgrade runbooks.</p>
+                <div class="action-row">
+                  <button onclick="loadMigrationNotes()">Migration Notes</button>
+                  <button onclick="loadLocalMigrationCheck()">Migration Check</button>
+                  <button onclick="loadUpgradeSafetyReport()">Upgrade Safety</button>
+                  <button onclick="loadDryRunSqlMigration()">Dry-run SQL</button>
+                  <button onclick="loadBackupChecklist()">Backup Checklist</button>
+                  <button onclick="loadManualMigrationApplyAssistant()">Apply Assistant</button>
+                  <button onclick="loadPostMigrationVerificationSnapshot()">Post-migration Verify</button>
+                  <button onclick="loadSafeCopyMigrationApply()">Safe Copy Apply</button>
+                  <button onclick="loadRollbackDrillAutomation()">Rollback Drill</button>
+                  <button onclick="loadHumanApprovedRealMigrationGate()">Real Migration Gate</button>
+                  <button onclick="loadFinalProductionUpgradeChecklist()">Production Checklist</button>
+                  <button onclick="loadProductionUpgradeRunbook()">Upgrade Runbook</button>
+                  <button onclick="loadProductionUpgradeRehearsalReport()">Rehearsal Report</button>
+                  <button onclick="loadOperatorHandoffPackage()">Operator Handoff</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 3: Cryptographic Signing Handoff -->
+            <details class="action-group">
+              <summary>🔐 Cryptographic Signing Handoff</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Digitally sign evidence bundles, verify cryptographic checksums, and close verifier gates.</p>
+                <div class="action-row">
+                  <button onclick="loadCryptographicSigningReadiness()">Signing Readiness</button>
+                  <button onclick="loadExternalTimestampHandoffPackage()">Timestamp Handoff</button>
+                  <button onclick="loadTimestampHandoffIntegrityCheck()">Timestamp Integrity</button>
+                  <button onclick="loadSignedPayloadImportPackage()">Signed Payload Import</button>
+                  <button onclick="loadTimestampTokenEvidencePackage()">Timestamp Token Evidence</button>
+                  <button onclick="loadSignedPayloadTimestampIntegrityCheck()">Signed+Timestamp Verify</button>
+                  <button onclick="loadPublicVerifierEvidencePackage()">Verifier Evidence</button>
+                  <button onclick="loadPublicVerifierEvidenceAttachments()">Verifier Evidence Records</button>
+                  <button onclick="loadVerifiedSignatureApprovalGate()">Verified Gate</button>
+                  <button onclick="loadSignedRehearsalArtifactPackage()">Signed Artifact Package</button>
+                  <button onclick="loadSignedRehearsalArtifacts()">Signed Artifacts</button>
+                  <button onclick="loadFinalOperatorApprovalRecords()">Final Operator Approval</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 4: Prevention & Risk Analytics -->
+            <details class="action-group">
+              <summary>📈 Prevention & Risk Analytics</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Track remaining backlog items, recurring trends, escalations, calendar events, and plan recommendations.</p>
+                <div class="action-row">
+                  <button onclick="createReleaseRetrospectiveNote()">New Retrospective</button>
+                  <button onclick="loadReleaseLearningLoop()">Prevention Checklist</button>
+                  <button onclick="loadReleaseRiskDeltaAnalytics()">Risk Delta</button>
+                  <button onclick="loadRecurringRiskTrends()">Recurring Risk Trends</button>
+                  <button onclick="loadRiskPreventionBacklog()">Risk Prevention Backlog</button>
+                  <button onclick="loadNextReleaseReadiness()">Next Release Readiness</button>
+                  <button onclick="loadPreventionExecutionBoard()">Prevention Execution Board</button>
+                  <button onclick="loadOverdueRiskEscalations()">Overdue Escalations</button>
+                  <button onclick="loadPreventionBurndownAnalytics()">Prevention Burndown</button>
+                  <button onclick="loadOwnerWorkloadBalance()">Owner Workload Balance</button>
+                  <button onclick="loadPreventionCalendarView()">Prevention Calendar</button>
+                  <button onclick="loadReleaseReadinessTimeline()">Readiness Timeline</button>
+                  <button onclick="loadReleaseReadinessScenarios()">Scenario Planning</button>
+                  <button onclick="loadReleasePlanRecommendation()">Plan Recommendation</button>
+                  <button onclick="loadScopeDecisionAudit()">Scope Audit</button>
+                  <button onclick="loadReleaseGovernanceReadiness()">Governance Readiness</button>
+                  <button onclick="compareReleaseApprovalHistory()">Compare Approvals</button>
+                </div>
+              </div>
+            </details>
+
+            <!-- Group 5: Recovery Runbook Milestones (v10 - v12) -->
+            <details class="action-group">
+              <summary>🛠️ Developer Rehearsals & Milestone Verification (v10 - v12)</summary>
+              <div class="action-group-content">
+                <p class="action-group-desc">Inspect runbooks and release packages for historical versions (v10.0 to v12.0).</p>
+                <div class="action-row">
+                  <button onclick="loadV119FinalReleaseTagPreparation()">v11.9 Release Tag</button>
+                  <button onclick="loadV119PortfolioDemoScript()">v11.9 Portfolio Script</button>
+                  <button onclick="loadV119OperatorFinalReleasePackage()">v11.9 Final Package</button>
+                  <button onclick="loadV120BaselineFreezeSummary()">v12.0 Baseline Freeze</button>
+                  <button onclick="loadV120ProductionDeploymentChecklist()">v12.0 Deploy Checklist</button>
+                  <button onclick="loadV120OperatorDeploymentPackage()">v12.0 Deploy Package</button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+      </section>
+
+      <section class="results-grid operations-results-grid">
+        <article class="panel result-panel accent-green"><div class="section-title"><div><span class="panel-kicker">Context</span><h3>OS Panel</h3><p>Dashboard and today focus.</p></div></div><div id="dashboard" class="rich-output">Click Reset Demo to begin.</div></article>
+        <article class="panel result-panel accent-red"><div class="section-title"><div><span class="panel-kicker">Risk</span><h3>Risk / Trace / Activity</h3><p>Findings appear here.</p></div></div><div id="risks" class="rich-output">No findings yet.</div></article>
+        <article class="panel result-panel accent-orange"><div class="section-title"><div><span class="panel-kicker">Release</span><h3>Readiness / Evidence</h3><p>Gate and evidence report.</p></div></div><div id="readiness" class="rich-output">No readiness yet.</div></article>
+        <article class="panel result-panel accent-blue history-panel"><div class="section-title"><div><span class="panel-kicker">History</span><h3>Operational Timeline</h3><p>Activity, signoff, and retrospective trail.</p></div><button class="ghost-btn compact-btn" onclick="loadOperationalHistory()">Refresh</button></div><div id="history" class="rich-output history-output">History appears after login or demo reset.</div></article>
+      </section>
+    </main>
+  </div>
+  <div id="globalBusy" class="busy hidden">Loading...</div><div id="toast" class="toast hidden"></div>
+  <script src="/static/ui_state.js"></script><script src="/static/i18n.js"></script><script src="/static/result_renderers.js"></script><script src="/static/evidence_renderer.js"></script><script src="/static/project_context.js"></script><script src="/static/project_creation_ui.js"></script><script src="/static/api_client.js"></script><script src="/static/app.js"></script><script src="/static/requirement_ui.js"></script><script src="/static/workitem_ui.js"></script><script src="/static/flow.js"></script><script src="/static/risk_drilldown_ui.js"></script><script src="/static/release_review_export_ui.js"></script><script src="/static/release_completion_renderers.js"></script><script src="/static/release_completion_ui.js"></script><script src="/static/release_signoff_ui.js"></script><script src="/static/release_history_ui.js"></script><script src="/static/release_learning_ui.js"></script><script src="/static/release_snapshot_analytics_ui.js"></script><script src="/static/prevention_execution_ui.js"></script><script src="/static/prevention_analytics_ui.js"></script><script src="/static/prevention_calendar_ui.js"></script><script src="/static/prevention_scenario_ui.js"></script><script src="/static/release_plan_recommendation_ui.js"></script><script src="/static/release_governance_ui.js"></script><script src="/static/migration_checker_ui.js"></script><script src="/static/migration_sql_ui.js"></script><script src="/static/migration_apply_ui.js"></script><script src="/static/migration_handoff_ui.js"></script><script src="/static/migration_rehearsal_ui.js"></script><script src="/static/migration_operator_approval_ui.js"></script><script src="/static/evidence_manifest_ui.js"></script><script src="/static/crypto_signing_ui.js"></script><script src="/static/signature_import_ui.js"></script><script src="/static/signature_policy_ui.js"></script><script src="/static/signature_contract_ui.js"></script><script src="/static/public_key_verifier_ui.js"></script><script src="/static/governance_v10_ui.js"></script><script src="/static/governance_v101_ui.js"></script><script src="/static/governance_v102_ui.js"></script><script src="/static/governance_v103_ui.js"></script><script src="/static/governance_v104_ui.js"></script><script src="/static/governance_v105_ui.js"></script>
+  <script src="/static/governance_v106_ui.js"></script><script src="/static/governance_v107_ui.js"></script><script src="/static/governance_v108_ui.js"></script><script src="/static/governance_v109_ui.js"></script><script src="/static/governance_v110_ui.js"></script><script src="/static/governance_v111_ui.js"></script><script src="/static/governance_v112_ui.js"></script><script src="/static/governance_v113_ui.js"></script><script src="/static/governance_v114_ui.js"></script><script src="/static/governance_v115_ui.js"></script><script src="/static/governance_v116_ui.js"></script><script src="/static/governance_v117_ui.js"></script><script src="/static/governance_v118_ui.js"></script><script src="/static/governance_v119_ui.js"></script><script src="/static/governance_v120_ui.js"></script><script src="/static/devflow_init.js"></script>
+  <script>
+    function filterActions(searchInput, containerId) {
+      const query = searchInput.value.toLowerCase().trim();
+      const container = document.getElementById(containerId);
+      const groups = container.querySelectorAll('details.action-group');
+      let totalVisible = 0;
+
+      groups.forEach(group => {
+        const buttons = group.querySelectorAll('.action-row button, .action-row a');
+        let groupMatch = false;
+
+        buttons.forEach(btn => {
+          const text = btn.textContent.toLowerCase();
+          const isMatch = text.includes(query);
+          btn.style.display = isMatch ? '' : 'none';
+          if (isMatch) {
+            groupMatch = true;
+            totalVisible++;
+          }
+        });
+
+        if (query === '') {
+          // Default: First details block is open, rest are closed
+          const index = Array.from(groups).indexOf(group);
+          if (index === 0) {
+            group.setAttribute('open', '');
+          } else {
+            group.removeAttribute('open');
+          }
+          group.style.display = '';
+        } else if (groupMatch) {
+          group.setAttribute('open', '');
+          group.style.display = '';
+        } else {
+          group.removeAttribute('open');
+          group.style.display = 'none';
+        }
+      });
+
+      // Handle empty state
+      let emptyMsg = container.querySelector('.no-actions-found');
+      if (totalVisible === 0 && query !== '') {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('div');
+          emptyMsg.className = 'no-actions-found';
+          emptyMsg.textContent = 'No matching actions found.';
+          container.appendChild(emptyMsg);
+        }
+      } else if (emptyMsg) {
+        emptyMsg.remove();
+      }
+    }
+
+    let authMode = "login";
+    function toggleAuthMode() {
+      const titleEl = document.getElementById("authTitle");
+      const btnEl = document.getElementById("authButton");
+      const linkEl = document.getElementById("authToggleLink");
+      const emailEl = document.getElementById("email");
+      const passwordEl = document.getElementById("password");
+      
+      if (emailEl) emailEl.value = "";
+      if (passwordEl) passwordEl.value = "";
+      
+      if (!titleEl || !btnEl || !linkEl) return;
+
+      if (authMode === "login") {
+        authMode = "register";
+        titleEl.textContent = "Create a new account";
+        btnEl.textContent = "Register Account";
+        btnEl.setAttribute("onclick", "registerAccount()");
+        linkEl.innerHTML = 'Already have an account? <span class="link-highlight">Sign In</span>';
+      } else {
+        authMode = "login";
+        titleEl.textContent = "Sign in to DevFlow";
+        btnEl.textContent = "Sign In";
+        btnEl.setAttribute("onclick", "login()");
+        linkEl.innerHTML = 'Don\'t have an account? <span class="link-highlight">Register</span>';
+      }
+    }
+  </script>
+</body>
+</html>
+

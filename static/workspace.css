@@ -1,0 +1,263 @@
+:root {
+  --bg: #f4f1e8;
+  --ink: #18202f;
+  --muted: #6b7280;
+  --line: #d8d1c2;
+  --panel: #fffdf8;
+  --green: #1e6f59;
+  --blue: #244f8f;
+  --amber: #b16a12;
+  --red: #a33a2d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f4f1e8 0%, #eef3f1 52%, #f8f5ed 100%);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.workspace-nav {
+  width: min(1180px, calc(100% - 32px));
+  margin: 20px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.back-link {
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-link::before {
+  content: "←";
+}
+
+.back-link:hover {
+  opacity: .78;
+}
+
+.workspace-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.workspace-status span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: 0 0 0 5px rgba(30, 111, 89, .12);
+}
+
+.workspace-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 30px 0 42px;
+}
+
+.workspace-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 22px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+h1 {
+  margin: 8px 0;
+  font-size: clamp(38px, 6vw, 70px);
+  line-height: .95;
+  letter-spacing: -.04em;
+  max-width: 760px;
+}
+
+.workspace-hero p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 660px;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.sync-btn {
+  border: 0;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 15px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(24, 32, 47, .16);
+}
+
+.sync-btn.secondary {
+  background: var(--green);
+}
+
+.sync-btn.danger {
+  background: var(--red);
+}
+
+.workspace-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.workspace-metrics div {
+  background: rgba(255, 253, 248, .78);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.workspace-metrics strong {
+  display: block;
+  font-size: 26px;
+}
+
+.workspace-metrics span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .95fr .95fr;
+  gap: 14px;
+}
+
+.widget {
+  background: rgba(255, 253, 248, .92);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 20px 50px rgba(24, 32, 47, .08);
+}
+
+.calendar-widget,
+.focus-widget {
+  grid-row: span 2;
+}
+
+.note-widget,
+.history-widget {
+  grid-column: span 2;
+}
+
+.main-glow {
+  background: linear-gradient(180deg, #1e6f59, #18202f);
+  color: #fff;
+  border-color: transparent;
+}
+
+.widget-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.widget-head b {
+  display: block;
+  font-size: 16px;
+}
+
+.widget-head small {
+  display: block;
+  color: var(--muted);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.main-glow .widget-head small {
+  color: rgba(255, 255, 255, .72);
+}
+
+.drag-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 14px 0 0 var(--green), 28px 0 0 var(--blue);
+}
+
+@media (max-width: 980px) {
+  .workspace-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    justify-content: flex-start;
+  }
+
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .note-widget,
+  .history-widget {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .workspace-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .workspace-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .sync-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero-actions {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 38px;
+  }
+}

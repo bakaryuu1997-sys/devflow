@@ -1,0 +1,16 @@
+.compact-label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+select {
+  width: 100%;
+  border: 1px solid #2b3646;
+  border-radius: 12px;
+  background: #0f141c;
+  color: var(--text);
+  padding: 10px;
+}

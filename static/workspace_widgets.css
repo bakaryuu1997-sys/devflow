@@ -1,0 +1,267 @@
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.time-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.time-cell {
+  width: 100%;
+  min-height: 46px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #faf7ef;
+  color: var(--muted);
+  font-weight: 900;
+  text-align: left;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.time-cell.busy {
+  border-style: solid;
+  background: #e8f2ee;
+  color: var(--green);
+}
+
+.task-list {
+  display: grid;
+  gap: 9px;
+  max-height: 280px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.task-item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 9px;
+}
+
+.task-item.done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.task-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--green);
+  background: #fff;
+  cursor: pointer;
+}
+
+.task-item.done .task-check {
+  background: var(--green);
+  box-shadow: inset 0 0 0 5px #fff;
+}
+
+.task-edit,
+.task-delete,
+.task-input-row button,
+.timer-actions button {
+  border: 0;
+  border-radius: 7px;
+  background: #edf1ef;
+  color: var(--ink);
+  padding: 8px 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.task-delete {
+  background: #f4e4df;
+  color: var(--red);
+}
+
+.task-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.task-input-row input {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 11px 12px;
+  font: inherit;
+}
+
+.timer-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 230px;
+}
+
+.progress-ring {
+  width: 190px;
+  height: 190px;
+  transform: rotate(-90deg);
+}
+
+.ring-bg,
+.ring-value {
+  fill: none;
+  stroke-width: 10;
+}
+
+.ring-bg {
+  stroke: rgba(255, 255, 255, .2);
+}
+
+.ring-value {
+  stroke: #f2b84b;
+  stroke-linecap: round;
+  stroke-dasharray: 364;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset .2s;
+}
+
+.timer-center {
+  position: absolute;
+  text-align: center;
+  display: grid;
+  gap: 4px;
+}
+
+.timer-center strong {
+  font-size: 38px;
+}
+
+.timer-center span,
+.timer-center em {
+  font-style: normal;
+  color: rgba(255, 255, 255, .72);
+  font-weight: 800;
+}
+
+.timer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.timer-actions button {
+  background: rgba(255, 255, 255, .15);
+  color: #fff;
+}
+
+.note-editor {
+  width: 100%;
+  min-height: 190px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 14px;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.55;
+}
+
+.workspace-history {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  max-height: 220px;
+  overflow: auto;
+  list-style: none;
+}
+
+.workspace-history li {
+  border-left: 4px solid var(--green);
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+}
+
+.workspace-history strong {
+  display: block;
+  font-size: 14px;
+}
+
+.workspace-history span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.score-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.score-top strong {
+  font-size: 56px;
+  line-height: .9;
+  color: var(--green);
+}
+
+.score-top span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.score-graph {
+  height: 160px;
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.score-bar {
+  flex: 1;
+  min-height: 12px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, var(--green), var(--blue));
+  box-shadow: 0 8px 18px rgba(30, 111, 89, .2);
+}
+
+@media (max-width: 640px) {
+  .task-item {
+    grid-template-columns: 28px 1fr;
+  }
+
+  .task-edit,
+  .task-delete {
+    grid-column: 2;
+  }
+
+  .timer-actions,
+  .task-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .score-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .score-top span {
+    text-align: left;
+  }
+}

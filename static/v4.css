@@ -1,0 +1,39 @@
+.v4-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.v4-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  display: grid;
+  gap: 10px;
+}
+
+.v4-card h4 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.v4-card p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 74px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  resize: vertical;
+  font: inherit;
+}
+
+@media (max-width: 1060px) {
+  .v4-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,19 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "responses": {
+          "200": {}
+        }
+      }
+    }
+  }
+}
