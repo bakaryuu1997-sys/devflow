@@ -7,6 +7,7 @@ function openReleaseNotes() {
 }
 
 async function initDevFlow() {
+  if (typeof loadAuthSurface === "function") await loadAuthSurface();
   await checkSession();
   await loadProjectSelector();
 }

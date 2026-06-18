@@ -20,3 +20,9 @@ app.include_router(router)
 @app.get("/")
 def index():
     return FileResponse("static/index.html")
+
+
+@app.get("/workspace")
+@app.get("/workspace/")
+def workspace():
+    return FileResponse("static/workspace.html")

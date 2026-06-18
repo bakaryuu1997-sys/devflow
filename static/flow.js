@@ -19,7 +19,7 @@ function goStep(step) {
     btn.classList.toggle("done", i < step);
   }
   document.getElementById("metricStep").textContent = `${step} / 6`;
-  document.getElementById("metricStepText").textContent = ["", "Start with demo data", "Upload and scan files", "Check requirement links", "Analyze changed requirement", "Run release gate", "Export evidence"][step];
+  document.getElementById("metricStepText").textContent = ["", "Start with controlled workspace data", "Upload and scan files", "Check requirement links", "Analyze changed requirement", "Run release gate", "Export evidence"][step];
 }
 
 async function runNextAction() {
@@ -32,15 +32,23 @@ async function runNextAction() {
 }
 
 async function resetDemo() {
+  if (typeof isProductionAuthSurface === "function" && isProductionAuthSurface()) {
+    toast("Local sample workspace is disabled in production.");
+    return;
+  }
   show("dashboard", await api("/api/demo/reset", { method: "POST" }));
-  document.getElementById("email").value = "admin@example.com";
-  document.getElementById("password").value = "password123";
+  if (typeof fillLocalSampleLogin === "function") {
+    fillLocalSampleLogin();
+  } else {
+    document.getElementById("email").value = "admin@example.com";
+    document.getElementById("password").value = "password123";
+  }
   await login();
   await loadProjectSelector();
   await loadToday();
   await loadOperationalHistory();
   goStep(2);
-  toast("Step 1 complete. Upload artifacts next.");
+  toast("Local sample workspace initialized. Upload artifacts next.");
 }
 
 async function loadToday() {
@@ -201,7 +209,7 @@ function renderOperationalHistory({ activity = [], signoffs = [], retrospectives
     at: item.created_at || item.timestamp,
   }));
   events.sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0));
-  if (!events.length) return '<div class="empty-history">No operational history yet. Run Reset Demo or release actions to populate the timeline.</div>';
+  if (!events.length) return '<div class="empty-history">No operational history yet. Sign in and run a release action, or initialize the local sample workspace for QA.</div>';
   return `<ol class="history-list">${events.slice(0, 12).map((event) => `
     <li>
       <span class="history-type">${escapeHtml(event.type)}</span>

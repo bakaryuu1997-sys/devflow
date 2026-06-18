@@ -39,9 +39,9 @@
 
     <section class="login-card production-login-card" aria-label="Authentication form">
       <div class="login-card-header">
-        <span class="auth-chip">Secure access</span>
+        <span id="authModeChip" class="auth-chip">Secure access</span>
         <h2 id="authTitle" data-i18n="login_title">Sign in to DevFlow</h2>
-        <p>Sign in with your account, or fill local demo credentials only when running demo QA.</p>
+        <p>Sign in with a real account. Local sample credentials are available only for isolated QA mode.</p>
       </div>
       <div class="login-form">
         <div class="input-group">
@@ -55,8 +55,8 @@
         <button id="authButton" onclick="login()" data-i18n="login_submit">Sign In</button>
       </div>
       <div class="login-quick-actions">
-        <button type="button" class="ghost-btn" onclick="fillDemoLogin()">Use demo admin</button>
-        <span>Public registration is viewer-only.</span>
+        <button id="localSampleLogin" type="button" class="ghost-btn" onclick="fillLocalSampleLogin()">Use local sample admin</button>
+        <span id="localSampleHint">Public registration is viewer-only.</span>
       </div>
       <div class="auth-toggle-text" id="authToggleLink" onclick="toggleAuthMode()" data-i18n="login_toggle_register">
         Don't have an account? <span class="link-highlight">Register</span>
@@ -94,11 +94,11 @@
       <div class="progress-box">
         <span class="progress-label" data-i18n="sidebar_flow_label">Recommended flow</span>
         <ol>
-          <li>Reset demo</li><li>Upload artifacts</li><li>Traceability</li>
+          <li>Initialize sample</li><li>Upload artifacts</li><li>Traceability</li>
           <li>Impact</li><li>Release gate</li><li>Evidence</li>
         </ol>
       </div>
-      <a class="soft-wide workspace-link" href="/static/workspace.html" data-i18n="sidebar_workspace_link">Open Operations Workspace</a>
+      <a class="soft-wide workspace-link" href="/workspace" data-i18n="sidebar_workspace_link">Open Operations Workspace</a>
       <button class="soft-wide" onclick="loadOperationalHistory()">View history timeline</button>
       <div class="sidebar-note"><strong data-i18n="sidebar_why_title">Why it matters</strong><span data-i18n="sidebar_why_desc">Jira tracks work. This checks release risk, gaps, evidence and safety.</span></div>
     </aside>
@@ -131,7 +131,7 @@
       </section>
 
       <section class="metrics-grid">
-        <article class="metric metric-gate"><span data-i18n="metric_step">Current step</span><strong id="metricStep">1 / 6</strong><small id="metricStepText" data-i18n="step1_desc">Start with demo data</small></article>
+        <article class="metric metric-gate"><span data-i18n="metric_step">Current step</span><strong id="metricStep">1 / 6</strong><small id="metricStepText" data-i18n="step1_desc">Start with controlled workspace data</small></article>
         <article class="metric metric-danger"><span data-i18n="metric_blockers">Blockers</span><strong id="metricBlockers">—</strong><small>From guards/readiness</small></article>
         <article class="metric metric-info"><span data-i18n="metric_traceability">Traceability</span><strong id="metricTrace">Not run</strong><small>Requirement links</small></article>
         <article class="metric metric-success"><span data-i18n="metric_mode">Mode</span><strong id="metricModeVal" data-i18n="metric_mode_val">Offline</strong><small>Runs locally</small></article>
@@ -143,11 +143,11 @@
             <div>
               <span class="panel-kicker">Step 1</span>
               <h3 data-i18n="step1_title">Workspace Initialization & Governance Control</h3>
-              <p data-i18n="step1_desc">Deploy compliance parameters, register workspace tracks, and seed admin parameters.</p>
+              <p data-i18n="step1_desc">Prepare controlled workspace data, then move into artifact upload.</p>
             </div>
           </div>
           <div class="action-row">
-            <button class="primary" onclick="resetDemo()" data-i18n="step1_btn_init">Initialize Workspace (Seed Data)</button>
+            <button id="resetDemoButton" class="primary" onclick="resetDemo()" data-i18n="step1_btn_init">Initialize Local Sample Workspace</button>
             <button onclick="loadDashboard()" data-i18n="step1_btn_refresh">Refresh Workspace Dashboard</button>
             <button onclick="loadToday()" data-i18n="step1_btn_today">View Today's Focus</button>
             <button onclick="verifyLedgerIntegrity()" data-i18n="step1_btn_verify">Verify Audit Integrity</button>
@@ -569,10 +569,10 @@ REQ-001,Login by email or phone,Critical</textarea></label><label>OpenAPI before
       </section>
 
       <section class="results-grid operations-results-grid">
-        <article class="panel result-panel accent-green"><div class="section-title"><div><span class="panel-kicker">Context</span><h3>OS Panel</h3><p>Dashboard and today focus.</p></div></div><div id="dashboard" class="rich-output">Click Reset Demo to begin.</div></article>
+        <article class="panel result-panel accent-green"><div class="section-title"><div><span class="panel-kicker">Context</span><h3>OS Panel</h3><p>Dashboard and today focus.</p></div></div><div id="dashboard" class="rich-output">Initialize a local sample workspace or load existing release data to begin.</div></article>
         <article class="panel result-panel accent-red"><div class="section-title"><div><span class="panel-kicker">Risk</span><h3>Risk / Trace / Activity</h3><p>Findings appear here.</p></div></div><div id="risks" class="rich-output">No findings yet.</div></article>
         <article class="panel result-panel accent-orange"><div class="section-title"><div><span class="panel-kicker">Release</span><h3>Readiness / Evidence</h3><p>Gate and evidence report.</p></div></div><div id="readiness" class="rich-output">No readiness yet.</div></article>
-        <article class="panel result-panel accent-blue history-panel"><div class="section-title"><div><span class="panel-kicker">History</span><h3>Operational Timeline</h3><p>Activity, signoff, and retrospective trail.</p></div><button class="ghost-btn compact-btn" onclick="loadOperationalHistory()">Refresh</button></div><div id="history" class="rich-output history-output">History appears after login or demo reset.</div></article>
+        <article class="panel result-panel accent-blue history-panel"><div class="section-title"><div><span class="panel-kicker">History</span><h3>Operational Timeline</h3><p>Activity, signoff, and retrospective trail.</p></div><button class="ghost-btn compact-btn" onclick="loadOperationalHistory()">Refresh</button></div><div id="history" class="rich-output history-output">History appears after login or release actions.</div></article>
       </section>
     </main>
   </div>

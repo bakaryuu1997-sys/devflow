@@ -10,32 +10,32 @@
 <body>
   <header class="workspace-nav">
     <a href="/" class="back-link" data-i18n="workspace_back_btn">Return to Governance Dashboard</a>
-    <span class="workspace-status"><span></span> Local operator state</span>
+    <span class="workspace-status"><span></span> Browser-local state</span>
   </header>
   <main class="workspace-shell">
     <section class="workspace-hero">
       <div>
         <span class="eyebrow">Operations workspace</span>
         <h1>Release command workspace</h1>
-        <p>Plan the day, track blockers, keep decision notes, and preserve an operator history while the release gate is moving.</p>
+        <p>Plan release work, track blockers, keep decision notes, and export the browser-local history before handoff.</p>
       </div>
       <div class="hero-actions">
-        <a class="sync-btn secondary" href="/">Sync from dashboard</a>
-        <button class="sync-btn" onclick="addHistoryNote()">Add history note</button>
+        <a class="sync-btn secondary" href="/">Open governance dashboard</a>
+        <button class="sync-btn" onclick="addHistoryNote()">Add history note</button><button class="sync-btn secondary" onclick="exportWorkspaceHistory()">Export history</button>
         <button class="sync-btn danger" onclick="resetWorkspace()">Reset workspace</button>
       </div>
     </section>
     <section class="workspace-metrics" aria-label="Workspace summary">
       <div><strong id="openTaskCount">0</strong><span>open actions</span></div>
       <div><strong id="sessionCountMetric">0</strong><span>focus sessions</span></div>
-      <div><strong id="historyCount">0</strong><span>history notes</span></div>
+      <div><strong id="historyCount">0</strong><span>local history</span></div>
     </section>
     <section class="bento-grid">
       <article class="widget calendar-widget"><header class="widget-head"><span class="drag-dot"></span><div><b>Release Focus</b><small>Click any block to edit</small></div></header><div class="calendar-grid" id="calendarGrid"></div></article>
       <article class="widget task-widget"><header class="widget-head"><span class="drag-dot"></span><div><b>Operator Checklist</b><small>Gate and evidence tasks</small></div></header><div class="task-list" id="taskList"></div><div class="task-input-row"><input id="taskInput" placeholder="Add an operational task..." /><button onclick="addTask()">Add</button></div></article>
       <article class="widget focus-widget main-glow"><header class="widget-head"><span class="drag-dot"></span><div><b>Focus Timer</b><small>Deep QA session</small></div></header><div class="timer-wrap"><svg class="progress-ring" viewBox="0 0 140 140"><circle class="ring-bg" cx="70" cy="70" r="58"></circle><circle id="timerRing" class="ring-value" cx="70" cy="70" r="58"></circle></svg><div class="timer-center"><strong id="timerText">25:00</strong><span id="timerState">Ready</span><em id="sessionCount">0 sessions</em></div></div><div class="timer-actions"><button onclick="toggleTimer()">Start / Pause</button><button onclick="resetTimer()">Reset</button></div></article>
       <article class="widget note-widget"><header class="widget-head"><span class="drag-dot"></span><div><b>Decision Note</b><small>Saved as plain text</small></div></header><textarea id="noteEditor" class="note-editor" placeholder="Write blocker decisions, release assumptions, or handoff notes..."></textarea></article>
-      <article class="widget history-widget"><header class="widget-head"><span class="drag-dot"></span><div><b>History Lane</b><small>Local operator log</small></div></header><ol class="workspace-history" id="workspaceHistory"></ol></article>
+      <article class="widget history-widget"><header class="widget-head"><span class="drag-dot"></span><div><b>Workspace History</b><small>Browser-local log; export before clearing storage</small></div></header><ol class="workspace-history" id="workspaceHistory"></ol></article>
       <article class="widget score-widget"><header class="widget-head"><span class="drag-dot"></span><div><b>Readiness Signal</b><small>7-step working trend</small></div></header><div class="score-top"><strong id="scoreValue">82</strong><span id="scoreHint">Based on completed tasks</span></div><div class="score-graph" id="scoreGraph"></div></article>
     </section>
   </main>

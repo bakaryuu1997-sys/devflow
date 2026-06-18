@@ -26,10 +26,11 @@ def test_production_mode_blocks_weak_secret(monkeypatch):
 
 def test_production_mode_passes_with_safe_config(monkeypatch):
     monkeypatch.setattr(auth_mode.settings, "environment", "production")
-    monkeypatch.setattr(auth_mode.settings, "jwt_secret_key", "strong-local-test-secret")
+    monkeypatch.setattr(auth_mode.settings, "jwt_secret_key", "strong-local-test-secret-32-chars")
     monkeypatch.setattr(auth_mode.settings, "allow_public_register", False)
     monkeypatch.setattr(auth_mode.settings, "access_token_minutes", 60)
     monkeypatch.setattr(auth_mode.settings, "allow_demo_reset", False)
     monkeypatch.setattr(auth_mode.settings, "auto_create_tables", False)
 
     validate_startup_security()
+

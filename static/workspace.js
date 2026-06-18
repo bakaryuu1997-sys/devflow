@@ -1,4 +1,5 @@
 const STORAGE_KEY = "devflow_workspace_state_v2";
+const HISTORY_LIMIT = 40;
 const defaultTasks = [
   { text: "Review release blockers", done: true },
   { text: "Confirm evidence package", done: false },
@@ -26,7 +27,7 @@ function defaultState() {
     tasks: structuredClone(defaultTasks),
     timeBlocks: structuredClone(defaultTimeBlocks),
     note: "",
-    history: [{ text: "Workspace opened for release operations.", createdAt: new Date().toISOString() }],
+    history: [createHistoryItem("Workspace opened for release operations.", "workspace")],
     totalSeconds: 25 * 60,
     remainingSeconds: 25 * 60,
     sessionCount: 0,
@@ -47,7 +48,7 @@ function saveState() {
 }
 
 function resetWorkspace() {
-  if (!confirm("Reset workspace tasks, notes, history and timer?")) return;
+  if (!confirm("Reset browser-local workspace tasks, notes, history and timer?")) return;
   state = defaultState();
   saveState();
   renderAll();
@@ -65,7 +66,7 @@ function editCalendarBlock(index) {
   const next = prompt(`Edit ${state.timeBlocks[index].time} block`, current);
   if (next === null) return;
   state.timeBlocks[index].label = next.trim();
-  addHistory(`Updated ${state.timeBlocks[index].time} block.`);
+  addHistory(`Updated ${state.timeBlocks[index].time} block.`, "calendar");
   saveState();
   renderCalendar();
 }
@@ -85,7 +86,7 @@ function renderTasks() {
 
 function toggleTask(index) {
   state.tasks[index].done = !state.tasks[index].done;
-  addHistory(`${state.tasks[index].done ? "Completed" : "Reopened"}: ${state.tasks[index].text}`);
+  addHistory(`${state.tasks[index].done ? "Completed" : "Reopened"}: ${state.tasks[index].text}`, "task");
   saveState();
   renderAll();
 }
@@ -94,13 +95,13 @@ function editTask(index) {
   const next = prompt("Edit task", state.tasks[index].text);
   if (next === null || !next.trim()) return;
   state.tasks[index].text = next.trim();
-  addHistory("Edited an operator checklist item.");
+  addHistory("Edited an operator checklist item.", "task");
   saveState();
   renderAll();
 }
 
 function deleteTask(index) {
-  addHistory(`Removed task: ${state.tasks[index].text}`);
+  addHistory(`Removed task: ${state.tasks[index].text}`, "task");
   state.tasks.splice(index, 1);
   saveState();
   renderAll();
@@ -112,7 +113,7 @@ function addTask() {
   if (!text) return;
   state.tasks.push({ text, done: false });
   input.value = "";
-  addHistory(`Added task: ${text}`);
+  addHistory(`Added task: ${text}`, "task");
   saveState();
   renderAll();
 }
@@ -137,7 +138,7 @@ function pauseTimer(label) {
 function completeSession() {
   state.sessionCount += 1;
   state.remainingSeconds = state.totalSeconds;
-  addHistory("Completed a focus session.");
+  addHistory("Completed a focus session.", "focus");
   pauseTimer("Completed");
   saveState();
   renderAll();
@@ -167,20 +168,60 @@ function saveNote() {
 
 function addHistoryNote() {
   const note = document.getElementById("noteEditor").value.trim();
-  addHistory(note || "Manual operator checkpoint recorded.");
+  addHistory(note || "Manual operator checkpoint recorded.", "note");
   saveState();
   renderAll();
 }
 
-function addHistory(text) {
-  state.history = [{ text, createdAt: new Date().toISOString() }, ...(state.history || [])].slice(0, 20);
+function addHistory(text, type = "operator") {
+  state.history = [createHistoryItem(text, type), ...(state.history || [])].slice(0, HISTORY_LIMIT);
+}
+
+function createHistoryItem(text, type) {
+  return { text, type, createdAt: new Date().toISOString() };
 }
 
 function renderHistory() {
   const items = state.history || [];
-  document.getElementById("workspaceHistory").innerHTML = items.map(item => `
-    <li><strong>${escapeText(item.text)}</strong><span>${escapeText(formatDate(item.createdAt))}</span></li>
+  const list = document.getElementById("workspaceHistory");
+  if (!items.length) {
+    list.innerHTML = `
+      <li class="history-empty">
+        <strong>No local history yet.</strong>
+        <span>Actions from this workspace are stored in this browser. Export before clearing storage.</span>
+      </li>
+    `;
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <li>
+      <span class="history-tag">${escapeText(item.type || "log")}</span>
+      <strong>${escapeText(item.text)}</strong>
+      <span>${escapeText(formatDate(item.createdAt))}</span>
+    </li>
   `).join("");
+}
+
+function exportWorkspaceHistory() {
+  const items = state.history || [];
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    storage: "browser-local localStorage",
+    count: items.length,
+    items,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `devflow-workspace-history-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  addHistory("Exported local workspace history.", "export");
+  saveState();
+  renderAll();
 }
 
 function renderScoreGraph() {
@@ -221,3 +262,10 @@ function renderAll() {
 }
 
 renderAll();
+
+window.addEventListener("storage", (event) => {
+  if (event.key === STORAGE_KEY) {
+    state = loadState();
+    renderAll();
+  }
+});

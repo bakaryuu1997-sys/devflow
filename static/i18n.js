@@ -53,8 +53,8 @@ const TRANSLATIONS = {
     
     // Step Panels
     "step1_title": "Workspace Initialization & Governance Control",
-    "step1_desc": "Deploy compliance parameters, register workspace tracks, and seed admin parameters.",
-    "step1_btn_init": "Initialize Workspace (Seed Data)",
+    "step1_desc": "Prepare controlled workspace data, then move into artifact upload.",
+    "step1_btn_init": "Initialize Local Sample Workspace",
     "step1_btn_refresh": "Refresh Workspace Dashboard",
     "step1_btn_today": "View Today's Focus",
     "step1_btn_verify": "Verify Audit Integrity",
@@ -211,8 +211,8 @@ const TRANSLATIONS = {
     
     // Step Panels
     "step1_title": "Khởi tạo Không gian làm việc & Kiểm soát Quản trị",
-    "step1_desc": "Thiết lập các tham số tuân thủ, đăng ký luồng làm việc và thiết lập cấu hình quản trị.",
-    "step1_btn_init": "Khởi tạo Workspace (Dữ liệu Seed)",
+    "step1_desc": "Chuẩn bị dữ liệu workspace có kiểm soát, sau đó chuyển sang upload artifact.",
+    "step1_btn_init": "Khởi tạo workspace mẫu local",
     "step1_btn_refresh": "Làm mới Dashboard",
     "step1_btn_today": "Xem trọng tâm hôm nay",
     "step1_btn_verify": "Xác thực tính toàn vẹn Audit",

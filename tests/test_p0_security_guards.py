@@ -16,7 +16,7 @@ def _login_headers():
 def _set_safe_production(monkeypatch):
     monkeypatch.setattr(auth_mode.settings, "environment", "production")
     monkeypatch.setattr(auth_mode.settings, "auth_mode", "production")
-    monkeypatch.setattr(auth_mode.settings, "jwt_secret_key", "strong-local-test-secret")
+    monkeypatch.setattr(auth_mode.settings, "jwt_secret_key", "strong-local-test-secret-32-chars")
     monkeypatch.setattr(auth_mode.settings, "allow_public_register", False)
     monkeypatch.setattr(auth_mode.settings, "access_token_minutes", 60)
     monkeypatch.setattr(auth_mode.settings, "auto_create_tables", False)
@@ -99,3 +99,4 @@ def test_local_write_auth_required_blocks_unsafe_routes(monkeypatch):
     response = client.post("/api/demo/fix")
 
     assert response.status_code == 401
+
