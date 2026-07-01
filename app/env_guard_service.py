@@ -1,6 +1,5 @@
 import re
 
-
 DEFAULT_REQUIRED = ["DATABASE_URL", "JWT_SECRET_KEY"]
 
 

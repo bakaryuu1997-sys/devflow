@@ -3,8 +3,8 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.final_evidence_bundle_service import final_signed_release_bundle_package
-from app.release_rehearsal_service import production_upgrade_rehearsal_report
 from app.models_v99 import GovernanceRehearsalRecord
+from app.release_rehearsal_service import production_upgrade_rehearsal_report
 from app.verified_gate_hardening_service import verified_evidence_manifest_gate
 
 

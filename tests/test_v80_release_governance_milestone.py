@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -61,7 +62,7 @@ def test_v80_migration_notes_endpoint_is_exportable():
 def test_v80_static_ui_and_routes_are_registered():
     index_html = open("static/index.html", encoding="utf-8").read()
     ui_js = open("static/release_governance_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
 
     assert "Governance Readiness" in index_html
     assert "Migration Notes" in index_html

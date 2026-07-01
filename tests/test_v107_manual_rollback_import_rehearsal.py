@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -44,7 +45,7 @@ def test_v107_restore_checklist_routes_ui_docs_and_cli_export(tmp_path):
     assert package["ready"] is True
     assert checklist["approval_phrase"] == "RESET DEMO PROFILE: core-risk"
     assert "Operator Manual Restore Package" in package["content"]
-    assert "routes_v107" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v107" in " ".join(wired_route_modules())
     assert "governance_v107_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_7_MANUAL_ROLLBACK_IMPORT_REHEARSAL.md").exists()
     out = tmp_path / "restore.md"

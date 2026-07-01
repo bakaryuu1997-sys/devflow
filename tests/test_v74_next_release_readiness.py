@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -85,7 +86,7 @@ def test_v74_next_release_readiness_flags_unplanned_and_ready_states():
 def test_v74_static_ui_and_routes_are_registered():
     index_html = open("static/index.html", encoding="utf-8").read()
     learning_js = open("static/release_learning_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
 
     assert "Next Release Readiness" in index_html
     assert "next-release-readiness" in learning_js

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from app.release_learning_helpers import DONE_STATUSES
 
 def prevention_execution_board_markdown(data: dict) -> str:
     lines = [

@@ -10,6 +10,7 @@ from app.models import Project, ReleaseLearningItem
 from app.release_learning_helpers import DONE_STATUSES
 from app.release_prevention_analytics_export import owner_workload_markdown, prevention_burndown_markdown
 
+
 def prevention_burndown_analytics(db: Session, project_id: int, today: date | None = None) -> dict:
     today = today or date.today()
     project = db.get(Project, project_id)

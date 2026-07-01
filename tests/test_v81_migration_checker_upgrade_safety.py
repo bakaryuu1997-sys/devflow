@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -30,7 +31,7 @@ def test_v81_upgrade_safety_report_is_exportable():
 def test_v81_static_ui_routes_and_cli_checker_exist():
     index_html = open("static/index.html", encoding="utf-8").read()
     ui_js = open("static/migration_checker_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
     script_py = open("scripts/migration_check.py", encoding="utf-8").read()
 
     assert "Migration Check" in index_html

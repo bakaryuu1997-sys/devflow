@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 from app.signature_adapter_fixtures import load_fixture_rows
 
 client = TestClient(app)
@@ -41,7 +42,7 @@ def test_v93_fixture_files_are_public_sample_only():
 
 def test_v93_static_ui_and_routes_are_wired():
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/signature_contract_ui.js").read_text(encoding="utf-8")
     assert "Adapter Contracts" in index_html
     assert "Sample Fixtures" in index_html

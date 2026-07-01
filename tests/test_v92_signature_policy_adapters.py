@@ -1,11 +1,12 @@
-from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -37,7 +38,7 @@ def test_v92_signature_adapter_dry_run_endpoint():
 
 def test_v92_static_ui_and_routes_are_wired():
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/signature_policy_ui.js").read_text(encoding="utf-8")
     assert "Signature Adapters" in index_html
     assert "Verification Policy" in index_html

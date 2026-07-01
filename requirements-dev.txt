@@ -1,0 +1,6 @@
+-r requirements.txt
+
+# Lint + format (config in pyproject.toml)
+ruff>=0.15,<0.16
+# Git hook runner for local quality gates
+pre-commit>=4.0,<5

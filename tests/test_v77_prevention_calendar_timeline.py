@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -74,7 +75,7 @@ def test_v77_release_readiness_timeline_scores_checkpoints():
 def test_v77_static_ui_and_routes_are_registered():
     index_html = open("static/index.html", encoding="utf-8").read()
     ui_js = open("static/prevention_calendar_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
 
     assert "Prevention Calendar" in index_html
     assert "Readiness Timeline" in index_html

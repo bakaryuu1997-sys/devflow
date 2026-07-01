@@ -14,8 +14,8 @@ from app.database import get_db
 from app.deps import current_user, oauth2_scheme, require_manage_users
 from app.models import User
 from app.rbac import ROLE_VIEWER
-from app.token_blacklist_service import blacklist_token
 from app.schemas import ActivityRead, LoginRequest, TokenRead, UserCreate, UserRead
+from app.token_blacklist_service import blacklist_token
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 

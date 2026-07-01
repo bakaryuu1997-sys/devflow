@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -57,7 +58,7 @@ def test_v100_stable_milestone_and_installer_checklist():
 
 
 def test_v96_to_v100_routes_ui_and_cli_exports(tmp_path):
-    routes = Path("app/routes.py").read_text(encoding="utf-8")
+    routes = " ".join(wired_route_modules())
     index = Path("static/index.html").read_text(encoding="utf-8")
     assert "routes_v100" in routes
     assert "Stable Milestone" in index

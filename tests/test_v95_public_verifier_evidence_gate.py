@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -42,7 +43,7 @@ def test_v95_verified_signature_approval_gate_endpoint():
 
 def test_v95_static_ui_and_routes_are_wired():
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/public_key_verifier_ui.js").read_text(encoding="utf-8")
     assert "Verifier Evidence" in index_html
     assert "Verified Gate" in index_html

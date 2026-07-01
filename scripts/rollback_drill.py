@@ -5,7 +5,8 @@ import shutil
 import sys
 from pathlib import Path
 
-from safe_copy_migration_apply import default_copy_path, main as apply_on_copy
+from safe_copy_migration_apply import default_copy_path
+from safe_copy_migration_apply import main as apply_on_copy
 
 
 def main() -> int:

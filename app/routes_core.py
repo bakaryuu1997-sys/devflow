@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth_mode import is_production_mode
@@ -7,7 +7,8 @@ from app.auth_service import create_user
 from app.config import settings
 from app.database import Base, engine, get_db
 from app.deps import require_release, require_write
-from app.models import Project, Release, Requirement, TraceLink, WorkItem, ActivityLog
+from app.models import ActivityLog, Project, Release, Requirement, TraceLink, WorkItem
+from app.release_risk_dashboard_service import release_risk_dashboard
 from app.schemas import (
     ProjectCreate,
     ProjectRead,
@@ -21,7 +22,6 @@ from app.schemas import (
     WorkItemRead,
     WorkItemUpdate,
 )
-from app.release_risk_dashboard_service import release_risk_dashboard
 from app.services import calculate_readiness, create_project, dashboard, run_risk_scan
 
 router = APIRouter(prefix="/api", tags=["core"])

@@ -111,7 +111,7 @@ def release_snapshot_analytics(db: Session, project_id: int) -> dict:
         "latest_release_version": snapshots[0].get("release", {}).get("version") if snapshots else None,
         "latest_decision": snapshots[0].get("approval", {}).get("decision") if snapshots else None,
         "max_blocking_risks_at_signoff": max(blocking_counts) if blocking_counts else 0,
-        "trend_rows": [_trend_row(row, snap) for row, snap in zip(signoffs, snapshots)],
+        "trend_rows": [_trend_row(row, snap) for row, snap in zip(signoffs, snapshots, strict=True)],
     }
 
 

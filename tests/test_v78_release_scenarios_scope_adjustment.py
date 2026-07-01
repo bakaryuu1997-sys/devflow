@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -77,7 +78,7 @@ def test_v78_scope_adjustment_can_defer_item_from_active_scope():
 def test_v78_static_ui_and_routes_are_registered():
     index_html = open("static/index.html", encoding="utf-8").read()
     ui_js = open("static/prevention_scenario_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
 
     assert "Scenario Planning" in index_html
     assert "release-readiness-scenarios" in ui_js

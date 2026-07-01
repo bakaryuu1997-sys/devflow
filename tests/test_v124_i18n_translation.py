@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def test_i18n_file_exists():
     i18n_path = Path("static/i18n.js")
     assert i18n_path.exists()

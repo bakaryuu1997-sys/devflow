@@ -1,11 +1,12 @@
-from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -64,7 +65,7 @@ def test_v85_production_upgrade_checklist_cli_and_static_ui_are_wired(tmp_path):
     result = subprocess.run([sys.executable, "scripts/production_upgrade_checklist.py", str(db_path)], text=True, capture_output=True, check=False)
     index_html = Path("static/index.html").read_text(encoding="utf-8")
     ui_js = Path("static/migration_apply_ui.js").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     assert result.returncode == 1
     assert "final production upgrade checklist" in result.stdout.lower()
     assert "Real Migration Gate" in index_html

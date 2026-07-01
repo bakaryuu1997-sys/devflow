@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models import Project, Release, Requirement, WorkItem, User
+from app.models import Project, Release, Requirement, User, WorkItem
 
 DEMO_RESET_APPROVAL = "I_UNDERSTAND_DEMO_RESET_WILL_REBUILD_LOCAL_DEMO_DATA"
 

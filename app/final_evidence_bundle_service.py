@@ -5,8 +5,8 @@ import hashlib
 from sqlalchemy.orm import Session
 
 from app.evidence_manifest_service import current_evidence_manifest
-from app.models_v98 import FinalSignedEvidenceBundle
 from app.models_v95 import PublicVerifierEvidenceAttachment
+from app.models_v98 import FinalSignedEvidenceBundle
 from app.verified_gate_hardening_service import verified_evidence_manifest_gate
 from app.verifier_profile_service import verifier_profile_registry
 

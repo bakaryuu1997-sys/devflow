@@ -1,11 +1,12 @@
-from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -55,7 +56,7 @@ def test_v87_operator_signoff_cli_and_static_ui_are_wired(tmp_path):
         str(out_path),
     ], text=True, capture_output=True, check=False)
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/migration_rehearsal_ui.js").read_text(encoding="utf-8")
     assert result.returncode == 0, result.stdout + result.stderr
     assert "operator sign-off checklist" in out_path.read_text(encoding="utf-8").lower()

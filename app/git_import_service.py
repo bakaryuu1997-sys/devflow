@@ -1,12 +1,12 @@
 import csv
 import io
 import re
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.code_risk_service import classify_file
 from app.models import GitItem, TraceLink
-
 
 KEY_RE = re.compile(r"\b(REQ|TASK|BUG)-[A-Za-z0-9_-]+\b")
 

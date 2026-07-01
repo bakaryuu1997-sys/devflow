@@ -1,9 +1,13 @@
 from __future__ import annotations
+
 import re
+
 from sqlalchemy.orm import Session
+
 from app.crypto_signing_service import cryptographic_signing_readiness, timestamp_handoff_integrity_check
 from app.models_v90 import ExternalTimestampHandoffRecord
 from app.models_v91 import SignedPayloadVerificationRecord, TimestampTokenEvidenceAttachment
+
 HEX64 = re.compile(r"^[0-9a-fA-F]{64}$")
 
 def signed_payload_import_package(db: Session) -> dict:

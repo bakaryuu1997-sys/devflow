@@ -1,8 +1,9 @@
 from collections import defaultdict
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import GitItem, TraceLink, WorkItem
+from app.models import GitItem, WorkItem
 
 
 def workload_dashboard(db: Session, project_id: int) -> list[dict]:

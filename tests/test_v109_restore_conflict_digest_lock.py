@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -56,7 +57,7 @@ def test_v109_blocks_missing_lock_then_restores_with_digest_audit():
 def test_v109_routes_ui_docs_and_cli_export(tmp_path):
     package = client.get("/api/release-governance/v10-9-operator-restore-conflict-package?profile_id=core-risk").json()
     assert "Operator Restore Conflict Package" in package["content"]
-    assert "routes_v109" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v109" in " ".join(wired_route_modules())
     assert "governance_v109_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_9_RESTORE_CONFLICT_DIGEST_LOCK.md").exists()
     out = tmp_path / "restore.md"

@@ -16,7 +16,7 @@ def recurring_risk_trends(db: Session, project_id: int, limit: int = 5) -> dict:
     if not signoffs:
         return _empty(project_id)
     snapshots = [snapshot_from_signoff(row) for row in signoffs]
-    snapshots_oldest_first = list(reversed(list(zip(signoffs, snapshots))))
+    snapshots_oldest_first = list(reversed(list(zip(signoffs, snapshots, strict=True))))
     occurrences = _risk_occurrences(snapshots_oldest_first)
     recurring = [row for row in occurrences.values() if row["snapshot_occurrences"] >= 2]
     recurring.sort(key=lambda row: (row["blocking_occurrences"], row["snapshot_occurrences"], _rank(row["latest_severity"])), reverse=True)

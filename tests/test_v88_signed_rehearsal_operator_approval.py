@@ -1,11 +1,12 @@
-from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -47,7 +48,7 @@ def test_v88_list_endpoints_and_static_ui_are_wired():
     artifacts = client.get("/api/release-governance/signed-rehearsal-artifacts").json()
     approvals = client.get("/api/release-governance/final-operator-approval-records").json()
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/migration_operator_approval_ui.js").read_text(encoding="utf-8")
     assert artifacts["version"] == "8.8"
     assert approvals["version"] == "8.8"

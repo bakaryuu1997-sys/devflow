@@ -1,6 +1,9 @@
 from __future__ import annotations
+
 from sqlalchemy.orm import Session
+
 from app.migration_checker_service import local_database_migration_check, upgrade_safety_report
+
 COLUMN_SQL = {
     "release_signoffs.snapshot_json": "ALTER TABLE release_signoffs ADD COLUMN snapshot_json TEXT DEFAULT '';",
     "release_learning_items.owner": "ALTER TABLE release_learning_items ADD COLUMN owner VARCHAR(160) DEFAULT '';",

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 def prevention_burndown_markdown(data: dict) -> str:
     lines = [
         "# Prevention Burndown Analytics",

@@ -108,16 +108,35 @@
         <div class="topbar-info">
           <span class="eyebrow" data-i18n="topbar_eyebrow">DevFlow Governance OS</span>
           <h2 data-i18n="topbar_title">Release Compliance Control Center</h2>
+          <p>One focused surface for release risk, traceability, evidence, and operator history.</p>
         </div>
         <div class="topbar-actions-auth">
           <div class="header-auth">
-            <button id="langBtn" class="ghost" onclick="toggleLanguage()" style="margin-right: 16px; font-weight: 600;">🌐 EN</button>
+            <button id="langBtn" class="ghost language-toggle" onclick="toggleLanguage()">EN</button>
             <!-- If logged in: user profile avatar and logout -->
             <div class="auth-logged-in hidden" id="authLoggedIn">
               <span id="loginStatus" class="status-chip neutral">Checking session...</span>
               <button onclick="logout()" class="ghost" data-i18n="topbar_logout">Logout</button>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="dashboard-command" aria-label="Release command overview">
+        <div class="command-copy">
+          <span class="panel-kicker">Today command</span>
+          <h3>Start with the release gate, then move evidence forward.</h3>
+          <p>Use the primary action to initialize or refresh the workspace, then follow the six-step rail only when the previous checkpoint is clear.</p>
+        </div>
+        <div class="command-primary">
+          <button id="resetDemoButton" class="primary command-cta" onclick="resetDemo()" data-i18n="step1_btn_init">Initialize Local Sample Workspace</button>
+          <button class="ghost command-secondary" onclick="loadOperationalHistory()">Review history</button>
+        </div>
+        <div class="command-quick">
+          <button onclick="loadDashboard()">Dashboard</button>
+          <button onclick="loadToday()">Today focus</button>
+          <button onclick="verifyLedgerIntegrity()">Audit integrity</button>
+          <a href="/workspace">Workspace</a>
         </div>
       </section>
 
@@ -147,7 +166,7 @@
             </div>
           </div>
           <div class="action-row">
-            <button id="resetDemoButton" class="primary" onclick="resetDemo()" data-i18n="step1_btn_init">Initialize Local Sample Workspace</button>
+            <button class="primary" onclick="resetDemo()" data-i18n="step1_btn_init">Initialize Local Sample Workspace</button>
             <button onclick="loadDashboard()" data-i18n="step1_btn_refresh">Refresh Workspace Dashboard</button>
             <button onclick="loadToday()" data-i18n="step1_btn_today">View Today's Focus</button>
             <button onclick="verifyLedgerIntegrity()" data-i18n="step1_btn_verify">Verify Audit Integrity</button>
@@ -662,4 +681,3 @@ REQ-001,Login by email or phone,Critical</textarea></label><label>OpenAPI before
   </script>
 </body>
 </html>
-

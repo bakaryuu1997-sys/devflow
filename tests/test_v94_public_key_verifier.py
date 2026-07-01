@@ -1,12 +1,12 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
 from app.public_key_verifier_fixtures import fixture_metadata, load_fixture_evidence
-from app.public_key_verifier_service import public_key_verifier_dry_run
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -60,7 +60,7 @@ def test_v94_rejects_tampered_payload():
 def test_v94_fixture_metadata_and_static_ui_are_wired():
     meta = fixture_metadata()
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     assert meta["all_files_present"] is True
     assert meta["contains_private_key_marker"] is False
     assert "Public-key Verifier" in index_html

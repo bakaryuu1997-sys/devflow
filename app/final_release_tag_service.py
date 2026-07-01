@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -35,7 +35,7 @@ def v11_9_final_release_tag_preparation(db: Session, profile_id: str = "core-ris
         "manifest_digest": handoff.get("manifest_digest", ""),
         "handoff_signature": handoff.get("handoff_signature", ""),
         "tag_signoff_phrase": TAG_SIGNOFF,
-        "prepared_at_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "prepared_at_utc": datetime.now(UTC).replace(microsecond=0).isoformat(),
         "git_commands": _git_commands(),
         "checks": checks,
         "non_goals": _non_goals(),

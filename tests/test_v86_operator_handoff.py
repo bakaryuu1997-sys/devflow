@@ -1,11 +1,12 @@
-from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -55,7 +56,7 @@ def test_v86_operator_handoff_cli_writes_package_and_static_ui_is_wired(tmp_path
         str(out_dir),
     ], text=True, capture_output=True, check=False)
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/migration_handoff_ui.js").read_text(encoding="utf-8")
     assert result.returncode == 0, result.stdout + result.stderr
     assert (out_dir / "RUNBOOK.md").exists()

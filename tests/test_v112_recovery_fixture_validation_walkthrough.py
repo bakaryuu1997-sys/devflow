@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -46,7 +47,7 @@ def test_v112_walkthrough_exposes_copy_targets_and_routes():
     assert data["version"] == "11.2"
     assert data["copy_targets"]["restore_phrase"] == "RESTORE DEMO PROFILE: core-risk"
     assert any("v11.2 validation" in step for step in data["walkthrough_steps"])
-    assert "routes_v112" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v112" in " ".join(wired_route_modules())
     assert "governance_v112_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
 
 

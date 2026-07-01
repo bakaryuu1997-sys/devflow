@@ -1,11 +1,12 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.first_run_wizard_service import DEMO_RESET_APPROVAL
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -36,7 +37,7 @@ def test_v102_operator_package_routes_ui_and_cli_exports(tmp_path):
     package = client.get("/api/release-governance/v10-2-operator-first-run-package").json()
     assert package["ready"] is True
     assert "Operator First-run Package" in package["content"]
-    routes = Path("app/routes.py").read_text(encoding="utf-8")
+    routes = " ".join(wired_route_modules())
     index = Path("static/index.html").read_text(encoding="utf-8")
     assert "routes_v102" in routes
     assert "v10.2 First-run Wizard" in index

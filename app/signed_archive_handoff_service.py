@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -35,7 +35,7 @@ def v11_8_signed_archive_checksum_handoff(db: Session, profile_id: str = "core-r
         "manifest_digest": checksum,
         "handoff_signature": signature,
         "signoff_label": SIGNOFF_LABEL,
-        "signed_at_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "signed_at_utc": datetime.now(UTC).replace(microsecond=0).isoformat(),
         "checks": checks,
         "copy_targets": _copy_targets(checksum, signature),
         "non_goals": _non_goals(),

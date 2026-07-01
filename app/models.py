@@ -1,9 +1,13 @@
 from datetime import datetime
 from hashlib import sha256
-from app.time_utils import utc_now
+
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, event, text
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.database import Base
+from app.time_utils import utc_now
+
+
 class Project(Base):
     __tablename__ = "projects"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

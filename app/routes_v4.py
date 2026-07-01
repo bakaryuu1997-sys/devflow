@@ -19,9 +19,9 @@ from app.schemas import (
     ImpactAnalysisRead,
     RequirementChangeCreate,
     RequirementChangeRead,
+    TraceabilityRow,
     TraceLinkCreate,
     TraceLinkRead,
-    TraceabilityRow,
 )
 from app.traceability_service import create_trace_link, list_trace_links, traceability_matrix
 

@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -41,7 +42,7 @@ def test_v114_operator_package_docs_ui_and_cli(tmp_path):
     assert package["version"] == "11.4"
     assert "v11.4 Operator Demo Handoff Package" in package["content"]
     assert Path("docs/V11_4_RECOVERY_EVIDENCE_HANDOFF.md").exists()
-    assert "routes_v114" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v114" in " ".join(wired_route_modules())
     assert "governance_v114_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     out = tmp_path / "v11_4.md"
     result = subprocess.run([sys.executable, "scripts/export_v11_4_operator_demo_handoff_package.py", str(out)], text=True, capture_output=True, check=False)

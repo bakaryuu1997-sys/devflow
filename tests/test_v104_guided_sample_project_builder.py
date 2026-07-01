@@ -1,11 +1,12 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.demo_profiles_data import TUTORIAL_STEPS
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -40,7 +41,7 @@ def test_v104_routes_ui_docs_and_cli_export(tmp_path):
     package = client.get("/api/release-governance/v10-4-operator-sample-builder-package").json()
     assert package["ready"] is True
     assert "Operator Sample Builder Package" in package["content"]
-    assert "routes_v104" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v104" in " ".join(wired_route_modules())
     assert "governance_v104_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_4_GUIDED_SAMPLE_PROJECT_BUILDER.md").exists()
     out = tmp_path / "builder.md"

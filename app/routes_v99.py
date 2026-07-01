@@ -2,7 +2,11 @@ from fastapi import APIRouter, Body, Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.end_to_end_rehearsal_service import end_to_end_governance_rehearsal, list_governance_rehearsals, record_governance_rehearsal
+from app.end_to_end_rehearsal_service import (
+    end_to_end_governance_rehearsal,
+    list_governance_rehearsals,
+    record_governance_rehearsal,
+)
 
 router = APIRouter(prefix="/api", tags=["v9-9-end-to-end-rehearsal"])
 

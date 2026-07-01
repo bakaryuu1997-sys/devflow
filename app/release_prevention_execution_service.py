@@ -7,7 +7,10 @@ from sqlalchemy.orm import Session
 
 from app.models import Project, ReleaseLearningItem
 from app.release_learning_helpers import DONE_STATUSES
-from app.release_prevention_execution_export import overdue_risk_escalations_markdown, prevention_execution_board_markdown
+from app.release_prevention_execution_export import (
+    overdue_risk_escalations_markdown,
+    prevention_execution_board_markdown,
+)
 
 ESCALATED_STATUS = "Escalated"
 

@@ -3,8 +3,17 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.deps import require_release, require_write
-from app.release_learning_service import create_learning_item, release_learning_loop, update_learning_item_planning, update_learning_item_status
-from app.schemas_core import ReleaseLearningItemCreate, ReleaseLearningItemPlanningUpdate, ReleaseLearningItemStatusUpdate
+from app.release_learning_service import (
+    create_learning_item,
+    release_learning_loop,
+    update_learning_item_planning,
+    update_learning_item_status,
+)
+from app.schemas_core import (
+    ReleaseLearningItemCreate,
+    ReleaseLearningItemPlanningUpdate,
+    ReleaseLearningItemStatusUpdate,
+)
 
 router = APIRouter(prefix="/api", tags=["v6-9-release-learning-loop"])
 

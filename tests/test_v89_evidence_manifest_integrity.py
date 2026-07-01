@@ -1,11 +1,12 @@
-from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -34,7 +35,7 @@ def test_v89_freeze_manifest_and_integrity_check_flow():
 
 def test_v89_static_ui_and_routes_are_wired():
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/evidence_manifest_ui.js").read_text(encoding="utf-8")
     assert "Evidence Manifest" in index_html
     assert "Bundle Integrity" in index_html

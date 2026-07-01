@@ -1,6 +1,8 @@
 import subprocess
 import sys
+
 from scripts.local_sync_watcher import DevFlowWatcher
+
 
 def test_watcher_help_menu():
     # Test --help menu

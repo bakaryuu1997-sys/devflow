@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -30,7 +31,7 @@ def test_v83_post_migration_verification_snapshot_reports_remaining_actions():
 def test_v83_static_ui_routes_and_cli_helpers_exist():
     index_html = open("static/index.html", encoding="utf-8").read()
     ui_js = open("static/migration_apply_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
     apply_script = open("scripts/manual_migration_apply_assistant.py", encoding="utf-8").read()
     verify_script = open("scripts/post_migration_verify.py", encoding="utf-8").read()
 

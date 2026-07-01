@@ -7,10 +7,15 @@ from sqlalchemy.orm import Session
 
 from app.models import Project, Release, ReleaseSignOff
 from app.release_completion_service import project_release_review_completion
-from app.release_risk_dashboard_service import release_risk_dashboard
 from app.release_review_checklist_service import release_review_checklist
+from app.release_risk_dashboard_service import release_risk_dashboard
+from app.release_snapshot_service import (
+    attach_structured_snapshot,
+    build_structured_snapshot,
+    snapshot_from_signoff,
+    snapshot_to_json,
+)
 from app.time_utils import utc_now
-from app.release_snapshot_service import attach_structured_snapshot, build_structured_snapshot, snapshot_to_json, snapshot_from_signoff
 
 
 def release_signoff_snapshot(db: Session, project_id: int) -> dict:

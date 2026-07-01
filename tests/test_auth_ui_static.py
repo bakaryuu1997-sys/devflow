@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 STATIC_ROOT = Path(__file__).resolve().parents[1] / "static"
 
 
@@ -46,6 +45,27 @@ def test_dashboard_history_copy_avoids_demo_reset_language():
     assert "Deploy compliance parameters" not in html
     assert "Run Reset Demo" not in flow_js
     assert "initialize the local sample workspace" in flow_js
+
+
+def test_professional_login_command_center_is_wired():
+    html = read_static("index.html")
+    css = read_static("professional.css")
+
+    # Command-center login markup is present and hooks the existing auth ids.
+    for token in (
+        "login-command-center",
+        "login-stage",
+        "login-proof-grid",
+        "production-login-card",
+        'id="authModeChip"',
+        'id="localSampleHint"',
+        "Production control room",
+    ):
+        assert token in html, f"missing login markup: {token}"
+
+    # The professional stylesheet ships the matching layout primitives.
+    for selector in (".app-shell", ".sidebar", ".topbar", ".login-command-center"):
+        assert selector in css, f"missing stylesheet rule: {selector}"
 
 
 def test_workspace_history_has_export_and_empty_state():

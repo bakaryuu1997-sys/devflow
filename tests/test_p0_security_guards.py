@@ -3,7 +3,6 @@ from fastapi.testclient import TestClient
 from app import auth_mode
 from app.main import app
 
-
 client = TestClient(app)
 
 

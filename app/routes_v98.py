@@ -2,7 +2,11 @@ from fastapi import APIRouter, Body, Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.final_evidence_bundle_service import create_final_signed_release_bundle, final_signed_release_bundle_package, list_final_signed_release_bundles
+from app.final_evidence_bundle_service import (
+    create_final_signed_release_bundle,
+    final_signed_release_bundle_package,
+    list_final_signed_release_bundles,
+)
 
 router = APIRouter(prefix="/api", tags=["v9-8-final-evidence-bundle"])
 

@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -30,7 +31,7 @@ def test_v82_backup_checklist_contains_verify_and_rollback_steps():
 def test_v82_static_ui_routes_and_cli_generator_exist():
     index_html = open("static/index.html", encoding="utf-8").read()
     ui_js = open("static/migration_sql_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
     script_py = open("scripts/dry_run_migration_sql.py", encoding="utf-8").read()
 
     assert "Dry-run SQL" in index_html

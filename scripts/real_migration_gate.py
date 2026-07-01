@@ -3,7 +3,7 @@ from __future__ import annotations
 import shutil
 import sqlite3
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from dry_run_migration_sql import generate_sql
@@ -52,7 +52,7 @@ def parse_args(args: list[str]) -> tuple[Path, bool]:
 
 
 def backup_path(db_path: Path) -> Path:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     return db_path.with_name(f"{db_path.stem}.v8_5_prod_backup_{stamp}{db_path.suffix}")
 
 

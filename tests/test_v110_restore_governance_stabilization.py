@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -43,7 +44,7 @@ def test_v110_routes_ui_docs_and_cli_export(tmp_path):
     package = client.get("/api/release-governance/v11-0-operator-recovery-package?profile_id=core-risk").json()
     assert package["version"] == "11.0"
     assert "Final Operator Recovery Package" in package["content"]
-    assert "routes_v110" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v110" in " ".join(wired_route_modules())
     assert "governance_v110_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V11_0_RESTORE_GOVERNANCE_STABILIZATION.md").exists()
     out = tmp_path / "recovery.md"

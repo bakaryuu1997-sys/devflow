@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -66,7 +67,7 @@ def test_v79_scope_decision_audit_records_adjustments():
 def test_v79_static_ui_and_routes_are_registered():
     index_html = open("static/index.html", encoding="utf-8").read()
     ui_js = open("static/release_plan_recommendation_ui.js", encoding="utf-8").read()
-    routes_py = open("app/routes.py", encoding="utf-8").read()
+    routes_py = " ".join(wired_route_modules())
 
     assert "Plan Recommendation" in index_html
     assert "Scope Audit" in index_html

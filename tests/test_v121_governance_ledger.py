@@ -1,8 +1,7 @@
-from hashlib import sha256
 from fastapi.testclient import TestClient
-from sqlalchemy import select
-from app.main import app
+
 from app.database import get_db
+from app.main import app
 from app.models import ActivityLog
 
 client = TestClient(app)

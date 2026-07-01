@@ -8,7 +8,11 @@ from sqlalchemy.orm import Session
 
 from app.profile_manual_restore_service import v10_8_restore_audit_trail
 from app.profile_reset_snapshot_service import v10_6_rollback_snapshot_export
-from app.profile_restore_conflict_service import v10_9_guarded_restore_plan, v10_9_restore_conflict_report, v10_9_restore_digest_lock_audit_trail
+from app.profile_restore_conflict_service import (
+    v10_9_guarded_restore_plan,
+    v10_9_restore_conflict_report,
+    v10_9_restore_digest_lock_audit_trail,
+)
 from app.recovery_fixture_validation_service import v11_2_fixture_validation_report
 from app.recovery_ux_fixture_service import v11_1_export_fixture_example, v11_1_import_fixture_example
 from app.sample_project_builder_service import v10_4_build_sample_project

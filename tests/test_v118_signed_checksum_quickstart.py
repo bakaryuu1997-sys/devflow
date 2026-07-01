@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -40,7 +41,7 @@ def test_v118_operator_package_docs_ui_and_cli(tmp_path):
     assert package["version"] == "11.8"
     assert "v11.8 Operator Checksum Quickstart Package" in package["content"]
     assert Path("docs/V11_8_SIGNED_CHECKSUM_QUICKSTART.md").exists()
-    assert "routes_v118" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v118" in " ".join(wired_route_modules())
     assert "governance_v118_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     out = tmp_path / "v11_8.md"
     result = subprocess.run([sys.executable, "scripts/export_v11_8_checksum_quickstart_package.py", str(out)], text=True, capture_output=True, check=False)

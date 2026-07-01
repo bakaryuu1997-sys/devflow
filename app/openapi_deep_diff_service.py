@@ -18,7 +18,7 @@ def deep_openapi_diff(before_raw: str, after_raw: str) -> list[dict]:
                 continue
             findings.extend(_compare_operation(path, method, spec or {}, after_paths[path][method] or {}))
 
-    for path, methods in after_paths.items():
+    for path in after_paths:
         if path not in before_paths:
             findings.append(_finding(path, "*", "Low", f"Endpoint added: {path}", False))
     return findings or [_finding("-", "-", "Low", "No deep OpenAPI breaking change detected.", False)]

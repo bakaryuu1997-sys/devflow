@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import argparse
-import sys
-import os
-import subprocess
-import json
 import csv
 import io
-import urllib.request
+import json
+import os
+import subprocess
+import sys
 import urllib.error
+import urllib.request
 
 # Default Configuration
 DEFAULT_URL = "http://127.0.0.1:8000"
@@ -118,7 +118,7 @@ def build_multipart(filename, content, fieldname="file"):
         f"--{boundary}\r\n"
         f'Content-Disposition: form-data; name="{fieldname}"; filename="{filename}"\r\n'
         f"Content-Type: text/plain\r\n\r\n"
-    ).encode("utf-8") + content_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+    ).encode() + content_bytes + f"\r\n--{boundary}--\r\n".encode()
     
     return body, header
 
@@ -155,7 +155,7 @@ def scan_command(args):
             if fname.endswith(".sql"):
                 fpath = os.path.join(migrations_dir, fname)
                 try:
-                    with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                    with open(fpath, encoding="utf-8", errors="ignore") as f:
                         sql_content = f.read()
                     
                     upload_url = f"{args.url}/api/projects/{args.project}/guards/sql"
@@ -184,7 +184,7 @@ def scan_command(args):
     if test_logs_path and os.path.exists(test_logs_path):
         print(f"Scanning test logs file '{test_logs_path}'...")
         try:
-            with open(test_logs_path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(test_logs_path, encoding="utf-8", errors="ignore") as f:
                 log_content = f.read()
             
             upload_url = f"{args.url}/api/projects/{args.project}/guards/tests"

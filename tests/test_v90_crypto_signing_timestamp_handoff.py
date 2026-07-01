@@ -1,11 +1,12 @@
-from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -36,7 +37,7 @@ def test_v90_timestamp_handoff_flow_and_integrity():
 
 def test_v90_static_ui_and_routes_are_wired():
     index_html = Path("static/index.html").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/crypto_signing_ui.js").read_text(encoding="utf-8")
     assert "Signing Readiness" in index_html
     assert "Timestamp Handoff" in index_html

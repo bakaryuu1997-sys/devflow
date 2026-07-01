@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.models import CodeChange
 
-
 RULES = [
     ("database", ["migration", "alembic", ".sql"], "High", "Database schema/data may change."),
     ("auth", ["auth", "login", "token", "session", "permission"], "High", "Authentication or permission logic changed."),

@@ -1,6 +1,7 @@
 import subprocess
 import sys
 
+
 def test_cli_help_menu():
     # Invoke the devflow_cli.py help menu
     result = subprocess.run(

@@ -1,12 +1,13 @@
-from pathlib import Path
 import shutil
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -65,7 +66,7 @@ def test_v84_cli_safe_copy_apply_and_rollback_drill(tmp_path):
 def test_v84_static_ui_and_routes_are_wired():
     index_html = Path("static/index.html").read_text(encoding="utf-8")
     ui_js = Path("static/migration_apply_ui.js").read_text(encoding="utf-8")
-    routes_py = Path("app/routes.py").read_text(encoding="utf-8")
+    routes_py = " ".join(wired_route_modules())
 
     assert "Safe Copy Apply" in index_html
     assert "Rollback Drill" in index_html

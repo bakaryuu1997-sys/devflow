@@ -1,10 +1,11 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes import wired_route_modules
 
 client = TestClient(app)
 
@@ -40,7 +41,7 @@ def test_v120_operator_package_docs_ui_and_cli(tmp_path):
     assert package["version"] == "12.0"
     assert "v12.0 Operator Deployment Package" in package["content"]
     assert Path("docs/V12_0_PRODUCTION_DEPLOYMENT_CHECKLIST.md").exists()
-    assert "routes_v120" in Path("app/routes.py").read_text(encoding="utf-8")
+    assert "routes_v120" in " ".join(wired_route_modules())
     assert "governance_v120_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     out = tmp_path / "v12_0.md"
     result = subprocess.run([sys.executable, "scripts/export_v12_0_deployment_package.py", str(out)], text=True, capture_output=True, check=False)

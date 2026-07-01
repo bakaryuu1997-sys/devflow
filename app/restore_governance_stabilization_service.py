@@ -2,23 +2,22 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.profile_manual_restore_service import restore_approval_phrase
+from app.profile_manual_restore_service import restore_approval_phrase, v10_8_restore_audit_trail
 from app.profile_reset_orchestrator_service import approval_phrase as profile_reset_approval_phrase
+from app.profile_reset_snapshot_service import (
+    v10_6_profile_reset_audit_trail,
+    v10_6_rollback_snapshot_export,
+)
 from app.profile_restore_conflict_service import (
     v10_9_guarded_restore_plan,
     v10_9_operator_restore_conflict_package,
     v10_9_restore_conflict_report,
     v10_9_restore_digest_lock_audit_trail,
 )
-from app.profile_reset_snapshot_service import (
-    v10_6_profile_reset_audit_trail,
-    v10_6_rollback_snapshot_export,
-)
 from app.profile_rollback_rehearsal_service import (
     v10_7_manual_rollback_import_rehearsal,
     v10_7_restore_checklist,
 )
-from app.profile_manual_restore_service import v10_8_restore_audit_trail
 
 
 def v11_0_restore_governance_stability_report(

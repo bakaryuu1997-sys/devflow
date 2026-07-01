@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from sqlalchemy.orm import Session
 
-from app.config import settings
 from app.migration_apply_assistant_service import post_migration_verification_snapshot
 from app.migration_checker_service import upgrade_safety_report
 from app.migration_copy_apply_service import rollback_drill_automation_plan, safe_copy_migration_apply_assistant
-from app.production_migration_gate_service import APPROVAL_PHRASE, final_production_upgrade_checklist, human_approved_real_migration_gate
+from app.production_migration_gate_service import (
+    APPROVAL_PHRASE,
+    final_production_upgrade_checklist,
+    human_approved_real_migration_gate,
+)
 
 
 def production_upgrade_runbook(db: Session) -> dict:

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+import argparse
+import json
 import os
 import sys
 import time
-import json
-import argparse
-import urllib.request
 import urllib.error
+import urllib.request
 
 # Default Configuration
 DEFAULT_URL = "http://127.0.0.1:8000"
@@ -81,7 +81,7 @@ class DevFlowWatcher:
             f"--{boundary}\r\n"
             f'Content-Disposition: form-data; name="{fieldname}"; filename="{filename}"\r\n'
             f"Content-Type: text/plain\r\n\r\n"
-        ).encode("utf-8") + content_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+        ).encode() + content_bytes + f"\r\n--{boundary}--\r\n".encode()
         
         return body, headers
 
@@ -92,7 +92,7 @@ class DevFlowWatcher:
         if filename.endswith(".sql") and "migrations" in filepath.lower():
             self.log(f"Migration file detected ({event_type}): {filename}")
             try:
-                with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+                with open(filepath, encoding="utf-8", errors="ignore") as f:
                     content = f.read()
                 
                 upload_url = f"{self.base_url}/api/projects/{self.project_id}/guards/sql"
@@ -114,7 +114,7 @@ class DevFlowWatcher:
         elif filename in ["pytest.log", "tests.log", "test.log", "test-results.xml"]:
             self.log(f"Test log file detected ({event_type}): {filename}")
             try:
-                with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+                with open(filepath, encoding="utf-8", errors="ignore") as f:
                     content = f.read()
                 
                 upload_url = f"{self.base_url}/api/projects/{self.project_id}/guards/tests"
@@ -142,7 +142,7 @@ class DevFlowWatcher:
         elif filename == ".env":
             self.log(f"Environment variables configuration change: {filename}")
             try:
-                with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+                with open(filepath, encoding="utf-8", errors="ignore") as f:
                     content = f.read()
                 
                 upload_url = f"{self.base_url}/api/projects/{self.project_id}/env-guard"

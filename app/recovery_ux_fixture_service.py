@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from app.profile_manual_restore_service import restore_approval_phrase
 from app.profile_reset_orchestrator_service import approval_phrase as reset_phrase
 from app.profile_reset_snapshot_service import v10_6_rollback_snapshot_export
-from app.profile_rollback_rehearsal_service import v10_7_manual_rollback_import_rehearsal
 from app.profile_restore_conflict_service import v10_9_restore_conflict_report
+from app.profile_rollback_rehearsal_service import v10_7_manual_rollback_import_rehearsal
 from app.restore_governance_stabilization_service import v11_0_final_operator_recovery_runbook
 
 
