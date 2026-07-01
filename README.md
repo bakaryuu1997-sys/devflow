@@ -26,6 +26,24 @@ On macOS or Linux, activate with:
 source .venv/bin/activate
 ```
 
+## Development & code quality
+
+```bash
+# Install dev tooling (ruff + pre-commit) on top of the runtime deps
+pip install -r requirements-dev.txt
+
+# Lint and auto-format (config lives in pyproject.toml)
+python -m ruff check app scripts tests
+python -m ruff format app scripts tests
+
+# Install git hooks so lint/format run automatically before each commit
+pre-commit install
+```
+
+Route modules (`app/routes_v*.py`) are discovered and wired automatically by
+`app/routes.py`; adding a new `routes_*.py` module with a `router` attribute is
+enough to expose it — no manual include list to maintain.
+
 ## Final demo path
 
 1. Run v11.9 locally and confirm the portfolio demo works.
