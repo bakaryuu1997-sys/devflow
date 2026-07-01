@@ -15,7 +15,9 @@ def auth_headers():
 
 
 def _project(headers):
-    return client.post("/api/projects", json={"name": "Scenario Planning", "description": "v7.8"}, headers=headers).json()
+    return client.post(
+        "/api/projects", json={"name": "Scenario Planning", "description": "v7.8"}, headers=headers
+    ).json()
 
 
 def _learning_item(headers, project_id, title, status="Open", owner="", due_date=""):
@@ -27,7 +29,9 @@ def _learning_item(headers, project_id, title, status="Open", owner="", due_date
         "owner": owner,
         "due_date": due_date,
     }
-    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()["item"]
+    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()[
+        "item"
+    ]
 
 
 def test_v78_release_readiness_scenarios_compare_scope_choices():
@@ -41,7 +45,9 @@ def test_v78_release_readiness_scenarios_compare_scope_choices():
     _learning_item(headers, project["id"], "Unscheduled scope item", owner="PM")
     _learning_item(headers, project["id"], "Already prevented item", status="Prevented")
 
-    data = client.get(f"/api/projects/{project['id']}/release-readiness-scenarios?target_days=7", headers=headers).json()
+    data = client.get(
+        f"/api/projects/{project['id']}/release-readiness-scenarios?target_days=7", headers=headers
+    ).json()
     names = [row["name"] for row in data["scenarios"]]
 
     assert data["active_scope_items"] == 3

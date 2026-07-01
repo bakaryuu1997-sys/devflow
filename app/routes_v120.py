@@ -17,7 +17,9 @@ def api_v12_0_baseline_freeze_summary(profile_id: str = Query(default="core-risk
 
 
 @router.get("/release-governance/v12-0-production-deployment-checklist")
-def api_v12_0_production_deployment_checklist(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v12_0_production_deployment_checklist(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v12_0_production_deployment_checklist(db, profile_id)
 
 

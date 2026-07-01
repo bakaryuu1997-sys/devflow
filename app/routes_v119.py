@@ -12,7 +12,9 @@ router = APIRouter(prefix="/api", tags=["v11-9-final-release-tag-portfolio"])
 
 
 @router.get("/release-governance/v11-9-final-release-tag-preparation")
-def api_v11_9_final_release_tag_preparation(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v11_9_final_release_tag_preparation(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v11_9_final_release_tag_preparation(db, profile_id)
 
 
@@ -22,5 +24,7 @@ def api_v11_9_portfolio_demo_script(profile_id: str = Query(default="core-risk")
 
 
 @router.get("/release-governance/v11-9-operator-final-release-package")
-def api_v11_9_operator_final_release_package(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v11_9_operator_final_release_package(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v11_9_operator_final_release_package(db, profile_id)

@@ -43,5 +43,7 @@ def api_v10_8_restore_audit_trail(profile_id: str = Query(default="core-risk"), 
 
 
 @router.get("/release-governance/v10-8-operator-restore-execution-package")
-def api_v10_8_operator_restore_execution_package(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v10_8_operator_restore_execution_package(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v10_8_operator_restore_execution_package(db, profile_id)

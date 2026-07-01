@@ -20,7 +20,11 @@ def record_requirement_change(db: Session, project_id: int, payload) -> Requirem
 
 
 def list_requirement_changes(db: Session, project_id: int) -> list[RequirementChange]:
-    stmt = select(RequirementChange).where(RequirementChange.project_id == project_id).order_by(RequirementChange.id.desc())
+    stmt = (
+        select(RequirementChange)
+        .where(RequirementChange.project_id == project_id)
+        .order_by(RequirementChange.id.desc())
+    )
     return list(db.scalars(stmt).all())
 
 
@@ -42,10 +46,14 @@ def detect_changed_fields(old: str, new: str) -> list[str]:
 
 
 def analyze_impact(db: Session, project_id: int, requirement_key: str) -> dict:
-    links = list(db.scalars(select(TraceLink).where(
-        TraceLink.project_id == project_id,
-        TraceLink.requirement_key == requirement_key,
-    )).all())
+    links = list(
+        db.scalars(
+            select(TraceLink).where(
+                TraceLink.project_id == project_id,
+                TraceLink.requirement_key == requirement_key,
+            )
+        ).all()
+    )
     return {
         "requirement_key": requirement_key,
         "impacted_tasks": _targets(links, "task"),

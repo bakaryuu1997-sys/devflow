@@ -33,12 +33,17 @@ def test_v86_runbook_cli_exports_markdown(tmp_path):
     db_path = tmp_path / "legacy.db"
     out_path = tmp_path / "RUNBOOK.md"
     create_legacy_database(db_path)
-    result = subprocess.run([
-        sys.executable,
-        "scripts/export_upgrade_runbook.py",
-        str(db_path),
-        str(out_path),
-    ], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/export_upgrade_runbook.py",
+            str(db_path),
+            str(out_path),
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     content = out_path.read_text(encoding="utf-8")
     assert "v8.6 production upgrade runbook" in content.lower()
@@ -49,12 +54,17 @@ def test_v86_operator_handoff_cli_writes_package_and_static_ui_is_wired(tmp_path
     db_path = tmp_path / "legacy.db"
     out_dir = tmp_path / "handoff"
     create_legacy_database(db_path)
-    result = subprocess.run([
-        sys.executable,
-        "scripts/operator_handoff_package.py",
-        str(db_path),
-        str(out_dir),
-    ], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/operator_handoff_package.py",
+            str(db_path),
+            str(out_dir),
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     index_html = Path("static/index.html").read_text(encoding="utf-8")
     routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/migration_handoff_ui.js").read_text(encoding="utf-8")

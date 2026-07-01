@@ -13,12 +13,16 @@ def auth_headers():
 
 def test_convert_placeholder_into_real_work_item():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-CONVERT",
-        "title": "Critical ledger export",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-CONVERT",
+            "title": "Critical ledger export",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
     placeholder = client.post(
         f"/api/requirements/{req['id']}/work-item-placeholders",
         json={"kind": "task"},
@@ -42,19 +46,27 @@ def test_convert_placeholder_into_real_work_item():
 
 def test_convert_placeholder_rejects_normal_work_item():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-NORMAL",
-        "title": "Normal task flow",
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers).json()
-    item = client.post("/api/projects/1/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "task",
-        "title": "Already real task",
-        "status": "Open",
-        "severity": "Medium",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-NORMAL",
+            "title": "Normal task flow",
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    item = client.post(
+        "/api/projects/1/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "task",
+            "title": "Already real task",
+            "status": "Open",
+            "severity": "Medium",
+        },
+        headers=headers,
+    ).json()
 
     response = client.post(
         f"/api/work-items/{item['id']}/convert-placeholder",
@@ -67,12 +79,16 @@ def test_convert_placeholder_rejects_normal_work_item():
 
 def test_release_review_checklist_exports_markdown_with_actions():
     headers = auth_headers()
-    client.post("/api/projects/1/requirements", json={
-        "key": "REQ-CHECKLIST",
-        "title": "Critical payment capture",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers)
+    client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-CHECKLIST",
+            "title": "Critical payment capture",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    )
 
     response = client.get("/api/projects/1/release-review-checklist", headers=headers)
 

@@ -22,7 +22,9 @@ router = APIRouter(prefix="/api/projects/{project_id}", tags=["v4-2-goal-complet
 
 
 @router.post("/git-import", response_model=list[GitItemRead])
-def git_import(project_id: int, payload: GitImportRequest, db: Session = Depends(get_db), _user: User = Depends(require_write)):
+def git_import(
+    project_id: int, payload: GitImportRequest, db: Session = Depends(get_db), _user: User = Depends(require_write)
+):
     return import_git_items(db, project_id, payload.content, payload.item_type)
 
 
@@ -32,7 +34,12 @@ def git_items(project_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/requirement-diff", response_model=list[RequirementDiffRead])
-def requirement_diff(project_id: int, payload: RequirementDiffRequest, db: Session = Depends(get_db), _user: User = Depends(require_write)):
+def requirement_diff(
+    project_id: int,
+    payload: RequirementDiffRequest,
+    db: Session = Depends(get_db),
+    _user: User = Depends(require_write),
+):
     return compare_requirement_csv(db, project_id, payload.old_csv, payload.new_csv)
 
 

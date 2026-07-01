@@ -48,6 +48,11 @@ def test_v111_routes_ui_docs_and_cli_export(tmp_path):
     assert "governance_v111_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V11_1_RECOVERY_UX_FIXTURE_EXAMPLES.md").exists()
     out = tmp_path / "fixtures.md"
-    result = subprocess.run([sys.executable, "scripts/export_v11_1_operator_fixture_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v11_1_operator_fixture_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v11.1 Operator Recovery Fixture Package" in out.read_text(encoding="utf-8")

@@ -39,18 +39,39 @@ def adapter_dry_run(db_path: Path, adapter: str, payload_hash: str, signature_ha
     if signature_hash and not HEX64.match(signature_hash):
         findings.append("Signature hash is not a SHA-256 style 64-character hex value.")
     findings.extend(policy["blockers"])
-    return {"version": "9.2", "status": "Dry Run Passed" if not findings else "Dry Run Needs Review", "adapter": adapter, "payload_hash": payload_hash, "findings": findings}
+    return {
+        "version": "9.2",
+        "status": "Dry Run Passed" if not findings else "Dry Run Needs Review",
+        "adapter": adapter,
+        "payload_hash": payload_hash,
+        "findings": findings,
+    }
 
 
 def render_policy(data: dict) -> str:
-    lines = ["# v9.2 Policy-Based Verification Checklist", "", f"Status: {data['status']}", f"Payload hash: `{data['payload_hash']}`", "", "## Checklist"]
+    lines = [
+        "# v9.2 Policy-Based Verification Checklist",
+        "",
+        f"Status: {data['status']}",
+        f"Payload hash: `{data['payload_hash']}`",
+        "",
+        "## Checklist",
+    ]
     lines.extend(f"- [ ] {item}" for item in data["checklist"])
     lines.extend(["", "## Adapters", *[f"- {name}" for name in data["adapters"]]])
-    lines.extend(["", "## Blockers", *[f"- {item}" for item in (data["blockers"] or ["No blockers."]) ]])
+    lines.extend(["", "## Blockers", *[f"- {item}" for item in (data["blockers"] or ["No blockers."])]])
     return "\n".join(lines).strip() + "\n"
 
 
 def render_dry_run(data: dict) -> str:
-    lines = ["# v9.2 Signature Adapter Dry Run", "", f"Status: {data['status']}", f"Adapter: {data['adapter']}", f"Payload hash: `{data['payload_hash']}`", "", "## Findings"]
+    lines = [
+        "# v9.2 Signature Adapter Dry Run",
+        "",
+        f"Status: {data['status']}",
+        f"Adapter: {data['adapter']}",
+        f"Payload hash: `{data['payload_hash']}`",
+        "",
+        "## Findings",
+    ]
     lines.extend(f"- {item}" for item in (data["findings"] or ["No findings."]))
     return "\n".join(lines).strip() + "\n"

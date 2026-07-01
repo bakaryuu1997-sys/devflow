@@ -33,12 +33,17 @@ def test_v87_rehearsal_cli_exports_markdown(tmp_path):
     db_path = tmp_path / "legacy.db"
     out_path = tmp_path / "REHEARSAL_REPORT.md"
     create_legacy_database(db_path)
-    result = subprocess.run([
-        sys.executable,
-        "scripts/export_rehearsal_report.py",
-        str(db_path),
-        str(out_path),
-    ], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/export_rehearsal_report.py",
+            str(db_path),
+            str(out_path),
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     content = out_path.read_text(encoding="utf-8")
     assert "v8.7 production upgrade rehearsal report" in content.lower()
@@ -49,12 +54,17 @@ def test_v87_operator_signoff_cli_and_static_ui_are_wired(tmp_path):
     db_path = tmp_path / "legacy.db"
     out_path = tmp_path / "OPERATOR_SIGNOFF_CHECKLIST.md"
     create_legacy_database(db_path)
-    result = subprocess.run([
-        sys.executable,
-        "scripts/operator_signoff_checklist.py",
-        str(db_path),
-        str(out_path),
-    ], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/operator_signoff_checklist.py",
+            str(db_path),
+            str(out_path),
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     index_html = Path("static/index.html").read_text(encoding="utf-8")
     routes_py = " ".join(wired_route_modules())
     ui_js = Path("static/migration_rehearsal_ui.js").read_text(encoding="utf-8")

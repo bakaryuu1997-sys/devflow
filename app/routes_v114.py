@@ -22,5 +22,7 @@ def api_v11_4_final_demo_handoff_polish(profile_id: str = Query(default="core-ri
 
 
 @router.get("/release-governance/v11-4-operator-demo-handoff-package")
-def api_v11_4_operator_demo_handoff_package(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v11_4_operator_demo_handoff_package(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v11_4_operator_demo_handoff_package(db, profile_id)

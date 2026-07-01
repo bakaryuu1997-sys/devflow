@@ -21,7 +21,9 @@ def test_v89_evidence_manifest_endpoints_are_wired():
 
 
 def test_v89_freeze_manifest_and_integrity_check_flow():
-    frozen = client.post("/api/release-governance/evidence-manifests", json={"notes": "Freeze current evidence."}).json()
+    frozen = client.post(
+        "/api/release-governance/evidence-manifests", json={"notes": "Freeze current evidence."}
+    ).json()
     assert frozen["status"] in {"Frozen", "Empty"}
     assert len(frozen["manifest_hash"]) == 64
     listed = client.get("/api/release-governance/evidence-manifests").json()
@@ -48,8 +50,18 @@ def test_v89_cli_manifest_and_integrity_exports(tmp_path):
     create_v89_database(db_path)
     manifest_out = tmp_path / "EVIDENCE_MANIFEST.md"
     integrity_out = tmp_path / "BUNDLE_INTEGRITY_CHECK.md"
-    manifest = subprocess.run([sys.executable, "scripts/export_evidence_manifest.py", str(db_path), str(manifest_out)], text=True, capture_output=True, check=False)
-    integrity = subprocess.run([sys.executable, "scripts/verify_export_bundle_integrity.py", str(db_path), str(integrity_out)], text=True, capture_output=True, check=False)
+    manifest = subprocess.run(
+        [sys.executable, "scripts/export_evidence_manifest.py", str(db_path), str(manifest_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    integrity = subprocess.run(
+        [sys.executable, "scripts/verify_export_bundle_integrity.py", str(db_path), str(integrity_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert manifest.returncode == 0, manifest.stdout + manifest.stderr
     assert integrity.returncode == 0, integrity.stdout + integrity.stderr
     assert "evidence manifest" in manifest_out.read_text(encoding="utf-8").lower()
@@ -59,10 +71,18 @@ def test_v89_cli_manifest_and_integrity_exports(tmp_path):
 def create_v89_database(path: Path) -> None:
     con = sqlite3.connect(path)
     try:
-        con.execute("CREATE TABLE signed_rehearsal_artifacts (id INTEGER PRIMARY KEY, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')")
-        con.execute("CREATE TABLE operator_approval_records (id INTEGER PRIMARY KEY, signed_artifact_id INTEGER, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')")
-        con.execute("CREATE TABLE evidence_manifest_records (id INTEGER PRIMARY KEY, algorithm TEXT DEFAULT 'sha256', manifest_hash TEXT DEFAULT '', bundle_hash TEXT DEFAULT '', status TEXT DEFAULT '', artifact_count INTEGER DEFAULT 0, approval_count INTEGER DEFAULT 0, item_count INTEGER DEFAULT 0, notes TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')")
-        con.execute("INSERT INTO signed_rehearsal_artifacts (status, content, created_at) VALUES ('Signed', 'artifact content', '2026-06-04T00:00:00')")
+        con.execute(
+            "CREATE TABLE signed_rehearsal_artifacts (id INTEGER PRIMARY KEY, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')"
+        )
+        con.execute(
+            "CREATE TABLE operator_approval_records (id INTEGER PRIMARY KEY, signed_artifact_id INTEGER, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')"
+        )
+        con.execute(
+            "CREATE TABLE evidence_manifest_records (id INTEGER PRIMARY KEY, algorithm TEXT DEFAULT 'sha256', manifest_hash TEXT DEFAULT '', bundle_hash TEXT DEFAULT '', status TEXT DEFAULT '', artifact_count INTEGER DEFAULT 0, approval_count INTEGER DEFAULT 0, item_count INTEGER DEFAULT 0, notes TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')"
+        )
+        con.execute(
+            "INSERT INTO signed_rehearsal_artifacts (status, content, created_at) VALUES ('Signed', 'artifact content', '2026-06-04T00:00:00')"
+        )
         con.commit()
     finally:
         con.close()

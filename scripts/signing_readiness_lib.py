@@ -41,13 +41,32 @@ def timestamp_handoff_package(db_path: Path) -> dict:
 
 
 def render_signing_readiness(data: dict) -> str:
-    lines = ["# v9.0 Cryptographic Signing Readiness", "", f"Status: {data['status']}", f"Payload hash: `{data['payload_hash']}`", f"Manifest hash: `{data['manifest_hash']}`", f"Bundle hash: `{data['bundle_hash']}`", "", "## Blockers"]
+    lines = [
+        "# v9.0 Cryptographic Signing Readiness",
+        "",
+        f"Status: {data['status']}",
+        f"Payload hash: `{data['payload_hash']}`",
+        f"Manifest hash: `{data['manifest_hash']}`",
+        f"Bundle hash: `{data['bundle_hash']}`",
+        "",
+        "## Blockers",
+    ]
     lines.extend(f"- {item}" for item in (data["blockers"] or ["No blockers."]))
     return "\n".join(lines).strip() + "\n"
 
 
 def render_timestamp_handoff(data: dict) -> str:
-    lines = ["# v9.0 External Timestamp Handoff Package", "", f"Status: {data['status']}", f"Payload hash: `{data['payload_hash']}`", "", "## Canonical payload", "```json", json.dumps(data["canonical_payload"], indent=2, sort_keys=True), "```"]
+    lines = [
+        "# v9.0 External Timestamp Handoff Package",
+        "",
+        f"Status: {data['status']}",
+        f"Payload hash: `{data['payload_hash']}`",
+        "",
+        "## Canonical payload",
+        "```json",
+        json.dumps(data["canonical_payload"], indent=2, sort_keys=True),
+        "```",
+    ]
     return "\n".join(lines).strip() + "\n"
 
 
@@ -66,7 +85,9 @@ def ensure_handoff_table(db_path: Path) -> None:
             content TEXT DEFAULT '',
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )""")
-        con.execute("CREATE INDEX IF NOT EXISTS ix_external_timestamp_handoff_records_payload_hash ON external_timestamp_handoff_records (payload_hash)")
+        con.execute(
+            "CREATE INDEX IF NOT EXISTS ix_external_timestamp_handoff_records_payload_hash ON external_timestamp_handoff_records (payload_hash)"
+        )
         con.commit()
 
 
@@ -96,4 +117,6 @@ def _payload(current: dict, frozen: dict | None) -> dict[str, Any]:
 
 
 def _hash_json(value: Any) -> str:
-    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()
+    return hashlib.sha256(
+        json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    ).hexdigest()

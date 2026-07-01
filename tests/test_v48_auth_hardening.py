@@ -33,4 +33,3 @@ def test_production_mode_passes_with_safe_config(monkeypatch):
     monkeypatch.setattr(auth_mode.settings, "auto_create_tables", False)
 
     validate_startup_security()
-

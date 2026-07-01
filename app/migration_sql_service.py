@@ -76,8 +76,12 @@ TABLE_SQL = {
 );""",
 }
 INDEX_SQL = {
-    "external_verifier_profiles": ["CREATE UNIQUE INDEX IF NOT EXISTS ix_external_verifier_profiles_name ON external_verifier_profiles (name);"],
-    "final_signed_evidence_bundles": ["CREATE INDEX IF NOT EXISTS ix_final_signed_evidence_bundles_bundle_hash ON final_signed_evidence_bundles (bundle_hash);"],
+    "external_verifier_profiles": [
+        "CREATE UNIQUE INDEX IF NOT EXISTS ix_external_verifier_profiles_name ON external_verifier_profiles (name);"
+    ],
+    "final_signed_evidence_bundles": [
+        "CREATE INDEX IF NOT EXISTS ix_final_signed_evidence_bundles_bundle_hash ON final_signed_evidence_bundles (bundle_hash);"
+    ],
     "scope_decision_audits": [
         "CREATE INDEX IF NOT EXISTS ix_scope_decision_audits_project_id ON scope_decision_audits (project_id);",
         "CREATE INDEX IF NOT EXISTS ix_scope_decision_audits_learning_item_id ON scope_decision_audits (learning_item_id);",
@@ -98,6 +102,8 @@ INDEX_SQL = {
         "CREATE INDEX IF NOT EXISTS ix_timestamp_token_evidence_attachments_payload_hash ON timestamp_token_evidence_attachments (payload_hash);",
     ],
 }
+
+
 def dry_run_sql_migration(db: Session) -> dict:
     check = local_database_migration_check(db)
     statements = _statements(check)
@@ -116,6 +122,8 @@ def dry_run_sql_migration(db: Session) -> dict:
     }
     data["content"] = _sql_markdown(data)
     return data
+
+
 def backup_checklist(db: Session) -> dict:
     safety = upgrade_safety_report(db)
     data = {
@@ -130,6 +138,8 @@ def backup_checklist(db: Session) -> dict:
     }
     data["content"] = _backup_markdown(data)
     return data
+
+
 def _statements(check: dict) -> list[dict]:
     rows: list[dict] = []
     for table in check["missing_tables"]:
@@ -146,12 +156,25 @@ def _statements(check: dict) -> list[dict]:
             if key in COLUMN_SQL:
                 rows.append(_row("add_column", key, COLUMN_SQL[key]))
     return rows
+
+
 def _row(kind: str, target: str, sql: str) -> dict:
     return {"kind": kind, "target": target, "sql": sql, "safe_mode": "additive", "destructive": False}
+
+
 def _apply_order(statements: list[dict]) -> list[str]:
     if not statements:
         return ["No schema SQL is needed for the current database."]
-    return ["1. Stop the app", "2. Back up the SQLite database", "3. Review dry-run SQL", "4. Apply SQL manually", "5. Run migration_check.py", "6. Run tests and smoke check"]
+    return [
+        "1. Stop the app",
+        "2. Back up the SQLite database",
+        "3. Review dry-run SQL",
+        "4. Apply SQL manually",
+        "5. Run migration_check.py",
+        "6. Run tests and smoke check",
+    ]
+
+
 def _safety_notes(statements: list[dict]) -> list[str]:
     notes = ["This endpoint never applies SQL automatically.", "Only additive CREATE/ALTER statements are generated."]
     if statements:
@@ -170,15 +193,32 @@ def _backup_steps(safety: dict) -> list[str]:
 
 
 def _verify_steps() -> list[str]:
-    return ["Run python scripts/migration_check.py devflow.db", "Start the app", "Open Governance Readiness", "Run HTTP smoke and pytest"]
+    return [
+        "Run python scripts/migration_check.py devflow.db",
+        "Start the app",
+        "Open Governance Readiness",
+        "Run HTTP smoke and pytest",
+    ]
 
 
 def _rollback_steps() -> list[str]:
-    return ["Stop the app", "Move the migrated DB aside", "Restore the timestamped backup", "Run migration_check.py again"]
+    return [
+        "Stop the app",
+        "Move the migrated DB aside",
+        "Restore the timestamped backup",
+        "Run migration_check.py again",
+    ]
 
 
 def _sql_markdown(data: dict) -> str:
-    lines = ["# v8.2 Dry-run SQL Migration", "", f"Status: {data['status']}", f"Will apply changes: {data['will_apply_changes']}", "", "## SQL"]
+    lines = [
+        "# v8.2 Dry-run SQL Migration",
+        "",
+        f"Status: {data['status']}",
+        f"Will apply changes: {data['will_apply_changes']}",
+        "",
+        "## SQL",
+    ]
     if data["statements"]:
         lines.extend(f"```sql\n{row['sql']}\n```" for row in data["statements"])
     else:

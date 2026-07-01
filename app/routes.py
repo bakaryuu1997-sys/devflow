@@ -28,11 +28,7 @@ _VERSION_RE = re.compile(r"^routes_v(\d+)$")
 
 def _discover_route_modules() -> list[str]:
     """Return every ``routes_*`` module name except this aggregator."""
-    names = [
-        name
-        for _, name, _ in pkgutil.iter_modules(_app_pkg.__path__)
-        if name.startswith("routes_")
-    ]
+    names = [name for _, name, _ in pkgutil.iter_modules(_app_pkg.__path__) if name.startswith("routes_")]
 
     def sort_key(name: str) -> tuple[int, int, str]:
         if name in _PRIORITY:

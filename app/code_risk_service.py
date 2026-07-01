@@ -5,7 +5,12 @@ from app.models import CodeChange
 
 RULES = [
     ("database", ["migration", "alembic", ".sql"], "High", "Database schema/data may change."),
-    ("auth", ["auth", "login", "token", "session", "permission"], "High", "Authentication or permission logic changed."),
+    (
+        "auth",
+        ["auth", "login", "token", "session", "permission"],
+        "High",
+        "Authentication or permission logic changed.",
+    ),
     ("payment", ["payment", "invoice", "billing", "checkout"], "Critical", "Payment flow changed."),
     ("config", [".env", "settings", "config", "secret"], "High", "Configuration or secret-sensitive file changed."),
     ("api", ["routes", "api", "schema", "openapi"], "Medium", "API contract may change."),

@@ -9,7 +9,9 @@ from app.models import TraceLink, WorkItem
 def bug_pattern_dashboard(db: Session, project_id: int) -> list[dict]:
     modules = defaultdict(lambda: {"open_bugs": 0, "critical_or_high": 0, "reopened": 0})
     work_bugs = db.scalars(select(WorkItem).where(WorkItem.project_id == project_id, WorkItem.kind == "bug")).all()
-    linked_bugs = db.scalars(select(TraceLink).where(TraceLink.project_id == project_id, TraceLink.link_type == "bug")).all()
+    linked_bugs = db.scalars(
+        select(TraceLink).where(TraceLink.project_id == project_id, TraceLink.link_type == "bug")
+    ).all()
 
     for bug in work_bugs:
         module = "general"

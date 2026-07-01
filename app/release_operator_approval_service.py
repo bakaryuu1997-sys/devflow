@@ -49,7 +49,12 @@ def create_signed_rehearsal_artifact(db: Session, payload: dict) -> dict:
 
 def list_signed_rehearsal_artifacts(db: Session) -> dict:
     rows = db.query(SignedRehearsalArtifact).order_by(SignedRehearsalArtifact.id.desc()).all()
-    data = {"version": "8.8", "mode": "signed-rehearsal-artifacts", "count": len(rows), "artifacts": [_artifact_row(row) for row in rows]}
+    data = {
+        "version": "8.8",
+        "mode": "signed-rehearsal-artifacts",
+        "count": len(rows),
+        "artifacts": [_artifact_row(row) for row in rows],
+    }
     data["content"] = _artifact_list_markdown(data)
     return data
 
@@ -78,39 +83,104 @@ def create_final_operator_approval_record(db: Session, payload: dict) -> dict:
 
 def list_final_operator_approval_records(db: Session) -> dict:
     rows = db.query(OperatorApprovalRecord).order_by(OperatorApprovalRecord.id.desc()).all()
-    data = {"version": "8.8", "mode": "final-operator-approval-records", "count": len(rows), "records": [_approval_row(row) for row in rows]}
+    data = {
+        "version": "8.8",
+        "mode": "final-operator-approval-records",
+        "count": len(rows),
+        "records": [_approval_row(row) for row in rows],
+    }
     data["content"] = _approval_list_markdown(data)
     return data
 
 
 def _latest_signed_artifact(db: Session) -> SignedRehearsalArtifact | None:
-    return db.query(SignedRehearsalArtifact).filter(SignedRehearsalArtifact.status == "Signed").order_by(SignedRehearsalArtifact.id.desc()).first()
+    return (
+        db.query(SignedRehearsalArtifact)
+        .filter(SignedRehearsalArtifact.status == "Signed")
+        .order_by(SignedRehearsalArtifact.id.desc())
+        .first()
+    )
 
 
 def _artifact_row(row: SignedRehearsalArtifact) -> dict:
-    return {"id": row.id, "status": row.status, "operator_name": row.operator_name, "reviewer_name": row.reviewer_name, "signature_text": row.signature_text, "notes": row.notes, "created_at": row.created_at.isoformat(), "content": row.content}
+    return {
+        "id": row.id,
+        "status": row.status,
+        "operator_name": row.operator_name,
+        "reviewer_name": row.reviewer_name,
+        "signature_text": row.signature_text,
+        "notes": row.notes,
+        "created_at": row.created_at.isoformat(),
+        "content": row.content,
+    }
 
 
 def _approval_row(row: OperatorApprovalRecord) -> dict:
-    return {"id": row.id, "status": row.status, "signed_artifact_id": row.signed_artifact_id, "approver_name": row.approver_name, "approval_note": row.approval_note, "created_at": row.created_at.isoformat(), "content": row.content}
+    return {
+        "id": row.id,
+        "status": row.status,
+        "signed_artifact_id": row.signed_artifact_id,
+        "approver_name": row.approver_name,
+        "approval_note": row.approval_note,
+        "created_at": row.created_at.isoformat(),
+        "content": row.content,
+    }
 
 
 def _blocked_approval(reason: str) -> dict:
-    return {"version": "8.8", "mode": "final-operator-approval-record", "status": "Blocked", "reason": reason, "content": f"# v8.8 Final Operator Approval Record\n\nStatus: Blocked\n\nReason: {reason}\n"}
+    return {
+        "version": "8.8",
+        "mode": "final-operator-approval-record",
+        "status": "Blocked",
+        "reason": reason,
+        "content": f"# v8.8 Final Operator Approval Record\n\nStatus: Blocked\n\nReason: {reason}\n",
+    }
 
 
 def _package_markdown(data: dict) -> str:
-    lines = ["# v8.8 Signed Rehearsal Artifact Package", "", f"Status: {data['status']}", f"Required signature: {data['required_signature_text']}", "", "## Evidence", f"- Rehearsal: {data['rehearsal_status']}", f"- Operator sign-off: {data['operator_signoff_status']}"]
+    lines = [
+        "# v8.8 Signed Rehearsal Artifact Package",
+        "",
+        f"Status: {data['status']}",
+        f"Required signature: {data['required_signature_text']}",
+        "",
+        "## Evidence",
+        f"- Rehearsal: {data['rehearsal_status']}",
+        f"- Operator sign-off: {data['operator_signoff_status']}",
+    ]
     return "\n".join(lines).strip() + "\n"
 
 
 def _signed_artifact_markdown(package: dict, payload: dict, status: str) -> str:
-    lines = ["# v8.8 Signed Rehearsal Artifact", "", f"Status: {status}", f"Operator: {payload.get('operator_name', '')}", f"Reviewer: {payload.get('reviewer_name', '')}", f"Signature: {payload.get('signature_text', '')}", "", "## Notes", payload.get("notes", "") or "No notes.", "", "## Source package", package["content"]]
+    lines = [
+        "# v8.8 Signed Rehearsal Artifact",
+        "",
+        f"Status: {status}",
+        f"Operator: {payload.get('operator_name', '')}",
+        f"Reviewer: {payload.get('reviewer_name', '')}",
+        f"Signature: {payload.get('signature_text', '')}",
+        "",
+        "## Notes",
+        payload.get("notes", "") or "No notes.",
+        "",
+        "## Source package",
+        package["content"],
+    ]
     return "\n".join(lines).strip() + "\n"
 
 
 def _approval_markdown(artifact: SignedRehearsalArtifact, payload: dict) -> str:
-    lines = ["# v8.8 Final Operator Approval Record", "", "Status: Approved", f"Signed artifact: {artifact.id}", f"Approver: {payload.get('approver_name', '')}", f"Approval phrase: {APPROVAL_PHRASE}", "", "## Approval note", payload.get("approval_note", "") or "No note."]
+    lines = [
+        "# v8.8 Final Operator Approval Record",
+        "",
+        "Status: Approved",
+        f"Signed artifact: {artifact.id}",
+        f"Approver: {payload.get('approver_name', '')}",
+        f"Approval phrase: {APPROVAL_PHRASE}",
+        "",
+        "## Approval note",
+        payload.get("approval_note", "") or "No note.",
+    ]
     return "\n".join(lines).strip() + "\n"
 
 

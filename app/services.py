@@ -22,7 +22,9 @@ def create_project(db: Session, name: str, description: str = "") -> Project:
 
 def run_risk_scan(db: Session, project_id: int) -> list[RiskEvent]:
     db.execute(delete(RiskEvent).where(RiskEvent.project_id == project_id))
-    requirements = db.scalars(select(Requirement).where(Requirement.project_id == project_id, Requirement.status != "Archived")).all()
+    requirements = db.scalars(
+        select(Requirement).where(Requirement.project_id == project_id, Requirement.status != "Archived")
+    ).all()
     created = []
     for req in requirements:
         items = db.scalars(select(WorkItem).where(WorkItem.requirement_id == req.id)).all()
@@ -39,7 +41,17 @@ def run_risk_scan(db: Session, project_id: int) -> list[RiskEvent]:
 
 
 def dashboard(db: Session, project_id: int) -> dict:
-    return {"project_id": project_id, "requirements": _count_active_requirements(db, project_id), "tasks": _count_work(db, project_id, "task"), "tests": _count_work(db, project_id, "test"), "bugs": _count_work(db, project_id, "bug"), "inbox_open": count_inbox_open(db, project_id), "decisions": count_decisions(db, project_id), "open_risks": _count(db, RiskEvent, project_id), "blocking_risks": _count_blocking_risks(db, project_id)}
+    return {
+        "project_id": project_id,
+        "requirements": _count_active_requirements(db, project_id),
+        "tasks": _count_work(db, project_id, "task"),
+        "tests": _count_work(db, project_id, "test"),
+        "bugs": _count_work(db, project_id, "bug"),
+        "inbox_open": count_inbox_open(db, project_id),
+        "decisions": count_decisions(db, project_id),
+        "open_risks": _count(db, RiskEvent, project_id),
+        "blocking_risks": _count_blocking_risks(db, project_id),
+    }
 
 
 def calculate_readiness(db: Session, release: Release) -> dict:
@@ -53,12 +65,24 @@ def calculate_readiness(db: Session, release: Release) -> dict:
     release.status = "Ready" if passed else "Blocked"
     db.commit()
     db.refresh(release)
-    log_activity(db, "release.readiness", f"Release {release.version} score={score} passed={passed}", release.project_id)
-    return {"release_id": release.id, "score": score, "blocking_risks": blockers, "passed": passed, "recommendations": recommendations(risk_dicts)}
+    log_activity(
+        db, "release.readiness", f"Release {release.version} score={score} passed={passed}", release.project_id
+    )
+    return {
+        "release_id": release.id,
+        "score": score,
+        "blocking_risks": blockers,
+        "passed": passed,
+        "recommendations": recommendations(risk_dicts),
+    }
 
 
 def _count_active_requirements(db: Session, project_id: int) -> int:
-    stmt = select(func.count()).select_from(Requirement).where(Requirement.project_id == project_id, Requirement.status != "Archived")
+    stmt = (
+        select(func.count())
+        .select_from(Requirement)
+        .where(Requirement.project_id == project_id, Requirement.status != "Archived")
+    )
     return int(db.scalar(stmt) or 0)
 
 
@@ -73,5 +97,9 @@ def _count_work(db: Session, project_id: int, kind: str) -> int:
 
 
 def _count_blocking_risks(db: Session, project_id: int) -> int:
-    stmt = select(func.count()).select_from(RiskEvent).where(RiskEvent.project_id == project_id, RiskEvent.blocking.is_(True))
+    stmt = (
+        select(func.count())
+        .select_from(RiskEvent)
+        .where(RiskEvent.project_id == project_id, RiskEvent.blocking.is_(True))
+    )
     return int(db.scalar(stmt) or 0)

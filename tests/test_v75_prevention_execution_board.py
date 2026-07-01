@@ -15,18 +15,24 @@ def auth_headers():
 
 
 def _create_project(headers):
-    return client.post("/api/projects", json={"name": "Prevention Execution", "description": "v7.5"}, headers=headers).json()
+    return client.post(
+        "/api/projects", json={"name": "Prevention Execution", "description": "v7.5"}, headers=headers
+    ).json()
 
 
 def _learning_item(headers, project_id, title, status="Open", owner="", due_date=""):
-    return client.post(f"/api/projects/{project_id}/release-learning-items", json={
-        "title": title,
-        "prevention_action": "Control recurring release risk before it reaches sign-off.",
-        "source": "manual",
-        "status": status,
-        "owner": owner,
-        "due_date": due_date,
-    }, headers=headers).json()["item"]
+    return client.post(
+        f"/api/projects/{project_id}/release-learning-items",
+        json={
+            "title": title,
+            "prevention_action": "Control recurring release risk before it reaches sign-off.",
+            "source": "manual",
+            "status": status,
+            "owner": owner,
+            "due_date": due_date,
+        },
+        headers=headers,
+    ).json()["item"]
 
 
 def test_v75_prevention_execution_board_lanes_and_markdown():
@@ -63,9 +69,11 @@ def test_v75_escalate_item_and_overdue_risk_escalations():
     yesterday = (date.today() - timedelta(days=8)).isoformat()
     item = _learning_item(headers, project["id"], "Escalate recurring blocker", owner="QA", due_date=yesterday)
 
-    escalated = client.post(f"/api/release-learning-items/{item['id']}/escalate", json={
-        "reason": "Missed due date before next release readiness review."
-    }, headers=headers).json()
+    escalated = client.post(
+        f"/api/release-learning-items/{item['id']}/escalate",
+        json={"reason": "Missed due date before next release readiness review."},
+        headers=headers,
+    ).json()
     assert escalated["changed"] is True
     assert escalated["item"]["status"] == "Escalated"
     assert "Escalation note" in escalated["item"]["prevention_action"]
@@ -83,7 +91,10 @@ def test_v75_escalate_item_and_overdue_risk_escalations():
 
 def test_v75_static_ui_and_routes_are_registered():
     index_html = open("static/index.html", encoding="utf-8").read()
-    learning_js = open("static/release_learning_ui.js", encoding="utf-8").read() + open("static/prevention_execution_ui.js", encoding="utf-8").read()
+    learning_js = (
+        open("static/release_learning_ui.js", encoding="utf-8").read()
+        + open("static/prevention_execution_ui.js", encoding="utf-8").read()
+    )
     routes_py = " ".join(wired_route_modules())
 
     assert "Prevention Execution Board" in index_html

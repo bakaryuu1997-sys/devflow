@@ -17,7 +17,9 @@ def api_v11_6_final_packaging_cleanup(profile_id: str = Query(default="core-risk
 
 
 @router.get("/release-governance/v11-6-beginner-install-verification")
-def api_v11_6_beginner_install_verification(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v11_6_beginner_install_verification(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v11_6_beginner_install_verification(db, profile_id)
 
 

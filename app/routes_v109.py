@@ -45,14 +45,20 @@ def api_v10_9_execute_guarded_manual_restore(
     snapshot_export: dict | None = Body(default=None),
     db: Session = Depends(get_db),
 ):
-    return v10_9_execute_guarded_manual_restore(db, profile_id, restore_approval, operator_name, snapshot_digest_lock, snapshot_export)
+    return v10_9_execute_guarded_manual_restore(
+        db, profile_id, restore_approval, operator_name, snapshot_digest_lock, snapshot_export
+    )
 
 
 @router.get("/release-governance/v10-9-restore-digest-lock-audit-trail")
-def api_v10_9_restore_digest_lock_audit_trail(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v10_9_restore_digest_lock_audit_trail(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v10_9_restore_digest_lock_audit_trail(db, profile_id)
 
 
 @router.get("/release-governance/v10-9-operator-restore-conflict-package")
-def api_v10_9_operator_restore_conflict_package(profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)):
+def api_v10_9_operator_restore_conflict_package(
+    profile_id: str = Query(default="core-risk"), db: Session = Depends(get_db)
+):
     return v10_9_operator_restore_conflict_package(db, profile_id)

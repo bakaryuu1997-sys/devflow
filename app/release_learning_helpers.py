@@ -9,21 +9,29 @@ def generated_prevention_items(retrospectives: list, risk_dashboard: dict) -> li
     items: list[dict] = []
     for note in retrospectives[:5]:
         for action in split_actions(note.action_items):
-            items.append({"source": f"retrospective#{note.id}", "title": short_title(action), "prevention_action": action})
+            items.append(
+                {"source": f"retrospective#{note.id}", "title": short_title(action), "prevention_action": action}
+            )
         if note.what_to_improve.strip():
-            items.append({
-                "source": f"retrospective#{note.id}",
-                "title": "Prevent repeated improvement gap",
-                "prevention_action": note.what_to_improve.strip(),
-            })
+            items.append(
+                {
+                    "source": f"retrospective#{note.id}",
+                    "title": "Prevent repeated improvement gap",
+                    "prevention_action": note.what_to_improve.strip(),
+                }
+            )
     for signal in recurring_risk_signals(risk_dashboard):
-        items.append({"source": "recurring-risk", "title": signal["title"], "prevention_action": signal["prevention_action"]})
+        items.append(
+            {"source": "recurring-risk", "title": signal["title"], "prevention_action": signal["prevention_action"]}
+        )
     if not items:
-        items.append({
-            "source": "release-review",
-            "title": "Keep pre-signoff review ritual",
-            "prevention_action": "Run risk dashboard, done gates, and final sign-off snapshot before every release.",
-        })
+        items.append(
+            {
+                "source": "release-review",
+                "title": "Keep pre-signoff review ritual",
+                "prevention_action": "Run risk dashboard, done gates, and final sign-off snapshot before every release.",
+            }
+        )
     return dedupe(items)[:10]
 
 
@@ -37,13 +45,15 @@ def recurring_risk_signals(risk_dashboard: dict) -> list[dict]:
         blocking = sum(1 for risk in risks if risk.get("rule_id") == rule_id and risk.get("blocking"))
         if count < 2 and blocking == 0:
             continue
-        signals.append({
-            "rule_id": rule_id,
-            "count": count,
-            "blocking_count": blocking,
-            "title": risk_title(rule_id),
-            "prevention_action": risk_prevention_action(rule_id),
-        })
+        signals.append(
+            {
+                "rule_id": rule_id,
+                "count": count,
+                "blocking_count": blocking,
+                "title": risk_title(rule_id),
+                "prevention_action": risk_prevention_action(rule_id),
+            }
+        )
     return signals
 
 

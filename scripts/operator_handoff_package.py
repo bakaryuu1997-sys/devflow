@@ -88,7 +88,14 @@ Expected result: schema is verified and no migration SQL remains pending.
 
 
 def manifest_doc(db_path: Path) -> str:
-    lines = ["# v8.6 handoff manifest", "", f"Database: {db_path}", f"Approval phrase: {APPROVAL_PHRASE}", "", "## Files"]
+    lines = [
+        "# v8.6 handoff manifest",
+        "",
+        f"Database: {db_path}",
+        f"Approval phrase: {APPROVAL_PHRASE}",
+        "",
+        "## Files",
+    ]
     lines.extend(f"- {filename}: {purpose}" for filename, purpose in PACKAGE_FILES.items())
     return "\n".join(lines).strip() + "\n"
 

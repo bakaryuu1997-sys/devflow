@@ -19,7 +19,10 @@ def recurring_risk_trends(db: Session, project_id: int, limit: int = 5) -> dict:
     snapshots_oldest_first = list(reversed(list(zip(signoffs, snapshots, strict=True))))
     occurrences = _risk_occurrences(snapshots_oldest_first)
     recurring = [row for row in occurrences.values() if row["snapshot_occurrences"] >= 2]
-    recurring.sort(key=lambda row: (row["blocking_occurrences"], row["snapshot_occurrences"], _rank(row["latest_severity"])), reverse=True)
+    recurring.sort(
+        key=lambda row: (row["blocking_occurrences"], row["snapshot_occurrences"], _rank(row["latest_severity"])),
+        reverse=True,
+    )
     data = {
         "project_id": project_id,
         "snapshot_count": len(signoffs),
@@ -35,7 +38,9 @@ def recurring_risk_trends(db: Session, project_id: int, limit: int = 5) -> dict:
 
 def recurring_risk_markdown(data: dict) -> str:
     if not data.get("can_analyze"):
-        return "# Recurring Risk Trends\n\nCreate at least two structured sign-off snapshots to analyze recurring risks.\n"
+        return (
+            "# Recurring Risk Trends\n\nCreate at least two structured sign-off snapshots to analyze recurring risks.\n"
+        )
     lines = [
         "# Recurring Risk Trends",
         "",
@@ -105,14 +110,16 @@ def _latest_snapshot_risks(signoff: ReleaseSignOff, snapshot: dict) -> list[dict
     rows = []
     for req in snapshot.get("requirements", []) or []:
         for risk in req.get("risk_events", []) or []:
-            rows.append({
-                "signoff_id": signoff.id,
-                "requirement_key": req.get("key"),
-                "rule_id": risk.get("rule_id"),
-                "title": risk.get("title"),
-                "severity": risk.get("severity"),
-                "blocking": bool(risk.get("blocking")),
-            })
+            rows.append(
+                {
+                    "signoff_id": signoff.id,
+                    "requirement_key": req.get("key"),
+                    "rule_id": risk.get("rule_id"),
+                    "title": risk.get("title"),
+                    "severity": risk.get("severity"),
+                    "blocking": bool(risk.get("blocking")),
+                }
+            )
     return rows
 
 

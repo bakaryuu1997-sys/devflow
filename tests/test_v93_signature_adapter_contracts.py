@@ -54,8 +54,18 @@ def test_v93_static_ui_and_routes_are_wired():
 def test_v93_cli_exports(tmp_path):
     contract_out = tmp_path / "SIGNATURE_ADAPTER_CONTRACT_TESTS.md"
     fixture_out = tmp_path / "SAMPLE_SIGNATURE_FIXTURES.md"
-    contract = subprocess.run([sys.executable, "scripts/export_signature_adapter_contract_tests.py", str(contract_out)], text=True, capture_output=True, check=False)
-    fixtures = subprocess.run([sys.executable, "scripts/export_sample_signature_fixtures.py", str(fixture_out)], text=True, capture_output=True, check=False)
+    contract = subprocess.run(
+        [sys.executable, "scripts/export_signature_adapter_contract_tests.py", str(contract_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    fixtures = subprocess.run(
+        [sys.executable, "scripts/export_sample_signature_fixtures.py", str(fixture_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert contract.returncode == 0, contract.stdout + contract.stderr
     assert fixtures.returncode == 0, fixtures.stdout + fixtures.stderr
     assert "Signature Adapter Contract Tests" in contract_out.read_text(encoding="utf-8")

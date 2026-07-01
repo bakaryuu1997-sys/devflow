@@ -69,7 +69,10 @@ def _preflight_checks(check: dict, backup: dict) -> list[dict]:
 
 def _manual_apply_steps(statements: list[dict]) -> list[str]:
     if not statements:
-        return ["No SQL needs to be applied on the copied database or live database.", "Run post-migration verification snapshot."]
+        return [
+            "No SQL needs to be applied on the copied database or live database.",
+            "Run post-migration verification snapshot.",
+        ]
     return [
         "Stop the app and any terminals using devflow.db.",
         "Copy devflow.db to a timestamped backup file.",
@@ -123,7 +126,14 @@ def _recommended_next_steps(check: dict, remaining: int) -> list[str]:
 
 
 def _assistant_markdown(data: dict) -> str:
-    lines = ["# v8.3 Manual Migration Apply Assistant", "", f"Status: {data['status']}", f"Will apply changes: {data['will_apply_changes']}", "", "## Manual apply steps"]
+    lines = [
+        "# v8.3 Manual Migration Apply Assistant",
+        "",
+        f"Status: {data['status']}",
+        f"Will apply changes: {data['will_apply_changes']}",
+        "",
+        "## Manual apply steps",
+    ]
     lines.extend(f"- [ ] {step}" for step in data["manual_apply_steps"])
     lines.extend(["", "## SQL script", "```sql", data["sql_script"].strip(), "```", "", "## Verify after apply"])
     lines.extend(f"- [ ] {step}" for step in data["post_apply_verification"])
@@ -131,8 +141,19 @@ def _assistant_markdown(data: dict) -> str:
 
 
 def _verification_markdown(data: dict) -> str:
-    lines = ["# v8.3 Post-migration Verification Snapshot", "", f"Status: {data['status']}", f"Schema ready: {data['schema_ready']}", f"Remaining SQL count: {data['remaining_sql_count']}", "", "## Verified schema"]
-    lines.extend(f"- {row['table']}: {row['state']} missing={', '.join(row['missing_columns']) or 'none'}" for row in data["verified_schema"])
+    lines = [
+        "# v8.3 Post-migration Verification Snapshot",
+        "",
+        f"Status: {data['status']}",
+        f"Schema ready: {data['schema_ready']}",
+        f"Remaining SQL count: {data['remaining_sql_count']}",
+        "",
+        "## Verified schema",
+    ]
+    lines.extend(
+        f"- {row['table']}: {row['state']} missing={', '.join(row['missing_columns']) or 'none'}"
+        for row in data["verified_schema"]
+    )
     lines.extend(["", "## Remaining actions"])
     lines.extend(f"- {action}" for action in data["remaining_actions"])
     return "\n".join(lines).strip() + "\n"

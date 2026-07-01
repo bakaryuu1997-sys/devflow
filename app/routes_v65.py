@@ -40,4 +40,8 @@ def api_release_review_checklist(project_id: int, db: Session = Depends(get_db))
 
 def _is_placeholder(item: WorkItem) -> bool:
     title = item.title.lower()
-    return "placeholder for" in title or title.startswith("implementation task placeholder") or title.startswith("test coverage placeholder")
+    return (
+        "placeholder for" in title
+        or title.startswith("implementation task placeholder")
+        or title.startswith("test coverage placeholder")
+    )

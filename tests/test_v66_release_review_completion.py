@@ -13,32 +13,44 @@ def auth_headers():
 
 def test_requirement_done_gates_block_until_task_test_and_risks_pass():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-GATE",
-        "title": "Critical audit export",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-GATE",
+            "title": "Critical audit export",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
 
     blocked = client.get(f"/api/requirements/{req['id']}/done-gates", headers=headers).json()
     assert blocked["is_done"] is False
     assert any(gate["key"] == "done_task" and gate["passed"] is False for gate in blocked["gates"])
     assert any(gate["key"] == "done_test" and gate["passed"] is False for gate in blocked["gates"])
 
-    client.post("/api/projects/1/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "task",
-        "title": "Implement audit export",
-        "status": "Done",
-        "severity": "Medium",
-    }, headers=headers)
-    client.post("/api/projects/1/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "test",
-        "title": "Audit export regression test",
-        "status": "Done",
-        "severity": "Medium",
-    }, headers=headers)
+    client.post(
+        "/api/projects/1/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "task",
+            "title": "Implement audit export",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
+    client.post(
+        "/api/projects/1/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "test",
+            "title": "Audit export regression test",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
 
     passed = client.get(f"/api/requirements/{req['id']}/done-gates", headers=headers).json()
     assert passed["is_done"] is True
@@ -47,24 +59,32 @@ def test_requirement_done_gates_block_until_task_test_and_risks_pass():
 
 def test_review_complete_requires_done_gates_and_tracks_project_completion():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-REVIEW",
-        "title": "Medium profile page",
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-REVIEW",
+            "title": "Medium profile page",
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
 
     rejected = client.post(f"/api/requirements/{req['id']}/review-complete", headers=headers)
     assert rejected.status_code == 200
     assert rejected.json()["marked"] is False
 
-    client.post("/api/projects/1/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "task",
-        "title": "Build profile page",
-        "status": "Done",
-        "severity": "Medium",
-    }, headers=headers)
+    client.post(
+        "/api/projects/1/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "task",
+            "title": "Build profile page",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
     marked = client.post(f"/api/requirements/{req['id']}/review-complete", headers=headers).json()
     assert marked["marked"] is True
     assert marked["review_complete"] is True

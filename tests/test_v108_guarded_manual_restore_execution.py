@@ -52,6 +52,11 @@ def test_v108_routes_ui_docs_and_cli_export(tmp_path):
     assert "governance_v108_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_8_GUARDED_MANUAL_RESTORE_EXECUTION.md").exists()
     out = tmp_path / "restore.md"
-    result = subprocess.run([sys.executable, "scripts/export_v10_8_restore_execution_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v10_8_restore_execution_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v10.8 Operator Restore Execution Package" in out.read_text(encoding="utf-8")

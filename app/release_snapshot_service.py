@@ -96,9 +96,13 @@ def snapshot_from_legacy_markdown(signoff: ReleaseSignOff) -> dict:
 
 
 def release_snapshot_analytics(db: Session, project_id: int) -> dict:
-    signoffs = list(db.scalars(
-        select(ReleaseSignOff).where(ReleaseSignOff.project_id == project_id).order_by(ReleaseSignOff.created_at.desc())
-    ).all())
+    signoffs = list(
+        db.scalars(
+            select(ReleaseSignOff)
+            .where(ReleaseSignOff.project_id == project_id)
+            .order_by(ReleaseSignOff.created_at.desc())
+        ).all()
+    )
     snapshots = [snapshot_from_signoff(row) for row in signoffs]
     requirement_keys = {req.get("key") for snap in snapshots for req in snap.get("requirements", []) if req.get("key")}
     blocking_counts = [int((snap.get("summary") or {}).get("blocking_risks", 0) or 0) for snap in snapshots]

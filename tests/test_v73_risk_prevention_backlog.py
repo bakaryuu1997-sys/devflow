@@ -17,25 +17,35 @@ def auth_headers():
 
 
 def _create_project(headers):
-    project = client.post("/api/projects", json={"name": "Prevention Backlog Project", "description": "v7.3"}, headers=headers).json()
+    project = client.post(
+        "/api/projects", json={"name": "Prevention Backlog Project", "description": "v7.3"}, headers=headers
+    ).json()
     client.post(f"/api/projects/{project['id']}/releases", json={"version": "7.3.0"}, headers=headers)
     return project
 
 
 def _add_reviewed_requirement(headers, project_id):
-    req = client.post(f"/api/projects/{project_id}/requirements", json={
-        "key": "REQ-PREVENT",
-        "title": "Prevention ready scope",
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers).json()
-    client.post(f"/api/projects/{project_id}/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "task",
-        "title": "Implement prevention scope",
-        "status": "Done",
-        "severity": "Medium",
-    }, headers=headers)
+    req = client.post(
+        f"/api/projects/{project_id}/requirements",
+        json={
+            "key": "REQ-PREVENT",
+            "title": "Prevention ready scope",
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    client.post(
+        f"/api/projects/{project_id}/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "task",
+            "title": "Implement prevention scope",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
     client.post(f"/api/requirements/{req['id']}/review-complete", headers=headers)
     return req
 
@@ -48,13 +58,15 @@ def _inject_risk_event(signoff_id, rule_id, severity="High", blocking=True):
         snapshot["requirements"][0]["risk_count"] = 1
         snapshot["requirements"][0]["blocking_risks"] = 1 if blocking else 0
         snapshot["requirements"][0]["highest_severity"] = severity
-        snapshot["requirements"][0]["risk_events"] = [{
-            "rule_id": rule_id,
-            "title": "Repeated unstable release gate",
-            "message": "This risk keeps returning.",
-            "severity": severity,
-            "blocking": blocking,
-        }]
+        snapshot["requirements"][0]["risk_events"] = [
+            {
+                "rule_id": rule_id,
+                "title": "Repeated unstable release gate",
+                "message": "This risk keeps returning.",
+                "severity": severity,
+                "blocking": blocking,
+            }
+        ]
         snapshot["summary"]["total_risks"] = 1
         snapshot["summary"]["blocking_risks"] = 1 if blocking else 0
         signoff.snapshot_json = json.dumps(snapshot)
@@ -64,14 +76,22 @@ def _inject_risk_event(signoff_id, rule_id, severity="High", blocking=True):
 
 
 def _create_two_risky_signoffs(headers, project_id):
-    first = client.post(f"/api/projects/{project_id}/release-signoffs", json={
-        "approved_by": "QA",
-        "approval_note": "First approval.",
-    }, headers=headers).json()["signoff"]
-    second = client.post(f"/api/projects/{project_id}/release-signoffs", json={
-        "approved_by": "QA",
-        "approval_note": "Second approval.",
-    }, headers=headers).json()["signoff"]
+    first = client.post(
+        f"/api/projects/{project_id}/release-signoffs",
+        json={
+            "approved_by": "QA",
+            "approval_note": "First approval.",
+        },
+        headers=headers,
+    ).json()["signoff"]
+    second = client.post(
+        f"/api/projects/{project_id}/release-signoffs",
+        json={
+            "approved_by": "QA",
+            "approval_note": "Second approval.",
+        },
+        headers=headers,
+    ).json()["signoff"]
     _inject_risk_event(first["id"], "recurring_unstable_gate")
     _inject_risk_event(second["id"], "recurring_unstable_gate")
 
@@ -107,7 +127,9 @@ def test_v73_auto_create_learning_items_is_idempotent():
     assert second["skipped"] == 1
 
     learning = client.get(f"/api/projects/{project['id']}/release-learning-loop", headers=headers).json()
-    assert any(item["source"] == "recurring-risk:recurring_unstable_gate" for item in learning["saved_prevention_items"])
+    assert any(
+        item["source"] == "recurring-risk:recurring_unstable_gate" for item in learning["saved_prevention_items"]
+    )
 
 
 def test_v73_static_ui_and_routes_are_registered():

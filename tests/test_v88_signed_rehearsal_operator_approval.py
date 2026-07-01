@@ -21,25 +21,34 @@ def test_v88_signed_rehearsal_package_endpoint_is_wired():
 
 def test_v88_signed_artifact_and_final_approval_flow():
     signature = "I ran and reviewed the production upgrade rehearsal on a copied database."
-    artifact = client.post("/api/release-governance/signed-rehearsal-artifacts", json={
-        "operator_name": "Operator A",
-        "reviewer_name": "Reviewer A",
-        "signature_text": signature,
-        "notes": "Rehearsal passed on DB copy.",
-    }).json()
+    artifact = client.post(
+        "/api/release-governance/signed-rehearsal-artifacts",
+        json={
+            "operator_name": "Operator A",
+            "reviewer_name": "Reviewer A",
+            "signature_text": signature,
+            "notes": "Rehearsal passed on DB copy.",
+        },
+    ).json()
     assert artifact["status"] in {"Signed", "Blocked"}
-    blocked = client.post("/api/release-governance/final-operator-approval-records", json={
-        "approver_name": "Approver A",
-        "approval_phrase": "WRONG",
-        "approval_note": "Wrong phrase should block.",
-    }).json()
+    blocked = client.post(
+        "/api/release-governance/final-operator-approval-records",
+        json={
+            "approver_name": "Approver A",
+            "approval_phrase": "WRONG",
+            "approval_note": "Wrong phrase should block.",
+        },
+    ).json()
     assert blocked["status"] == "Blocked"
     if artifact["status"] == "Signed":
-        approved = client.post("/api/release-governance/final-operator-approval-records", json={
-            "approver_name": "Approver A",
-            "approval_phrase": "I_APPROVE_PRODUCTION_MIGRATION",
-            "approval_note": "Approved after signed rehearsal.",
-        }).json()
+        approved = client.post(
+            "/api/release-governance/final-operator-approval-records",
+            json={
+                "approver_name": "Approver A",
+                "approval_phrase": "I_APPROVE_PRODUCTION_MIGRATION",
+                "approval_note": "Approved after signed rehearsal.",
+            },
+        ).json()
         assert approved["status"] == "Approved"
         assert approved["signed_artifact_id"] == artifact["id"]
 
@@ -63,8 +72,18 @@ def test_v88_cli_exports_for_signed_package_and_final_approval(tmp_path):
     create_v88_database(db_path)
     package_out = tmp_path / "SIGNED_REHEARSAL_PACKAGE.md"
     approval_out = tmp_path / "FINAL_OPERATOR_APPROVAL_RECORD.md"
-    package = subprocess.run([sys.executable, "scripts/export_signed_rehearsal_package.py", str(db_path), str(package_out)], text=True, capture_output=True, check=False)
-    approval = subprocess.run([sys.executable, "scripts/final_operator_approval_record.py", str(db_path), str(approval_out)], text=True, capture_output=True, check=False)
+    package = subprocess.run(
+        [sys.executable, "scripts/export_signed_rehearsal_package.py", str(db_path), str(package_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    approval = subprocess.run(
+        [sys.executable, "scripts/final_operator_approval_record.py", str(db_path), str(approval_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert package.returncode == 0, package.stdout + package.stderr
     assert approval.returncode == 0, approval.stdout + approval.stderr
     assert "signed rehearsal artifact package" in package_out.read_text(encoding="utf-8").lower()

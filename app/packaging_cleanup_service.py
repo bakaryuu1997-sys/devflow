@@ -60,23 +60,38 @@ def v11_6_operator_final_package(db: Session, profile_id: str = "core-risk") -> 
     data = {
         "version": VERSION,
         "mode": "operator-final-package",
-        "status": "Operator final package ready" if cleanup["ready"] and install["ready"] else "Operator final package blocked",
+        "status": "Operator final package ready"
+        if cleanup["ready"] and install["ready"]
+        else "Operator final package blocked",
         "ready": cleanup["ready"] and install["ready"],
         "profile_id": profile_id,
         "release_candidate": RC_LABEL,
     }
-    data["content"] = "\n\n".join([
-        "# v11.6 Operator Final Package",
-        cleanup["content"],
-        install["content"],
-    ]).strip() + "\n"
+    data["content"] = (
+        "\n\n".join(
+            [
+                "# v11.6 Operator Final Package",
+                cleanup["content"],
+                install["content"],
+            ]
+        ).strip()
+        + "\n"
+    )
     return data
 
 
 def _packaging_checks() -> list[dict]:
     return [
-        _check("readme-current-or-newer", any(v in _read("README.md") for v in ["v11.6", "v11.7", "v11.8", "v11.9"]), "README names v11.6 or newer."),
-        _check("version-current-or-newer", any(v in _read("VERSION.md") for v in ["v11.6", "v11.7", "v11.8", "v11.9"]), "VERSION.md is current or newer."),
+        _check(
+            "readme-current-or-newer",
+            any(v in _read("README.md") for v in ["v11.6", "v11.7", "v11.8", "v11.9"]),
+            "README names v11.6 or newer.",
+        ),
+        _check(
+            "version-current-or-newer",
+            any(v in _read("VERSION.md") for v in ["v11.6", "v11.7", "v11.8", "v11.9"]),
+            "VERSION.md is current or newer.",
+        ),
         _check("requirements-present", Path("requirements.txt").exists(), "requirements.txt is present."),
         _check("docs-present", Path("docs/V11_6_FINAL_PACKAGING_INSTALL.md").exists(), "v11.6 docs are present."),
         _check("no-new-destructive-path", True, "v11.6 only packages and verifies installation."),
@@ -88,7 +103,9 @@ def _install_checks() -> list[dict]:
     readme = _read("README.md")
     return [
         _check("venv-step-present", "python -m venv .venv" in readme, "README shows virtualenv setup."),
-        _check("pip-install-step-present", "pip install -r requirements.txt" in readme, "README shows dependency install."),
+        _check(
+            "pip-install-step-present", "pip install -r requirements.txt" in readme, "README shows dependency install."
+        ),
         _check("run-step-present", "uvicorn app.main:app --reload" in readme, "README shows local run command."),
         _check("sqlalchemy-dependency", "sqlalchemy" in req, "SQLAlchemy dependency is declared."),
         _check("pytest-dependency", "pytest" in req, "pytest dependency is declared."),

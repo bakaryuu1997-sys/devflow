@@ -24,12 +24,15 @@ def test_v92_signature_adapter_and_policy_endpoints():
 
 def test_v92_signature_adapter_dry_run_endpoint():
     policy = client.get("/api/release-governance/policy-based-verification-checklist").json()
-    result = client.post("/api/release-governance/signature-adapter-dry-run", json={
-        "adapter": "generic-sha256-reference",
-        "payload_hash": policy["payload_hash"],
-        "signature_hash": "a" * 64,
-        "token_hash": "b" * 64,
-    }).json()
+    result = client.post(
+        "/api/release-governance/signature-adapter-dry-run",
+        json={
+            "adapter": "generic-sha256-reference",
+            "payload_hash": policy["payload_hash"],
+            "signature_hash": "a" * 64,
+            "token_hash": "b" * 64,
+        },
+    ).json()
     assert result["version"] == "9.2"
     assert result["mode"] == "signature-adapter-dry-run"
     assert result["adapter"] == "generic-sha256-reference"
@@ -51,10 +54,28 @@ def test_v92_cli_policy_and_dry_run(tmp_path):
     create_minimal_evidence_db(db_path)
     policy_out = tmp_path / "SIGNATURE_POLICY_CHECKLIST.md"
     dry_out = tmp_path / "SIGNATURE_ADAPTER_DRY_RUN.md"
-    policy = subprocess.run([sys.executable, "scripts/export_signature_policy_checklist.py", str(db_path), str(policy_out)], text=True, capture_output=True, check=False)
+    policy = subprocess.run(
+        [sys.executable, "scripts/export_signature_policy_checklist.py", str(db_path), str(policy_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert policy.returncode == 0, policy.stdout + policy.stderr
     payload_hash = extract_payload_hash(policy_out.read_text(encoding="utf-8"))
-    dry = subprocess.run([sys.executable, "scripts/signature_adapter_dry_run.py", str(db_path), "generic-sha256-reference", payload_hash, "a" * 64, str(dry_out)], text=True, capture_output=True, check=False)
+    dry = subprocess.run(
+        [
+            sys.executable,
+            "scripts/signature_adapter_dry_run.py",
+            str(db_path),
+            "generic-sha256-reference",
+            payload_hash,
+            "a" * 64,
+            str(dry_out),
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert dry.returncode in {0, 1}, dry.stdout + dry.stderr
     assert "Policy-Based Verification Checklist" in policy_out.read_text(encoding="utf-8")
     assert "Signature Adapter Dry Run" in dry_out.read_text(encoding="utf-8")
@@ -63,10 +84,18 @@ def test_v92_cli_policy_and_dry_run(tmp_path):
 def create_minimal_evidence_db(path: Path) -> None:
     con = sqlite3.connect(path)
     try:
-        con.execute("CREATE TABLE signed_rehearsal_artifacts (id INTEGER PRIMARY KEY, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')")
-        con.execute("CREATE TABLE operator_approval_records (id INTEGER PRIMARY KEY, signed_artifact_id INTEGER, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')")
-        con.execute("CREATE TABLE evidence_manifest_records (id INTEGER PRIMARY KEY, algorithm TEXT DEFAULT 'sha256', manifest_hash TEXT DEFAULT '', bundle_hash TEXT DEFAULT '', status TEXT DEFAULT '', artifact_count INTEGER DEFAULT 0, approval_count INTEGER DEFAULT 0, item_count INTEGER DEFAULT 0, notes TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')")
-        con.execute("INSERT INTO signed_rehearsal_artifacts (status, content, created_at) VALUES ('Signed', 'artifact content', '2026-06-04T00:00:00')")
+        con.execute(
+            "CREATE TABLE signed_rehearsal_artifacts (id INTEGER PRIMARY KEY, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')"
+        )
+        con.execute(
+            "CREATE TABLE operator_approval_records (id INTEGER PRIMARY KEY, signed_artifact_id INTEGER, status TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')"
+        )
+        con.execute(
+            "CREATE TABLE evidence_manifest_records (id INTEGER PRIMARY KEY, algorithm TEXT DEFAULT 'sha256', manifest_hash TEXT DEFAULT '', bundle_hash TEXT DEFAULT '', status TEXT DEFAULT '', artifact_count INTEGER DEFAULT 0, approval_count INTEGER DEFAULT 0, item_count INTEGER DEFAULT 0, notes TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT '')"
+        )
+        con.execute(
+            "INSERT INTO signed_rehearsal_artifacts (status, content, created_at) VALUES ('Signed', 'artifact content', '2026-06-04T00:00:00')"
+        )
         con.commit()
     finally:
         con.close()
@@ -75,4 +104,4 @@ def create_minimal_evidence_db(path: Path) -> None:
 def extract_payload_hash(markdown: str) -> str:
     marker = "Payload hash: `"
     start = markdown.index(marker) + len(marker)
-    return markdown[start:start + 64]
+    return markdown[start : start + 64]

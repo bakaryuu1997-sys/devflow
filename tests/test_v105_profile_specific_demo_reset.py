@@ -22,7 +22,9 @@ def test_v105_reset_plan_exposes_profile_specific_approval_phrase():
 
 def test_v105_blocks_reset_without_exact_approval_phrase():
     client.post("/api/demo/reset")
-    blocked = client.post("/api/release-governance/v10-5-execute-profile-reset?profile_id=core-risk&approval=wrong").json()
+    blocked = client.post(
+        "/api/release-governance/v10-5-execute-profile-reset?profile_id=core-risk&approval=wrong"
+    ).json()
     assert blocked["ready"] is False
     assert blocked["status"] == "Approval phrase required"
     assert blocked["expected_approval_phrase"] == "RESET DEMO PROFILE: core-risk"
@@ -33,7 +35,9 @@ def test_v105_executes_scoped_profile_reset_and_rebuilds_seed_data():
     phrase = "RESET DEMO PROFILE: core-risk"
     first = client.post("/api/release-governance/v10-4-build-sample-project?profile_id=core-risk").json()
     assert first["status"] == "Built"
-    reset = client.post(f"/api/release-governance/v10-5-execute-profile-reset?profile_id=core-risk&approval={phrase}&operator_name=Long").json()
+    reset = client.post(
+        f"/api/release-governance/v10-5-execute-profile-reset?profile_id=core-risk&approval={phrase}&operator_name=Long"
+    ).json()
     assert reset["status"] == "Reset complete"
     assert reset["deleted_records"]["projects"] == 1
     projects = client.get("/api/projects").json()
@@ -50,6 +54,11 @@ def test_v105_routes_ui_docs_and_cli_export(tmp_path):
     assert "governance_v105_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_5_PROFILE_SPECIFIC_DEMO_RESET.md").exists()
     out = tmp_path / "reset.md"
-    result = subprocess.run([sys.executable, "scripts/export_v10_5_operator_reset_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v10_5_operator_reset_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v10.5 Operator Profile Reset Package" in out.read_text(encoding="utf-8")

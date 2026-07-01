@@ -13,19 +13,27 @@ def auth_headers():
 
 def test_release_risk_dashboard_groups_risks_by_requirement_with_fix_hints():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-DASH",
-        "title": "Critical checkout flow",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
-    client.post("/api/projects/1/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "bug",
-        "title": "Checkout fails",
-        "status": "Open",
-        "severity": "Critical",
-    }, headers=headers)
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-DASH",
+            "title": "Critical checkout flow",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    client.post(
+        "/api/projects/1/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "bug",
+            "title": "Checkout fails",
+            "status": "Open",
+            "severity": "Critical",
+        },
+        headers=headers,
+    )
 
     response = client.get("/api/projects/1/release-risk-dashboard", headers=headers)
 
@@ -44,12 +52,16 @@ def test_release_risk_dashboard_groups_risks_by_requirement_with_fix_hints():
 
 def test_release_risk_dashboard_excludes_archived_requirements():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-DASH-ARCHIVED",
-        "title": "Archived risky requirement",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-DASH-ARCHIVED",
+            "title": "Archived risky requirement",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
     client.post(f"/api/requirements/{req['id']}/archive", headers=headers)
 
     data = client.get("/api/projects/1/release-risk-dashboard", headers=headers).json()

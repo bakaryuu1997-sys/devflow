@@ -8,13 +8,88 @@ REQUIRED_SCHEMA = {
     "release_signoffs": ["snapshot_json"],
     "release_learning_items": ["owner", "due_date"],
     "scope_decision_audits": ["project_id", "learning_item_id", "old_status", "new_status", "reason", "created_at"],
-    "signed_rehearsal_artifacts": ["artifact_type", "operator_name", "reviewer_name", "signature_text", "status", "notes", "content", "created_at"],
-    "operator_approval_records": ["signed_artifact_id", "approver_name", "approval_phrase", "status", "approval_note", "content", "created_at"],
-    "evidence_manifest_records": ["algorithm", "manifest_hash", "bundle_hash", "status", "artifact_count", "approval_count", "item_count", "notes", "content", "created_at"],
-    "external_timestamp_handoff_records": ["payload_hash", "manifest_hash", "bundle_hash", "timestamp_authority", "request_reference", "response_token_hash", "status", "notes", "content", "created_at"],
-    "signed_payload_verification_records": ["payload_hash", "manifest_hash", "bundle_hash", "signature_algorithm", "signer_name", "signature_reference", "signature_hash", "verification_status", "notes", "content", "created_at"],
-    "timestamp_token_evidence_attachments": ["handoff_id", "payload_hash", "token_hash", "timestamp_authority", "token_reference", "verification_status", "notes", "content", "created_at"],
-    "public_verifier_evidence_attachments": ["adapter", "payload_hash", "signature_hash", "public_key_hash", "signer_name", "key_reference", "evidence_reference", "verification_status", "gate_status", "findings", "notes", "content", "created_at"],
+    "signed_rehearsal_artifacts": [
+        "artifact_type",
+        "operator_name",
+        "reviewer_name",
+        "signature_text",
+        "status",
+        "notes",
+        "content",
+        "created_at",
+    ],
+    "operator_approval_records": [
+        "signed_artifact_id",
+        "approver_name",
+        "approval_phrase",
+        "status",
+        "approval_note",
+        "content",
+        "created_at",
+    ],
+    "evidence_manifest_records": [
+        "algorithm",
+        "manifest_hash",
+        "bundle_hash",
+        "status",
+        "artifact_count",
+        "approval_count",
+        "item_count",
+        "notes",
+        "content",
+        "created_at",
+    ],
+    "external_timestamp_handoff_records": [
+        "payload_hash",
+        "manifest_hash",
+        "bundle_hash",
+        "timestamp_authority",
+        "request_reference",
+        "response_token_hash",
+        "status",
+        "notes",
+        "content",
+        "created_at",
+    ],
+    "signed_payload_verification_records": [
+        "payload_hash",
+        "manifest_hash",
+        "bundle_hash",
+        "signature_algorithm",
+        "signer_name",
+        "signature_reference",
+        "signature_hash",
+        "verification_status",
+        "notes",
+        "content",
+        "created_at",
+    ],
+    "timestamp_token_evidence_attachments": [
+        "handoff_id",
+        "payload_hash",
+        "token_hash",
+        "timestamp_authority",
+        "token_reference",
+        "verification_status",
+        "notes",
+        "content",
+        "created_at",
+    ],
+    "public_verifier_evidence_attachments": [
+        "adapter",
+        "payload_hash",
+        "signature_hash",
+        "public_key_hash",
+        "signer_name",
+        "key_reference",
+        "evidence_reference",
+        "verification_status",
+        "gate_status",
+        "findings",
+        "notes",
+        "content",
+        "created_at",
+    ],
 }
 
 COLUMN_SQL = {
@@ -46,7 +121,6 @@ TABLE_SQL = {
   created_at DATETIME,
   FOREIGN KEY(signed_artifact_id) REFERENCES signed_rehearsal_artifacts (id)
 );""",
-
     "evidence_manifest_records": """CREATE TABLE IF NOT EXISTS evidence_manifest_records (
   id INTEGER NOT NULL PRIMARY KEY,
   algorithm VARCHAR(40) DEFAULT 'sha256',
@@ -60,7 +134,6 @@ TABLE_SQL = {
   content TEXT DEFAULT '',
   created_at DATETIME
 );""",
-
     "external_timestamp_handoff_records": """CREATE TABLE IF NOT EXISTS external_timestamp_handoff_records (
   id INTEGER NOT NULL PRIMARY KEY,
   payload_hash VARCHAR(128) NOT NULL,
@@ -74,7 +147,6 @@ TABLE_SQL = {
   content TEXT DEFAULT '',
   created_at DATETIME
 );""",
-
     "signed_payload_verification_records": """CREATE TABLE IF NOT EXISTS signed_payload_verification_records (id INTEGER PRIMARY KEY, payload_hash TEXT NOT NULL, manifest_hash TEXT DEFAULT '', bundle_hash TEXT DEFAULT '', signature_algorithm TEXT DEFAULT '', signer_name TEXT DEFAULT '', signature_reference TEXT DEFAULT '', signature_hash TEXT DEFAULT '', verification_status TEXT DEFAULT '', notes TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP);""",
     "timestamp_token_evidence_attachments": """CREATE TABLE IF NOT EXISTS timestamp_token_evidence_attachments (id INTEGER PRIMARY KEY, handoff_id INTEGER DEFAULT 0, payload_hash TEXT NOT NULL, token_hash TEXT DEFAULT '', timestamp_authority TEXT DEFAULT '', token_reference TEXT DEFAULT '', verification_status TEXT DEFAULT '', notes TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP);""",
     "public_verifier_evidence_attachments": """CREATE TABLE IF NOT EXISTS public_verifier_evidence_attachments (id INTEGER PRIMARY KEY, adapter TEXT DEFAULT 'ed25519-public-key', payload_hash TEXT NOT NULL, signature_hash TEXT DEFAULT '', public_key_hash TEXT DEFAULT '', signer_name TEXT DEFAULT '', key_reference TEXT DEFAULT '', evidence_reference TEXT DEFAULT '', verification_status TEXT DEFAULT 'Needs Review', gate_status TEXT DEFAULT 'Not Gate-Ready', findings TEXT DEFAULT '', notes TEXT DEFAULT '', content TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP);""",
@@ -105,9 +177,15 @@ INDEX_SQL = {
     "external_timestamp_handoff_records": [
         "CREATE INDEX IF NOT EXISTS ix_external_timestamp_handoff_records_payload_hash ON external_timestamp_handoff_records (payload_hash);",
     ],
-    "signed_payload_verification_records": ["CREATE INDEX IF NOT EXISTS ix_signed_payload_verification_records_payload_hash ON signed_payload_verification_records (payload_hash);"],
-    "timestamp_token_evidence_attachments": ["CREATE INDEX IF NOT EXISTS ix_timestamp_token_evidence_attachments_payload_hash ON timestamp_token_evidence_attachments (payload_hash);"],
-    "public_verifier_evidence_attachments": ["CREATE INDEX IF NOT EXISTS ix_public_verifier_evidence_attachments_payload_hash ON public_verifier_evidence_attachments (payload_hash);"],
+    "signed_payload_verification_records": [
+        "CREATE INDEX IF NOT EXISTS ix_signed_payload_verification_records_payload_hash ON signed_payload_verification_records (payload_hash);"
+    ],
+    "timestamp_token_evidence_attachments": [
+        "CREATE INDEX IF NOT EXISTS ix_timestamp_token_evidence_attachments_payload_hash ON timestamp_token_evidence_attachments (payload_hash);"
+    ],
+    "public_verifier_evidence_attachments": [
+        "CREATE INDEX IF NOT EXISTS ix_public_verifier_evidence_attachments_payload_hash ON public_verifier_evidence_attachments (payload_hash);"
+    ],
 }
 
 

@@ -26,7 +26,9 @@ def api_requirement_done_gates(requirement_id: int, db: Session = Depends(get_db
 
 
 @router.post("/requirements/{requirement_id}/review-complete")
-def api_mark_requirement_review_complete(requirement_id: int, db: Session = Depends(get_db), _user=Depends(require_write)):
+def api_mark_requirement_review_complete(
+    requirement_id: int, db: Session = Depends(get_db), _user=Depends(require_write)
+):
     requirement = _requirement_or_404(db, requirement_id)
     if requirement.status == "Archived":
         raise HTTPException(400, "Archived requirements cannot be marked review complete")

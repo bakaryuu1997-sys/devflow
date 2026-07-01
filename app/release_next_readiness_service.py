@@ -12,11 +12,13 @@ from app.release_learning_helpers import DONE_STATUSES
 def next_release_readiness(db: Session, project_id: int, today: date | None = None) -> dict:
     today = today or date.today()
     project = db.get(Project, project_id)
-    items = list(db.scalars(
-        select(ReleaseLearningItem)
-        .where(ReleaseLearningItem.project_id == project_id)
-        .order_by(ReleaseLearningItem.created_at.desc())
-    ).all())
+    items = list(
+        db.scalars(
+            select(ReleaseLearningItem)
+            .where(ReleaseLearningItem.project_id == project_id)
+            .order_by(ReleaseLearningItem.created_at.desc())
+        ).all()
+    )
     rows = [_planning_row(item, today) for item in items]
     open_rows = [row for row in rows if row["status"] not in DONE_STATUSES]
     planned_rows = [row for row in open_rows if row["owner"] and row["due_date"]]
@@ -117,7 +119,9 @@ def _status(score: int, open_rows: list[dict], overdue_rows: list[dict]) -> str:
     return "At Risk"
 
 
-def _action_hints(open_rows: list[dict], unassigned: list[dict], missing_due: list[dict], overdue: list[dict], due_soon: list[dict]) -> list[str]:
+def _action_hints(
+    open_rows: list[dict], unassigned: list[dict], missing_due: list[dict], overdue: list[dict], due_soon: list[dict]
+) -> list[str]:
     hints = []
     if overdue:
         hints.append(f"Fix or re-plan {len(overdue)} overdue prevention item(s) before release review starts.")

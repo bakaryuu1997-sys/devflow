@@ -10,7 +10,10 @@ from app.release_snapshot_service import snapshot_from_signoff
 
 REQ_ROW_RE = re.compile(r"^- \[[ x]\] (?P<key>[^—|]+) — (?P<title>.*?) \|", re.MULTILINE)
 
-def compare_release_signoffs(db: Session, project_id: int, base_id: int | None = None, target_id: int | None = None) -> dict:
+
+def compare_release_signoffs(
+    db: Session, project_id: int, base_id: int | None = None, target_id: int | None = None
+) -> dict:
     signoffs = _project_signoffs(db, project_id)
     if len(signoffs) < 2 and not (base_id and target_id):
         return {
@@ -50,6 +53,7 @@ def compare_release_signoffs(db: Session, project_id: int, base_id: int | None =
     comparison["summary_markdown"] = _compare_markdown(comparison)
     return comparison
 
+
 def create_retrospective_note(
     db: Session,
     project_id: int,
@@ -81,6 +85,7 @@ def create_retrospective_note(
         "content": retrospective_markdown(project.name if project else "Unknown project", note, signoff),
     }
 
+
 def list_retrospective_notes(db: Session, project_id: int) -> list[dict]:
     notes = db.scalars(
         select(ReleaseRetrospective)
@@ -88,6 +93,7 @@ def list_retrospective_notes(db: Session, project_id: int) -> list[dict]:
         .order_by(ReleaseRetrospective.created_at.desc())
     ).all()
     return [_retrospective_dict(note) for note in notes]
+
 
 def export_retrospective_note(db: Session, note_id: int) -> dict | None:
     note = db.get(ReleaseRetrospective, note_id)
@@ -99,31 +105,40 @@ def export_retrospective_note(db: Session, note_id: int) -> dict | None:
     data["content"] = retrospective_markdown(project.name if project else "Unknown project", note, signoff)
     return data
 
+
 def retrospective_markdown(project_name: str, note: ReleaseRetrospective, signoff: ReleaseSignOff | None) -> str:
     release = signoff.release_version if signoff else "unassigned"
-    return "\n".join([
-        "# Post-release Retrospective Note",
-        "",
-        f"Project: {project_name} (#{note.project_id})",
-        f"Release: {release}",
-        f"Author: {note.author}",
-        f"Created at: {note.created_at.isoformat() if note.created_at else ''}",
-        "",
-        "## What went well",
-        note.what_went_well or "No note provided.",
-        "",
-        "## What to improve",
-        note.what_to_improve or "No note provided.",
-        "",
-        "## Action items",
-        note.action_items or "No action items recorded.",
-        "",
-    ])
+    return "\n".join(
+        [
+            "# Post-release Retrospective Note",
+            "",
+            f"Project: {project_name} (#{note.project_id})",
+            f"Release: {release}",
+            f"Author: {note.author}",
+            f"Created at: {note.created_at.isoformat() if note.created_at else ''}",
+            "",
+            "## What went well",
+            note.what_went_well or "No note provided.",
+            "",
+            "## What to improve",
+            note.what_to_improve or "No note provided.",
+            "",
+            "## Action items",
+            note.action_items or "No action items recorded.",
+            "",
+        ]
+    )
+
 
 def _project_signoffs(db: Session, project_id: int) -> list[ReleaseSignOff]:
-    return list(db.scalars(
-        select(ReleaseSignOff).where(ReleaseSignOff.project_id == project_id).order_by(ReleaseSignOff.created_at.desc())
-    ).all())
+    return list(
+        db.scalars(
+            select(ReleaseSignOff)
+            .where(ReleaseSignOff.project_id == project_id)
+            .order_by(ReleaseSignOff.created_at.desc())
+        ).all()
+    )
+
 
 def legacy_approval_rows(snapshot: str) -> dict[str, str]:
     rows: dict[str, str] = {}
@@ -131,6 +146,7 @@ def legacy_approval_rows(snapshot: str) -> dict[str, str]:
         key = match.group("key").strip()
         rows[key] = match.group("title").strip()
     return rows
+
 
 def _approval_rows_from_snapshot(signoff: ReleaseSignOff) -> dict[str, str]:
     snapshot = snapshot_from_signoff(signoff)
@@ -144,8 +160,10 @@ def _approval_rows_from_snapshot(signoff: ReleaseSignOff) -> dict[str, str]:
         return rows
     return legacy_approval_rows(signoff.snapshot)
 
+
 def _row_dict(key: str, title: str) -> dict:
     return {"requirement_key": key, "requirement_title": title}
+
 
 def _signoff_summary(signoff: ReleaseSignOff) -> dict:
     return {
@@ -155,6 +173,7 @@ def _signoff_summary(signoff: ReleaseSignOff) -> dict:
         "approval_note": signoff.approval_note,
         "created_at": signoff.created_at.isoformat() if signoff.created_at else None,
     }
+
 
 def _retrospective_dict(note: ReleaseRetrospective) -> dict:
     return {
@@ -167,6 +186,7 @@ def _retrospective_dict(note: ReleaseRetrospective) -> dict:
         "action_items": note.action_items,
         "created_at": note.created_at.isoformat() if note.created_at else None,
     }
+
 
 def _compare_markdown(data: dict) -> str:
     base = data["base"]
@@ -193,6 +213,7 @@ def _compare_markdown(data: dict) -> str:
     lines.extend(["", "## Unchanged requirements"])
     lines.extend(_requirement_lines(data["unchanged_requirements"]))
     return "\n".join(lines).strip() + "\n"
+
 
 def _requirement_lines(rows: list[dict]) -> list[str]:
     return [f"- {row['requirement_key']} — {row['requirement_title']}" for row in rows] or ["- None"]

@@ -35,7 +35,15 @@ def build_rehearsal_report(db_path: Path) -> str:
         lines.append(f"- {mark}: {item['table']} ({details})")
     lines.extend(["", "## Rehearsal commands"])
     lines.extend(f"```bash\n{command}\n```" for command in commands)
-    lines.extend(["", "## Operator notes", "- [ ] Safe copy migration passed", "- [ ] Rollback drill passed", "- [ ] Post-migration verification command is ready"])
+    lines.extend(
+        [
+            "",
+            "## Operator notes",
+            "- [ ] Safe copy migration passed",
+            "- [ ] Rollback drill passed",
+            "- [ ] Post-migration verification command is ready",
+        ]
+    )
     return "\n".join(lines).strip() + "\n"
 
 

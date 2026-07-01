@@ -44,7 +44,9 @@ def analyze_openapi_diff(before_raw: str, after_raw: str) -> list[dict]:
         findings.append(_finding("api", "removed_endpoint", "High", True, f"Endpoint removed: {path}"))
     for path in sorted(after_paths - before_paths):
         findings.append(_finding("api", "added_endpoint", "Low", False, f"Endpoint added: {path}"))
-    return findings or [_finding("api", "no_breaking_path_change", "Low", False, "No path-level breaking change detected.")]
+    return findings or [
+        _finding("api", "no_breaking_path_change", "Low", False, "No path-level breaking change detected.")
+    ]
 
 
 def analyze_test_report(content: str) -> list[dict]:
@@ -57,8 +59,12 @@ def analyze_test_report(content: str) -> list[dict]:
 def _dangerous_delete_findings(content: str) -> list[dict]:
     findings = []
     for statement in _sql_statements(content):
-        if re.search(r"\bDELETE\s+FROM\b", statement, flags=re.IGNORECASE) and not re.search(r"\bWHERE\b", statement, flags=re.IGNORECASE):
-            findings.append(_finding("migration", "delete_without_where", "High", True, "DELETE statement has no WHERE clause."))
+        if re.search(r"\bDELETE\s+FROM\b", statement, flags=re.IGNORECASE) and not re.search(
+            r"\bWHERE\b", statement, flags=re.IGNORECASE
+        ):
+            findings.append(
+                _finding("migration", "delete_without_where", "High", True, "DELETE statement has no WHERE clause.")
+            )
     return findings
 
 
@@ -76,4 +82,10 @@ def _extract_failed_tests(content: str) -> int:
 
 
 def _finding(guard_type: str, rule_id: str, severity: str, blocking: bool, message: str) -> dict:
-    return {"guard_type": guard_type, "title": rule_id.replace("_", " ").title(), "severity": severity, "blocking": blocking, "message": message}
+    return {
+        "guard_type": guard_type,
+        "title": rule_id.replace("_", " ").title(),
+        "severity": severity,
+        "blocking": blocking,
+        "message": message,
+    }

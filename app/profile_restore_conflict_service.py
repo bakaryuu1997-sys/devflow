@@ -15,7 +15,9 @@ from app.profile_rollback_rehearsal_service import v10_7_manual_rollback_import_
 DIGEST_LOCK_AUDIT_ACTION = "v10_9_restore_digest_lock"
 
 
-def v10_9_restore_conflict_report(db: Session, profile_id: str = "core-risk", snapshot_export: dict | None = None) -> dict:
+def v10_9_restore_conflict_report(
+    db: Session, profile_id: str = "core-risk", snapshot_export: dict | None = None
+) -> dict:
     source = snapshot_export or v10_6_rollback_snapshot_export(db, profile_id)
     snapshot = source.get("snapshot", source)
     current = v10_6_rollback_snapshot_export(db, profile_id).get("snapshot", {})
@@ -82,10 +84,19 @@ def v10_9_execute_guarded_manual_restore(
 
 
 def v10_9_restore_digest_lock_audit_trail(db: Session, profile_id: str = "core-risk") -> dict:
-    rows = db.scalars(select(ActivityLog).where(ActivityLog.action == DIGEST_LOCK_AUDIT_ACTION).order_by(ActivityLog.id.desc())).all()
+    rows = db.scalars(
+        select(ActivityLog).where(ActivityLog.action == DIGEST_LOCK_AUDIT_ACTION).order_by(ActivityLog.id.desc())
+    ).all()
     events = [_decode_event(row) for row in rows]
     filtered = [event for event in events if event.get("profile_id") == profile_id]
-    data = {"version": "10.9", "mode": "restore-digest-lock-audit", "status": "Audit trail ready", "ready": True, "profile_id": profile_id, "audit_events": filtered}
+    data = {
+        "version": "10.9",
+        "mode": "restore-digest-lock-audit",
+        "status": "Audit trail ready",
+        "ready": True,
+        "profile_id": profile_id,
+        "audit_events": filtered,
+    }
     data["content"] = _audit_markdown(data)
     return data
 
@@ -94,22 +105,52 @@ def v10_9_operator_restore_conflict_package(db: Session, profile_id: str = "core
     report = v10_9_restore_conflict_report(db, profile_id)
     plan = v10_9_guarded_restore_plan(db, profile_id)
     audit = v10_9_restore_digest_lock_audit_trail(db, profile_id)
-    data = {"version": "10.9", "mode": "operator-restore-conflict-package", "status": plan["status"], "ready": plan["ready"], "profile_id": profile_id}
-    data["content"] = "# v10.9 Operator Restore Conflict Package\n\n" + "\n\n".join([report["content"], plan["content"], audit["content"]])
+    data = {
+        "version": "10.9",
+        "mode": "operator-restore-conflict-package",
+        "status": plan["status"],
+        "ready": plan["ready"],
+        "profile_id": profile_id,
+    }
+    data["content"] = "# v10.9 Operator Restore Conflict Package\n\n" + "\n\n".join(
+        [report["content"], plan["content"], audit["content"]]
+    )
     return data
 
 
 def _detect_conflicts(snapshot: dict, current: dict) -> list[dict]:
     conflicts: list[dict] = []
     if not current.get("ready"):
-        conflicts.append({"type": "current_project_missing", "severity": "medium", "detail": current.get("status", "Current profile project is missing")})
+        conflicts.append(
+            {
+                "type": "current_project_missing",
+                "severity": "medium",
+                "detail": current.get("status", "Current profile project is missing"),
+            }
+        )
     if snapshot.get("profile_id") != current.get("profile_id"):
-        conflicts.append({"type": "profile_mismatch", "severity": "critical", "detail": "Snapshot profile differs from current profile."})
+        conflicts.append(
+            {
+                "type": "profile_mismatch",
+                "severity": "critical",
+                "detail": "Snapshot profile differs from current profile.",
+            }
+        )
     for table, delta in _count_delta(snapshot, current).items():
         if delta["snapshot"] != delta["current"]:
-            conflicts.append({"type": "table_count_delta", "severity": "high", "table": table, "snapshot": delta["snapshot"], "current": delta["current"]})
+            conflicts.append(
+                {
+                    "type": "table_count_delta",
+                    "severity": "high",
+                    "table": table,
+                    "snapshot": delta["snapshot"],
+                    "current": delta["current"],
+                }
+            )
     if snapshot.get("ready") and current.get("ready") and _digest(snapshot) != _digest(current):
-        conflicts.append({"type": "row_digest_delta", "severity": "high", "detail": "Current rows differ from the locked snapshot."})
+        conflicts.append(
+            {"type": "row_digest_delta", "severity": "high", "detail": "Current rows differ from the locked snapshot."}
+        )
     return conflicts
 
 
@@ -125,13 +166,29 @@ def _counts(tables: dict) -> dict:
 
 
 def _blocked(profile_id: str, report: dict, status: str) -> dict:
-    data = {"version": "10.9", "mode": "guarded-restore-with-digest-lock", "status": status, "ready": False, "profile_id": profile_id, "expected_snapshot_digest_lock": report["snapshot_digest_lock_required"], "conflicts": report["conflicts"]}
-    data["content"] = f"# v10.9 Restore Blocked\n\nStatus: {status}\nExpected snapshot digest lock: `{report['snapshot_digest_lock_required']}`\n"
+    data = {
+        "version": "10.9",
+        "mode": "guarded-restore-with-digest-lock",
+        "status": status,
+        "ready": False,
+        "profile_id": profile_id,
+        "expected_snapshot_digest_lock": report["snapshot_digest_lock_required"],
+        "conflicts": report["conflicts"],
+    }
+    data["content"] = (
+        f"# v10.9 Restore Blocked\n\nStatus: {status}\nExpected snapshot digest lock: `{report['snapshot_digest_lock_required']}`\n"
+    )
     return data
 
 
 def _write_digest_lock_audit(db: Session, profile_id: str, operator_name: str, report: dict) -> dict:
-    event = {"profile_id": profile_id, "operator_name": operator_name or "unknown", "snapshot_digest_lock": report["snapshot_digest_lock_required"], "current_digest": report["current_digest"], "conflict_count": len(report["conflicts"])}
+    event = {
+        "profile_id": profile_id,
+        "operator_name": operator_name or "unknown",
+        "snapshot_digest_lock": report["snapshot_digest_lock_required"],
+        "current_digest": report["current_digest"],
+        "conflict_count": len(report["conflicts"]),
+    }
     db.add(ActivityLog(project_id=None, action=DIGEST_LOCK_AUDIT_ACTION, message=json.dumps(event, sort_keys=True)))
     db.commit()
     event["audit_digest"] = _digest(event)
@@ -146,7 +203,11 @@ def _decode_event(row: ActivityLog) -> dict:
 
 
 def _guardrails() -> list[str]:
-    return ["A restore must include the v10.8 restore phrase.", "The operator must also submit the exact snapshot digest lock.", "Conflict detection runs before restore and is written to audit after success."]
+    return [
+        "A restore must include the v10.8 restore phrase.",
+        "The operator must also submit the exact snapshot digest lock.",
+        "Conflict detection runs before restore and is written to audit after success.",
+    ]
 
 
 def _json_default(value):
@@ -160,7 +221,15 @@ def _digest(data: dict) -> str:
 
 
 def _conflict_markdown(data: dict) -> str:
-    lines = ["# v10.9 Restore Conflict Detection", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Snapshot digest lock: `{data['snapshot_digest_lock_required']}`", "", "## Conflicts"]
+    lines = [
+        "# v10.9 Restore Conflict Detection",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Snapshot digest lock: `{data['snapshot_digest_lock_required']}`",
+        "",
+        "## Conflicts",
+    ]
     if not data["conflicts"]:
         lines.append("- None detected.")
     for item in data["conflicts"]:
@@ -169,7 +238,15 @@ def _conflict_markdown(data: dict) -> str:
 
 
 def _plan_markdown(data: dict) -> str:
-    lines = ["# v10.9 Guarded Restore Plan With Digest Lock", "", f"Status: {data['status']}", f"Restore phrase: `{data['restore_approval_phrase']}`", f"Digest lock: `{data['snapshot_digest_lock_required']}`", "", "## Guardrails"]
+    lines = [
+        "# v10.9 Guarded Restore Plan With Digest Lock",
+        "",
+        f"Status: {data['status']}",
+        f"Restore phrase: `{data['restore_approval_phrase']}`",
+        f"Digest lock: `{data['snapshot_digest_lock_required']}`",
+        "",
+        "## Guardrails",
+    ]
     lines.extend(f"- {item}" for item in data["guardrails"])
     return "\n".join(lines).strip() + "\n"
 
@@ -183,5 +260,7 @@ def _audit_markdown(data: dict) -> str:
     if not data["audit_events"]:
         lines.append("No digest lock restore events recorded yet.")
     for event in data["audit_events"]:
-        lines.append(f"- Audit #{event['audit_id']}: lock `{event['snapshot_digest_lock']}` by {event['operator_name']}")
+        lines.append(
+            f"- Audit #{event['audit_id']}: lock `{event['snapshot_digest_lock']}` by {event['operator_name']}"
+        )
     return "\n".join(lines).strip() + "\n"

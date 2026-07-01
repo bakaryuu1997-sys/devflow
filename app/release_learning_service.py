@@ -112,14 +112,20 @@ def learning_loop_markdown(data: dict) -> str:
 
 
 def _retrospectives(db: Session, project_id: int) -> list[ReleaseRetrospective]:
-    return list(db.scalars(
-        select(ReleaseRetrospective).where(ReleaseRetrospective.project_id == project_id).order_by(ReleaseRetrospective.created_at.desc())
-    ).all())
+    return list(
+        db.scalars(
+            select(ReleaseRetrospective)
+            .where(ReleaseRetrospective.project_id == project_id)
+            .order_by(ReleaseRetrospective.created_at.desc())
+        ).all()
+    )
 
 
 def _saved_items(db: Session, project_id: int) -> list[dict]:
     items = db.scalars(
-        select(ReleaseLearningItem).where(ReleaseLearningItem.project_id == project_id).order_by(ReleaseLearningItem.created_at.desc())
+        select(ReleaseLearningItem)
+        .where(ReleaseLearningItem.project_id == project_id)
+        .order_by(ReleaseLearningItem.created_at.desc())
     ).all()
     return [_learning_item_dict(item) for item in items]
 

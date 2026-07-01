@@ -87,9 +87,13 @@ def risk_delta_markdown(data: dict) -> str:
 
 
 def _project_signoffs(db: Session, project_id: int) -> list[ReleaseSignOff]:
-    return list(db.scalars(
-        select(ReleaseSignOff).where(ReleaseSignOff.project_id == project_id).order_by(ReleaseSignOff.created_at.desc())
-    ).all())
+    return list(
+        db.scalars(
+            select(ReleaseSignOff)
+            .where(ReleaseSignOff.project_id == project_id)
+            .order_by(ReleaseSignOff.created_at.desc())
+        ).all()
+    )
 
 
 def _requirement_map(snapshot: dict) -> dict[str, dict]:
@@ -145,7 +149,8 @@ def _summary_delta(base_snapshot: dict, target_snapshot: dict) -> dict:
         "requirement_delta": target_req - base_req,
         "base_done_requirements": int(base.get("done_requirements", 0) or 0),
         "target_done_requirements": int(target.get("done_requirements", 0) or 0),
-        "done_requirements_delta": int(target.get("done_requirements", 0) or 0) - int(base.get("done_requirements", 0) or 0),
+        "done_requirements_delta": int(target.get("done_requirements", 0) or 0)
+        - int(base.get("done_requirements", 0) or 0),
     }
 
 
@@ -154,13 +159,21 @@ def _action_hints(summary: dict, worsened: list[dict], added: list[dict]) -> lis
     if summary["blocking_risks_delta"] > 0:
         hints.append("Blocking risk increased. Review worsened requirements before approving the next release.")
     if summary["total_risks_delta"] > 0:
-        hints.append("Total risk increased. Add prevention checklist items for repeated or newly introduced risk patterns.")
+        hints.append(
+            "Total risk increased. Add prevention checklist items for repeated or newly introduced risk patterns."
+        )
     for row in worsened[:3]:
-        hints.append(f"Focus {row['requirement_key']}: risk {row['base_risk_count']} → {row['target_risk_count']}, blocking {row['base_blocking_risks']} → {row['target_blocking_risks']}.")
+        hints.append(
+            f"Focus {row['requirement_key']}: risk {row['base_risk_count']} → {row['target_risk_count']}, blocking {row['base_blocking_risks']} → {row['target_blocking_risks']}."
+        )
     if added:
-        hints.append("New requirements appeared since the base snapshot. Confirm each one has task/test coverage and review completion.")
+        hints.append(
+            "New requirements appeared since the base snapshot. Confirm each one has task/test coverage and review completion."
+        )
     if not hints:
-        hints.append("Risk did not worsen between the selected snapshots. Keep the current prevention checklist active.")
+        hints.append(
+            "Risk did not worsen between the selected snapshots. Keep the current prevention checklist active."
+        )
     return hints
 
 

@@ -65,13 +65,16 @@ def v11_5_operator_release_candidate_package(db: Session, profile_id: str = "cor
         "profile_id": profile_id,
         "release_candidate": RC_LABEL,
     }
-    data["content"] = "\n\n".join(
-        [
-            "# v11.5 Operator Release Candidate Package",
-            freeze["content"],
-            checklist["content"],
-        ]
-    ).strip() + "\n"
+    data["content"] = (
+        "\n\n".join(
+            [
+                "# v11.5 Operator Release Candidate Package",
+                freeze["content"],
+                checklist["content"],
+            ]
+        ).strip()
+        + "\n"
+    )
     return data
 
 
@@ -111,7 +114,11 @@ def _acceptance_items(freeze: dict) -> list[dict]:
     return [
         _item("rc-freeze", freeze["ready"], "Release candidate freeze report is ready."),
         _item("evidence-reviewed", freeze["ready"], "Operator reviewed the evidence bundle."),
-        _item("digest-lock-copied", bool(freeze["immutable_copy_targets"].get("snapshot_digest_lock")), "Digest lock is copied exactly."),
+        _item(
+            "digest-lock-copied",
+            bool(freeze["immutable_copy_targets"].get("snapshot_digest_lock")),
+            "Digest lock is copied exactly.",
+        ),
         _item("non-goals-reviewed", True, "Operator understands v11.5 does not execute restore."),
         _item("handoff-ready", freeze["freeze_state"] == "frozen", "Demo can be handed off as the frozen candidate."),
     ]
@@ -132,7 +139,9 @@ def _freeze_markdown(data: dict) -> str:
         "",
         "## Freeze Gates",
     ]
-    lines.extend(f"- {'PASS' if gate['pass'] else 'BLOCK'}: {gate['id']} — {gate['detail']}" for gate in data["freeze_gates"])
+    lines.extend(
+        f"- {'PASS' if gate['pass'] else 'BLOCK'}: {gate['id']} — {gate['detail']}" for gate in data["freeze_gates"]
+    )
     lines.extend(["", "## Non-goals"])
     lines.extend(f"- {item}" for item in data["non_goals"])
     return "\n".join(lines).strip() + "\n"
@@ -148,6 +157,8 @@ def _checklist_markdown(data: dict) -> str:
         "",
         "## Checklist",
     ]
-    lines.extend(f"- {'DONE' if item['checked'] else 'TODO'}: {item['id']} — {item['detail']}" for item in data["checklist"])
+    lines.extend(
+        f"- {'DONE' if item['checked'] else 'TODO'}: {item['id']} — {item['detail']}" for item in data["checklist"]
+    )
     lines.append(f"\n{data['handoff_note']}")
     return "\n".join(lines).strip() + "\n"

@@ -48,7 +48,9 @@ def test_v94_rejects_tampered_payload():
         "use_fixture": False,
         "payload_text": "tampered payload",
         "public_key_pem": evidence["public_key_pem"],
-        "signature_b64": Path("fixtures/signature_adapters/ed25519_public_key_sample/signature.b64").read_text().strip(),
+        "signature_b64": Path("fixtures/signature_adapters/ed25519_public_key_sample/signature.b64")
+        .read_text()
+        .strip(),
     }
     with client:
         data = client.post("/api/release-governance/public-key-verifier-dry-run", json=payload).json()
@@ -71,8 +73,18 @@ def test_v94_fixture_metadata_and_static_ui_are_wired():
 def test_v94_cli_exports(tmp_path):
     readiness_out = tmp_path / "PUBLIC_KEY_VERIFIER_READINESS.md"
     dry_run_out = tmp_path / "PUBLIC_KEY_VERIFIER_DRY_RUN.md"
-    readiness = subprocess.run([sys.executable, "scripts/export_public_key_verifier_readiness.py", str(readiness_out)], text=True, capture_output=True, check=False)
-    dry_run = subprocess.run([sys.executable, "scripts/public_key_verifier_dry_run.py", str(dry_run_out)], text=True, capture_output=True, check=False)
+    readiness = subprocess.run(
+        [sys.executable, "scripts/export_public_key_verifier_readiness.py", str(readiness_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    dry_run = subprocess.run(
+        [sys.executable, "scripts/public_key_verifier_dry_run.py", str(dry_run_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert readiness.returncode == 0, readiness.stdout + readiness.stderr
     assert dry_run.returncode == 0, dry_run.stdout + dry_run.stderr
     assert "Public-Key Verifier Readiness" in readiness_out.read_text(encoding="utf-8")

@@ -14,12 +14,16 @@ def auth_headers():
 def test_create_requirement_from_api():
     headers = auth_headers()
 
-    response = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-EXPORT-001",
-        "title": "Export evidence report",
-        "priority": "High",
-        "status": "Open",
-    }, headers=headers)
+    response = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-EXPORT-001",
+            "title": "Export evidence report",
+            "priority": "High",
+            "status": "Open",
+        },
+        headers=headers,
+    )
 
     assert response.status_code == 200
     assert response.json()["key"] == "REQ-EXPORT-001"
@@ -27,12 +31,16 @@ def test_create_requirement_from_api():
 
 def test_requirement_list_contains_created_requirement():
     headers = auth_headers()
-    client.post("/api/projects/1/requirements", json={
-        "key": "REQ-AUDIT-001",
-        "title": "Show auth audit log",
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers)
+    client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-AUDIT-001",
+            "title": "Show auth audit log",
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    )
 
     requirements = client.get("/api/projects/1/requirements", headers=headers).json()
 
@@ -41,12 +49,16 @@ def test_requirement_list_contains_created_requirement():
 
 def test_traceability_includes_created_requirement():
     headers = auth_headers()
-    client.post("/api/projects/1/requirements", json={
-        "key": "REQ-RISK-001",
-        "title": "Show release risk score",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers)
+    client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-RISK-001",
+            "title": "Show release risk score",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    )
 
     rows = client.get("/api/projects/1/traceability", headers=headers).json()
 

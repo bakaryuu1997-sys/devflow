@@ -44,6 +44,11 @@ def test_v117_operator_release_package_docs_ui_and_cli(tmp_path):
     assert "routes_v117" in " ".join(wired_route_modules())
     assert "governance_v117_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     out = tmp_path / "v11_7.md"
-    result = subprocess.run([sys.executable, "scripts/export_v11_7_release_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v11_7_release_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stderr
     assert "Archive Integrity Manifest" in out.read_text(encoding="utf-8")

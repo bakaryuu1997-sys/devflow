@@ -12,25 +12,35 @@ def auth_headers():
 
 
 def _create_project(headers):
-    project = client.post("/api/projects", json={"name": "Structured Snapshot Project", "description": "v7.0"}, headers=headers).json()
+    project = client.post(
+        "/api/projects", json={"name": "Structured Snapshot Project", "description": "v7.0"}, headers=headers
+    ).json()
     client.post(f"/api/projects/{project['id']}/releases", json={"version": "7.0.0"}, headers=headers)
     return project
 
 
 def _add_reviewed_requirement(headers, project_id, key, title):
-    req = client.post(f"/api/projects/{project_id}/requirements", json={
-        "key": key,
-        "title": title,
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers).json()
-    client.post(f"/api/projects/{project_id}/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "task",
-        "title": f"Implement {title}",
-        "status": "Done",
-        "severity": "Medium",
-    }, headers=headers)
+    req = client.post(
+        f"/api/projects/{project_id}/requirements",
+        json={
+            "key": key,
+            "title": title,
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    client.post(
+        f"/api/projects/{project_id}/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "task",
+            "title": f"Implement {title}",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
     client.post(f"/api/requirements/{req['id']}/review-complete", headers=headers)
     return req
 
@@ -40,10 +50,14 @@ def test_signoff_stores_and_exports_structured_snapshot():
     project = _create_project(headers)
     req = _add_reviewed_requirement(headers, project["id"], "REQ-JSON-1", "Structured approval scope")
 
-    created = client.post(f"/api/projects/{project['id']}/release-signoffs", json={
-        "approved_by": "Release Manager",
-        "approval_note": "Stored as JSON snapshot.",
-    }, headers=headers).json()
+    created = client.post(
+        f"/api/projects/{project['id']}/release-signoffs",
+        json={
+            "approved_by": "Release Manager",
+            "approval_note": "Stored as JSON snapshot.",
+        },
+        headers=headers,
+    ).json()
     assert created["created"] is True
     assert created["signoff"]["has_structured_snapshot"] is True
 
@@ -59,16 +73,24 @@ def test_snapshot_analytics_and_structured_compare_use_json_rows():
     headers = auth_headers()
     project = _create_project(headers)
     _add_reviewed_requirement(headers, project["id"], "REQ-JSON-A", "First JSON scope")
-    first = client.post(f"/api/projects/{project['id']}/release-signoffs", json={
-        "approved_by": "QA",
-        "approval_note": "First JSON approval.",
-    }, headers=headers).json()["signoff"]
+    first = client.post(
+        f"/api/projects/{project['id']}/release-signoffs",
+        json={
+            "approved_by": "QA",
+            "approval_note": "First JSON approval.",
+        },
+        headers=headers,
+    ).json()["signoff"]
 
     _add_reviewed_requirement(headers, project["id"], "REQ-JSON-B", "Second JSON scope")
-    client.post(f"/api/projects/{project['id']}/release-signoffs", json={
-        "approved_by": "QA",
-        "approval_note": "Second JSON approval.",
-    }, headers=headers)
+    client.post(
+        f"/api/projects/{project['id']}/release-signoffs",
+        json={
+            "approved_by": "QA",
+            "approval_note": "Second JSON approval.",
+        },
+        headers=headers,
+    )
 
     compare = client.get(f"/api/projects/{project['id']}/release-signoffs/compare", headers=headers).json()
     assert compare["can_compare"] is True

@@ -18,7 +18,9 @@ def prevention_burndown_markdown(data: dict) -> str:
         "## Burndown projection",
     ]
     for row in data.get("burndown_projection", []):
-        lines.append(f"- {row['checkpoint']} ({row['date']}): remaining open={row['remaining_open_items']}, planned closed={row['planned_closed_by_checkpoint']}")
+        lines.append(
+            f"- {row['checkpoint']} ({row['date']}): remaining open={row['remaining_open_items']}, planned closed={row['planned_closed_by_checkpoint']}"
+        )
     lines.extend(["", "## Action hints"])
     lines.extend([f"- {hint}" for hint in data.get("action_hints", [])])
     return "\n".join(lines).strip() + "\n"

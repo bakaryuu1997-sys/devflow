@@ -15,7 +15,9 @@ def auth_headers():
 
 
 def _project(headers):
-    return client.post("/api/projects", json={"name": "Plan Recommendation", "description": "v7.9"}, headers=headers).json()
+    return client.post(
+        "/api/projects", json={"name": "Plan Recommendation", "description": "v7.9"}, headers=headers
+    ).json()
 
 
 def _learning_item(headers, project_id, title, owner="", due_date=""):
@@ -27,7 +29,9 @@ def _learning_item(headers, project_id, title, owner="", due_date=""):
         "owner": owner,
         "due_date": due_date,
     }
-    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()["item"]
+    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()[
+        "item"
+    ]
 
 
 def test_v79_release_plan_recommendation_picks_better_scenario():
@@ -37,7 +41,9 @@ def test_v79_release_plan_recommendation_picks_better_scenario():
     _learning_item(headers, project["id"], "Overdue recommendation item", owner="QA", due_date=yesterday)
     _learning_item(headers, project["id"], "Unscheduled recommendation item", owner="PM")
 
-    data = client.get(f"/api/projects/{project['id']}/release-plan-recommendation?target_days=7", headers=headers).json()
+    data = client.get(
+        f"/api/projects/{project['id']}/release-plan-recommendation?target_days=7", headers=headers
+    ).json()
 
     assert data["recommended_plan"]["name"] != "Baseline"
     assert data["expected_score_gain"] > 0

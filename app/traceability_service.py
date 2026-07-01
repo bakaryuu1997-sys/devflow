@@ -32,17 +32,19 @@ def traceability_matrix(db: Session, project_id: int) -> list[dict]:
         api_count = _count_links(req_links, "api")
         commit_count = _count_links(req_links, "commit")
         warnings = _warnings(req.priority, task_count, test_count, bug_count)
-        rows.append({
-            "requirement_key": req.key,
-            "requirement_title": req.title,
-            "task_count": task_count,
-            "api_count": api_count,
-            "test_count": test_count,
-            "bug_count": bug_count,
-            "commit_count": commit_count,
-            "risk": _risk(req.priority, test_count, bug_count, warnings),
-            "warnings": warnings,
-        })
+        rows.append(
+            {
+                "requirement_key": req.key,
+                "requirement_title": req.title,
+                "task_count": task_count,
+                "api_count": api_count,
+                "test_count": test_count,
+                "bug_count": bug_count,
+                "commit_count": commit_count,
+                "risk": _risk(req.priority, test_count, bug_count, warnings),
+                "warnings": warnings,
+            }
+        )
     return rows
 
 

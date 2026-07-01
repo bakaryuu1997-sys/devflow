@@ -12,21 +12,31 @@ def auth_headers():
 
 
 def _create_clean_release_project(headers):
-    project = client.post("/api/projects", json={"name": "Clean Signoff Project", "description": "v6.7"}, headers=headers).json()
+    project = client.post(
+        "/api/projects", json={"name": "Clean Signoff Project", "description": "v6.7"}, headers=headers
+    ).json()
     client.post(f"/api/projects/{project['id']}/releases", json={"version": "2.0.0"}, headers=headers)
-    req = client.post(f"/api/projects/{project['id']}/requirements", json={
-        "key": "REQ-SIGNOFF",
-        "title": "Profile settings page",
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers).json()
-    client.post(f"/api/projects/{project['id']}/work-items", json={
-        "requirement_id": req["id"],
-        "kind": "task",
-        "title": "Build profile settings page",
-        "status": "Done",
-        "severity": "Medium",
-    }, headers=headers)
+    req = client.post(
+        f"/api/projects/{project['id']}/requirements",
+        json={
+            "key": "REQ-SIGNOFF",
+            "title": "Profile settings page",
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    client.post(
+        f"/api/projects/{project['id']}/work-items",
+        json={
+            "requirement_id": req["id"],
+            "kind": "task",
+            "title": "Build profile settings page",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
     client.post(f"/api/requirements/{req['id']}/review-complete", headers=headers)
     return project, req
 
@@ -38,10 +48,14 @@ def test_signoff_snapshot_blocks_unfinished_demo_release():
     assert snapshot["decision"] == "WAIT"
     assert snapshot["signoff_blockers"]
 
-    rejected = client.post("/api/projects/1/release-signoffs", json={
-        "approved_by": "QA Lead",
-        "approval_note": "Trying too early",
-    }, headers=headers).json()
+    rejected = client.post(
+        "/api/projects/1/release-signoffs",
+        json={
+            "approved_by": "QA Lead",
+            "approval_note": "Trying too early",
+        },
+        headers=headers,
+    ).json()
     assert rejected["created"] is False
     assert "cannot be signed off" in rejected["message"]
 
@@ -55,10 +69,14 @@ def test_create_final_signoff_and_export_approval_record():
     assert snapshot["completion"]["release_review_complete"] is True
     assert snapshot["risk_dashboard"]["blocking_risks"] == 0
 
-    created = client.post(f"/api/projects/{project['id']}/release-signoffs", json={
-        "approved_by": "Release Manager",
-        "approval_note": "Approved for production release.",
-    }, headers=headers).json()
+    created = client.post(
+        f"/api/projects/{project['id']}/release-signoffs",
+        json={
+            "approved_by": "Release Manager",
+            "approval_note": "Approved for production release.",
+        },
+        headers=headers,
+    ).json()
     assert created["created"] is True
     assert created["signoff"]["release_version"] == "2.0.0"
     assert "Final Release Sign-off Approval Record" in created["approval_record"]

@@ -18,11 +18,13 @@ ESCALATED_STATUS = "Escalated"
 def prevention_execution_board(db: Session, project_id: int, today: date | None = None) -> dict:
     today = today or date.today()
     project = db.get(Project, project_id)
-    items = list(db.scalars(
-        select(ReleaseLearningItem)
-        .where(ReleaseLearningItem.project_id == project_id)
-        .order_by(ReleaseLearningItem.created_at.desc())
-    ).all())
+    items = list(
+        db.scalars(
+            select(ReleaseLearningItem)
+            .where(ReleaseLearningItem.project_id == project_id)
+            .order_by(ReleaseLearningItem.created_at.desc())
+        ).all()
+    )
     rows = [_execution_row(item, today) for item in items]
     open_rows = [row for row in rows if not row["is_done"]]
     escalated_rows = [row for row in open_rows if row["status"] == ESCALATED_STATUS]
@@ -96,6 +98,7 @@ def overdue_risk_escalations(db: Session, project_id: int, today: date | None = 
     data["content"] = overdue_risk_escalations_markdown(data)
     return data
 
+
 def _execution_row(item: ReleaseLearningItem, today: date) -> dict:
     due = getattr(item, "due_date", "") or ""
     due_day = _parse_date(due)
@@ -159,7 +162,9 @@ def _escalation_message(row: dict, days: int) -> str:
     return "Prevention item has been escalated and needs owner follow-up before release planning continues."
 
 
-def _action_hints(open_rows: list[dict], unplanned: list[dict], due_soon: list[dict], overdue: list[dict], escalated: list[dict]) -> list[str]:
+def _action_hints(
+    open_rows: list[dict], unplanned: list[dict], due_soon: list[dict], overdue: list[dict], escalated: list[dict]
+) -> list[str]:
     hints = []
     if overdue:
         hints.append(f"Escalate or re-plan {len(overdue)} overdue prevention item(s) today.")

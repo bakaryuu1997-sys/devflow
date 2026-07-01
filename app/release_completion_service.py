@@ -98,7 +98,9 @@ def _gates(requirement: Requirement, items: list[WorkItem], risks: list[RiskEven
         _gate("no_blocking_risk", no_blocking_risks, "No active blocking release-risk remains."),
     ]
     if high_priority:
-        gates.insert(1, _gate("done_test", has_done_test, "High/Critical requirement has at least one Done or Closed test."))
+        gates.insert(
+            1, _gate("done_test", has_done_test, "High/Critical requirement has at least one Done or Closed test.")
+        )
     else:
         gates.insert(1, _gate("done_test_optional", True, "Test gate is optional for Low/Medium requirements."))
     return gates

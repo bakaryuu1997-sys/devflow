@@ -56,7 +56,9 @@ def v10_3_tutorial_progress(db: Session) -> dict:
     return data
 
 
-def v10_3_update_tutorial_step(db: Session, step_id: str, status: str = "Done", operator_name: str = "", notes: str = "") -> dict:
+def v10_3_update_tutorial_step(
+    db: Session, step_id: str, status: str = "Done", operator_name: str = "", notes: str = ""
+) -> dict:
     if step_id not in {row[0] for row in TUTORIAL_STEPS}:
         return {"version": "10.3", "mode": "tutorial-step-update", "status": "Unknown step", "ready": False}
     if status not in VALID_STATUSES:
@@ -70,7 +72,14 @@ def v10_3_update_tutorial_step(db: Session, step_id: str, status: str = "Done", 
     record.notes = notes
     record.updated_at = utc_now()
     db.commit()
-    return {"version": "10.3", "mode": "tutorial-step-update", "status": "Saved", "ready": True, "step_id": step_id, "step_status": status}
+    return {
+        "version": "10.3",
+        "mode": "tutorial-step-update",
+        "status": "Saved",
+        "ready": True,
+        "step_id": step_id,
+        "step_status": status,
+    }
 
 
 def v10_3_operator_tutorial_package(db: Session) -> dict:
@@ -78,7 +87,9 @@ def v10_3_operator_tutorial_package(db: Session) -> dict:
     progress = v10_3_tutorial_progress(db)
     plan = v10_3_demo_profile_reset_plan("core-risk")
     data = {"version": "10.3", "mode": "operator-tutorial-package", "status": "Ready", "ready": True}
-    data["content"] = "# v10.3 Operator Tutorial Package\n\n" + "\n\n".join([profiles["content"], plan["content"], progress["content"]])
+    data["content"] = "# v10.3 Operator Tutorial Package\n\n" + "\n\n".join(
+        [profiles["content"], plan["content"], progress["content"]]
+    )
     return data
 
 
@@ -91,7 +102,13 @@ def _progress_map(db: Session) -> dict[str, TutorialProgress]:
 
 
 def _tutorial_row(step_id: str, name: str, action: str, record: TutorialProgress | None) -> dict:
-    return {"step_id": step_id, "name": name, "action": action, "status": record.status if record else "Open", "notes": record.notes if record else ""}
+    return {
+        "step_id": step_id,
+        "name": name,
+        "action": action,
+        "status": record.status if record else "Open",
+        "notes": record.notes if record else "",
+    }
 
 
 def _next_step(steps: list[dict]) -> str:
@@ -102,22 +119,38 @@ def _next_step(steps: list[dict]) -> str:
 
 
 def _profile_safety_notes() -> list[str]:
-    return ["Profiles are deterministic demo presets, not production migrations.", "Use v10.2 reset safety before rebuilding demo data.", "Private keys are never included in demo profiles."]
+    return [
+        "Profiles are deterministic demo presets, not production migrations.",
+        "Use v10.2 reset safety before rebuilding demo data.",
+        "Private keys are never included in demo profiles.",
+    ]
 
 
 def _profile_guardrails() -> list[str]:
-    return ["Preview selected profile before reset.", "Keep old /api/demo/reset backward compatible.", "Do not mix demo profile reset with production DB migration."]
+    return [
+        "Preview selected profile before reset.",
+        "Keep old /api/demo/reset backward compatible.",
+        "Do not mix demo profile reset with production DB migration.",
+    ]
 
 
 def _profile_plan_steps(profile: dict | None) -> list[str]:
     if not profile:
         return []
-    return [f"Select profile: {profile['name']}.", "Run v10.2 Demo Reset Safety.", "Reset or seed local demo data only after confirmation.", "Open tutorial progress and mark the profile step complete."]
+    return [
+        f"Select profile: {profile['name']}.",
+        "Run v10.2 Demo Reset Safety.",
+        "Reset or seed local demo data only after confirmation.",
+        "Open tutorial progress and mark the profile step complete.",
+    ]
 
 
 def _profiles_markdown(data: dict) -> str:
     lines = ["# v10.3 Demo Data Profiles", "", f"Status: {data['status']}", "", "## Profiles"]
-    lines.extend(f"- **{p['name']}** (`{p['profile_id']}`): {p['description']} Risk: {p['risk_level']}." for p in data["profiles"])
+    lines.extend(
+        f"- **{p['name']}** (`{p['profile_id']}`): {p['description']} Risk: {p['risk_level']}."
+        for p in data["profiles"]
+    )
     lines.extend(["", "## Safety notes", *[f"- {item}" for item in data["safety_notes"]]])
     return "\n".join(lines).strip() + "\n"
 
@@ -125,7 +158,9 @@ def _profiles_markdown(data: dict) -> str:
 def _profile_plan_markdown(data: dict) -> str:
     title = data["profile"]["name"] if data["profile"] else "Unknown profile"
     lines = ["# v10.3 Demo Profile Reset Plan", "", f"Profile: {title}", f"Status: {data['status']}", "", "## Plan"]
-    lines.extend(f"{i}. {item}" for i, item in enumerate(data["plan_steps"] or ["Choose a valid profile first."], start=1))
+    lines.extend(
+        f"{i}. {item}" for i, item in enumerate(data["plan_steps"] or ["Choose a valid profile first."], start=1)
+    )
     lines.extend(["", "## Guardrails", *[f"- {item}" for item in data["guardrails"]]])
     return "\n".join(lines).strip() + "\n"
 

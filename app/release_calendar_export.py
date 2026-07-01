@@ -39,14 +39,16 @@ def release_readiness_timeline_markdown(data: dict) -> str:
         "## Timeline Checkpoints",
     ]
     for row in data["checkpoints"]:
-        lines.extend([
-            f"### {row['label']} - {row['date']}",
-            f"- Status: {row['status']}",
-            f"- Readiness score: {row['readiness_score']}",
-            f"- Remaining open after planned due dates: {row['remaining_open_items']}",
-            f"- Overdue by checkpoint: {row['overdue_by_checkpoint']}",
-            f"- Unscheduled open items: {row['unscheduled_open_items']}",
-        ])
+        lines.extend(
+            [
+                f"### {row['label']} - {row['date']}",
+                f"- Status: {row['status']}",
+                f"- Readiness score: {row['readiness_score']}",
+                f"- Remaining open after planned due dates: {row['remaining_open_items']}",
+                f"- Overdue by checkpoint: {row['overdue_by_checkpoint']}",
+                f"- Unscheduled open items: {row['unscheduled_open_items']}",
+            ]
+        )
     lines.extend(["", "## Action Hints"])
     lines.extend(f"- {hint}" for hint in data["action_hints"])
     return "\n".join(lines)

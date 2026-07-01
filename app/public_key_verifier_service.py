@@ -89,7 +89,9 @@ def public_key_verifier_dry_run(db: Session, payload: dict[str, Any] | None = No
         "optional_dependency_available": _crypto_available(),
         "payload_hash": sha256(evidence["payload_bytes"]).hexdigest() if evidence["payload_bytes"] else "",
         "signature_hash": sha256(evidence["signature_bytes"]).hexdigest() if evidence["signature_bytes"] else "",
-        "public_key_hash": sha256(evidence["public_key_pem"].encode()).hexdigest() if evidence["public_key_pem"] else "",
+        "public_key_hash": sha256(evidence["public_key_pem"].encode()).hexdigest()
+        if evidence["public_key_pem"]
+        else "",
         "findings": findings,
         "next_steps": _next_steps(verified, findings),
     }
@@ -159,6 +161,13 @@ def _rules() -> list[str]:
 
 def _next_steps(verified: bool, findings: list[str]) -> list[str]:
     if verified:
-        return ["Keep production keys outside the app.", "Run policy checklist before enabling production verification.", "Attach verification output to evidence manifest."]
-    return ["Resolve findings.", "Re-run with exact payload, public key, and detached signature.", "Do not mark production evidence verified until this adapter passes."]
-
+        return [
+            "Keep production keys outside the app.",
+            "Run policy checklist before enabling production verification.",
+            "Attach verification output to evidence manifest.",
+        ]
+    return [
+        "Resolve findings.",
+        "Re-run with exact payload, public key, and detached signature.",
+        "Do not mark production evidence verified until this adapter passes.",
+    ]

@@ -14,6 +14,8 @@ class Project(Base):
     name: Mapped[str] = mapped_column(String(160))
     description: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class Requirement(Base):
     __tablename__ = "requirements"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -23,6 +25,8 @@ class Requirement(Base):
     priority: Mapped[str] = mapped_column(String(40), default="Medium")
     status: Mapped[str] = mapped_column(String(40), default="Open")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class WorkItem(Base):
     __tablename__ = "work_items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -33,6 +37,8 @@ class WorkItem(Base):
     status: Mapped[str] = mapped_column(String(40), default="Open")
     severity: Mapped[str] = mapped_column(String(40), default="Medium")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class RequirementReview(Base):
     __tablename__ = "requirement_reviews"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -41,6 +47,8 @@ class RequirementReview(Base):
     is_complete: Mapped[bool] = mapped_column(Boolean, default=False)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class RiskEvent(Base):
     __tablename__ = "risk_events"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -52,6 +60,8 @@ class RiskEvent(Base):
     severity: Mapped[str] = mapped_column(String(40))
     blocking: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class Release(Base):
     __tablename__ = "releases"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -61,6 +71,8 @@ class Release(Base):
     readiness_score: Mapped[int] = mapped_column(Integer, default=0)
     gate_passed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class ReleaseSignOff(Base):
     __tablename__ = "release_signoffs"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -72,6 +84,8 @@ class ReleaseSignOff(Base):
     snapshot: Mapped[str] = mapped_column(Text, default="")
     snapshot_json: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class ReleaseRetrospective(Base):
     __tablename__ = "release_retrospectives"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -82,6 +96,8 @@ class ReleaseRetrospective(Base):
     what_to_improve: Mapped[str] = mapped_column(Text, default="")
     action_items: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class ReleaseLearningItem(Base):
     __tablename__ = "release_learning_items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -93,6 +109,8 @@ class ReleaseLearningItem(Base):
     owner: Mapped[str] = mapped_column(String(160), default="")
     due_date: Mapped[str] = mapped_column(String(40), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class ScopeDecisionAudit(Base):
     __tablename__ = "scope_decision_audits"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -102,6 +120,8 @@ class ScopeDecisionAudit(Base):
     new_status: Mapped[str] = mapped_column(String(40), default="")
     reason: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class InboxItem(Base):
     __tablename__ = "inbox_items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -111,6 +131,8 @@ class InboxItem(Base):
     priority: Mapped[str] = mapped_column(String(40), default="Medium")
     status: Mapped[str] = mapped_column(String(40), default="Open")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class Decision(Base):
     __tablename__ = "decisions"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -119,6 +141,8 @@ class Decision(Base):
     context: Mapped[str] = mapped_column(Text, default="")
     decision: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class ActivityLog(Base):
     __tablename__ = "activity_logs"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -129,6 +153,7 @@ class ActivityLog(Base):
     previous_hash: Mapped[str] = mapped_column(String(64), default="")
     current_hash: Mapped[str] = mapped_column(String(64), default="")
 
+
 @event.listens_for(ActivityLog, "before_insert")
 def receive_before_insert(mapper, connection, target):
     try:
@@ -136,21 +161,24 @@ def receive_before_insert(mapper, connection, target):
         prev_hash = result[0] if result and result[0] else "0" * 64
     except Exception:
         prev_hash = "0" * 64
-    
+
     target.previous_hash = prev_hash
-    
+
     if target.created_at is None:
         target.created_at = utc_now()
-        
+
     if target.created_at.tzinfo is not None:
         from datetime import UTC
+
         target.created_at = target.created_at.astimezone(UTC).replace(tzinfo=None)
-        
+
     created_str = str(target.created_at)
     project_id_str = str(target.project_id) if target.project_id else "None"
-    
+
     payload = f"{target.action}:{target.message}:{created_str}:{project_id_str}:{prev_hash}"
     target.current_hash = sha256(payload.encode("utf-8")).hexdigest()
+
+
 class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -159,6 +187,8 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(40), default="admin")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class GuardFinding(Base):
     __tablename__ = "guard_findings"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -170,6 +200,8 @@ class GuardFinding(Base):
     message: Mapped[str] = mapped_column(Text)
     blocking: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class RequirementChange(Base):
     __tablename__ = "requirement_changes"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -180,6 +212,8 @@ class RequirementChange(Base):
     changed_fields: Mapped[str] = mapped_column(Text, default="")
     status: Mapped[str] = mapped_column(String(40), default="Needs Review")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class TraceLink(Base):
     __tablename__ = "trace_links"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -191,6 +225,8 @@ class TraceLink(Base):
     status: Mapped[str] = mapped_column(String(40), default="Open")
     module: Mapped[str] = mapped_column(String(80), default="general")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class CodeChange(Base):
     __tablename__ = "code_changes"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -201,6 +237,8 @@ class CodeChange(Base):
     severity: Mapped[str] = mapped_column(String(40))
     reason: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class GitItem(Base):
     __tablename__ = "git_items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -214,6 +252,8 @@ class GitItem(Base):
     linked_key: Mapped[str] = mapped_column(String(80), default="")
     risk: Mapped[str] = mapped_column(String(40), default="Low")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
 class RequirementDiff(Base):
     __tablename__ = "requirement_diffs"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

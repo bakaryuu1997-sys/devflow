@@ -14,7 +14,9 @@ from app.recovery_ux_fixture_service import v11_1_export_fixture_example, v11_1_
 from app.sample_project_builder_data import SAMPLE_PROFILE_SEEDS
 
 
-def v11_2_fixture_validation_report(db: Session, profile_id: str = "core-risk", fixture_payload: dict | None = None) -> dict:
+def v11_2_fixture_validation_report(
+    db: Session, profile_id: str = "core-risk", fixture_payload: dict | None = None
+) -> dict:
     payload = fixture_payload or v11_1_export_fixture_example(db, profile_id)["fixture_payload"]
     snapshot_export = payload.get("snapshot_export", {}) if isinstance(payload, dict) else {}
     snapshot = snapshot_export.get("snapshot", {}) if isinstance(snapshot_export, dict) else {}
@@ -30,7 +32,9 @@ def v11_2_fixture_validation_report(db: Session, profile_id: str = "core-risk", 
         "status": "Fixture validation hardened and ready" if ready else "Fixture validation blocked",
         "ready": ready,
         "profile_id": profile_id,
-        "fixture_name": payload.get("fixture_name", "inline-fixture") if isinstance(payload, dict) else "invalid-fixture",
+        "fixture_name": payload.get("fixture_name", "inline-fixture")
+        if isinstance(payload, dict)
+        else "invalid-fixture",
         "snapshot_digest": snapshot_export.get("snapshot_digest", "") if isinstance(snapshot_export, dict) else "",
         "computed_snapshot_digest": _digest(snapshot),
         "checks": checks,
@@ -87,16 +91,55 @@ def _validation_checks(profile_id: str, payload: dict, snapshot_export: dict, sn
     computed_digest = _digest(snapshot)
     required = ["projects", "requirements", "work_items"]
     return [
-        _check("known-profile", profile_id in SAMPLE_PROFILE_SEEDS, "error", "Selected profile must exist in demo catalog."),
-        _check("fixture-version", payload.get("fixture_version") == "11.1" if isinstance(payload, dict) else False, "warning", "Fixture should come from v11.1 export."),
-        _check("snapshot-export-version", snapshot_export.get("version") == "10.6" if isinstance(snapshot_export, dict) else False, "error", "Snapshot export must be v10.6."),
-        _check("payload-profile-match", payload_profile == profile_id, "error", "Fixture profile_id must match selected profile."),
-        _check("snapshot-profile-match", exported_profile == profile_id and snapshot.get("profile_id") == profile_id, "error", "Snapshot profile must match selected profile."),
-        _check("snapshot-ready", bool(snapshot.get("ready")), "error", "Snapshot must be ready before import rehearsal."),
-        _check("digest-lock-match", exported_digest == computed_digest, "error", "Exported digest must match snapshot payload digest."),
+        _check(
+            "known-profile", profile_id in SAMPLE_PROFILE_SEEDS, "error", "Selected profile must exist in demo catalog."
+        ),
+        _check(
+            "fixture-version",
+            payload.get("fixture_version") == "11.1" if isinstance(payload, dict) else False,
+            "warning",
+            "Fixture should come from v11.1 export.",
+        ),
+        _check(
+            "snapshot-export-version",
+            snapshot_export.get("version") == "10.6" if isinstance(snapshot_export, dict) else False,
+            "error",
+            "Snapshot export must be v10.6.",
+        ),
+        _check(
+            "payload-profile-match",
+            payload_profile == profile_id,
+            "error",
+            "Fixture profile_id must match selected profile.",
+        ),
+        _check(
+            "snapshot-profile-match",
+            exported_profile == profile_id and snapshot.get("profile_id") == profile_id,
+            "error",
+            "Snapshot profile must match selected profile.",
+        ),
+        _check(
+            "snapshot-ready", bool(snapshot.get("ready")), "error", "Snapshot must be ready before import rehearsal."
+        ),
+        _check(
+            "digest-lock-match",
+            exported_digest == computed_digest,
+            "error",
+            "Exported digest must match snapshot payload digest.",
+        ),
         _check("has-project-row", bool(tables.get("projects")), "error", "Snapshot must include a project row."),
-        _check("required-tables", all(name in tables for name in required), "error", "Snapshot must include project, requirement, and work item tables."),
-        _check("full-restore-table-set", all(name in tables for name in REQUIRED_TABLES), "warning", "Release and trace tables are recommended for complete walkthroughs."),
+        _check(
+            "required-tables",
+            all(name in tables for name in required),
+            "error",
+            "Snapshot must include project, requirement, and work item tables.",
+        ),
+        _check(
+            "full-restore-table-set",
+            all(name in tables for name in REQUIRED_TABLES),
+            "warning",
+            "Release and trace tables are recommended for complete walkthroughs.",
+        ),
     ]
 
 
@@ -126,9 +169,21 @@ def _walkthrough_steps(profile_id: str) -> list[str]:
 
 def _sample_requests(profile_id: str, report: dict) -> list[dict]:
     return [
-        {"label": "export fixture", "method": "GET", "path": f"/api/release-governance/v11-1-export-fixture-example?profile_id={profile_id}"},
-        {"label": "validate fixture", "method": "POST", "path": f"/api/release-governance/v11-2-fixture-validation-report?profile_id={profile_id}"},
-        {"label": "restore guard input", "restore_approval": restore_approval_phrase(profile_id), "snapshot_digest_lock": report["computed_snapshot_digest"]},
+        {
+            "label": "export fixture",
+            "method": "GET",
+            "path": f"/api/release-governance/v11-1-export-fixture-example?profile_id={profile_id}",
+        },
+        {
+            "label": "validate fixture",
+            "method": "POST",
+            "path": f"/api/release-governance/v11-2-fixture-validation-report?profile_id={profile_id}",
+        },
+        {
+            "label": "restore guard input",
+            "restore_approval": restore_approval_phrase(profile_id),
+            "snapshot_digest_lock": report["computed_snapshot_digest"],
+        },
     ]
 
 
@@ -143,7 +198,15 @@ def _digest(data: dict) -> str:
 
 
 def _validation_markdown(data: dict) -> str:
-    lines = ["# v11.2 Recovery Fixture Validation Report", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Computed digest: `{data['computed_snapshot_digest']}`", "", "## Checks"]
+    lines = [
+        "# v11.2 Recovery Fixture Validation Report",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Computed digest: `{data['computed_snapshot_digest']}`",
+        "",
+        "## Checks",
+    ]
     for item in data["checks"]:
         mark = "PASS" if item["pass"] else item["severity"].upper()
         lines.append(f"- {mark}: {item['id']} — {item['detail']}")
@@ -151,7 +214,14 @@ def _validation_markdown(data: dict) -> str:
 
 
 def _walkthrough_markdown(data: dict) -> str:
-    lines = ["# v11.2 Sample Operator Walkthrough", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", "", "## Steps"]
+    lines = [
+        "# v11.2 Sample Operator Walkthrough",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        "",
+        "## Steps",
+    ]
     lines.extend(f"{i}. {step}" for i, step in enumerate(data["walkthrough_steps"], 1))
     lines.extend(["", "## Copy Targets"])
     lines.extend(f"- {key}: `{value}`" for key, value in data["copy_targets"].items())

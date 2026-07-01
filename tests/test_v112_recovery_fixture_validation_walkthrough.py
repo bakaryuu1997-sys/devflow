@@ -13,7 +13,9 @@ client = TestClient(app)
 def _fixture():
     client.post("/api/demo/reset")
     client.post("/api/release-governance/v10-4-build-sample-project?profile_id=core-risk")
-    return client.get("/api/release-governance/v11-1-export-fixture-example?profile_id=core-risk").json()["fixture_payload"]
+    return client.get("/api/release-governance/v11-1-export-fixture-example?profile_id=core-risk").json()[
+        "fixture_payload"
+    ]
 
 
 def test_v112_fixture_validation_accepts_valid_fixture():
@@ -57,6 +59,11 @@ def test_v112_docs_and_cli_export(tmp_path):
     assert "Operator Fixture Validation Walkthrough Package" in package["content"]
     assert Path("docs/V11_2_RECOVERY_FIXTURE_VALIDATION_WALKTHROUGH.md").exists()
     out = tmp_path / "walkthrough.md"
-    result = subprocess.run([sys.executable, "scripts/export_v11_2_operator_walkthrough_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v11_2_operator_walkthrough_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v11.2 Operator Fixture Validation Walkthrough Package" in out.read_text(encoding="utf-8")

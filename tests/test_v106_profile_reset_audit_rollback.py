@@ -25,11 +25,15 @@ def test_v106_exports_snapshot_for_built_profile_project():
 def test_v106_execute_reset_records_audit_and_preserves_approval_gate():
     client.post("/api/demo/reset")
     client.post("/api/release-governance/v10-4-build-sample-project?profile_id=core-risk")
-    blocked = client.post("/api/release-governance/v10-6-execute-profile-reset?profile_id=core-risk&approval=wrong").json()
+    blocked = client.post(
+        "/api/release-governance/v10-6-execute-profile-reset?profile_id=core-risk&approval=wrong"
+    ).json()
     assert blocked["ready"] is False
     assert blocked["status"] == "Approval phrase required"
     phrase = "RESET DEMO PROFILE: core-risk"
-    result = client.post(f"/api/release-governance/v10-6-execute-profile-reset?profile_id=core-risk&approval={phrase}&operator_name=Long").json()
+    result = client.post(
+        f"/api/release-governance/v10-6-execute-profile-reset?profile_id=core-risk&approval={phrase}&operator_name=Long"
+    ).json()
     assert result["version"] == "10.6"
     assert result["status"] == "Reset complete"
     assert result["rollback_snapshot_counts"]["requirements"] == 1
@@ -46,6 +50,11 @@ def test_v106_routes_ui_docs_and_cli_export(tmp_path):
     assert "governance_v106_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_6_PROFILE_RESET_AUDIT_ROLLBACK.md").exists()
     out = tmp_path / "rollback.md"
-    result = subprocess.run([sys.executable, "scripts/export_v10_6_rollback_snapshot.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v10_6_rollback_snapshot.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v10.6 Operator Rollback Snapshot Package" in out.read_text(encoding="utf-8")

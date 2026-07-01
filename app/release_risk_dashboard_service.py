@@ -15,7 +15,10 @@ def release_risk_dashboard(db: Session, project_id: int) -> dict:
             continue
         req_risks = [risk for risk in risks if risk.requirement_id == req.id]
         grouped.append(_requirement_dashboard_row(req, req_risks))
-    grouped.sort(key=lambda row: (_severity_rank(row["highest_severity"]), row["blocking_risks"], row["risk_count"]), reverse=True)
+    grouped.sort(
+        key=lambda row: (_severity_rank(row["highest_severity"]), row["blocking_risks"], row["risk_count"]),
+        reverse=True,
+    )
     blocking = sum(row["blocking_risks"] for row in grouped)
     return {
         "project_id": project_id,
@@ -82,7 +85,13 @@ def _archived_drilldown(requirement: Requirement) -> dict:
 
 
 def _risk_dict(risk: RiskEvent) -> dict:
-    return {"rule_id": risk.rule_id, "title": risk.title, "message": risk.message, "severity": risk.severity, "blocking": risk.blocking}
+    return {
+        "rule_id": risk.rule_id,
+        "title": risk.title,
+        "message": risk.message,
+        "severity": risk.severity,
+        "blocking": risk.blocking,
+    }
 
 
 def _highest_severity(risks: list[RiskEvent]) -> str:
@@ -106,9 +115,21 @@ def _missing_placeholders(risks: list[RiskEvent]) -> list[dict]:
     rule_ids = {risk.rule_id for risk in risks}
     placeholders = []
     if "requirement_without_task" in rule_ids:
-        placeholders.append({"kind": "task", "title": "Create implementation task placeholder", "reason": "This requirement has no linked implementation task yet."})
+        placeholders.append(
+            {
+                "kind": "task",
+                "title": "Create implementation task placeholder",
+                "reason": "This requirement has no linked implementation task yet.",
+            }
+        )
     if "critical_requirement_without_test" in rule_ids:
-        placeholders.append({"kind": "test", "title": "Create test coverage placeholder", "reason": "This high/critical requirement has no linked test yet."})
+        placeholders.append(
+            {
+                "kind": "test",
+                "title": "Create test coverage placeholder",
+                "reason": "This high/critical requirement has no linked test yet.",
+            }
+        )
     return placeholders
 
 
@@ -121,4 +142,11 @@ def _top_actions(rows: list[dict]) -> list[str]:
 
 
 def _work_item_dict(item: WorkItem) -> dict:
-    return {"id": item.id, "kind": item.kind, "title": item.title, "status": item.status, "severity": item.severity, "requirement_id": item.requirement_id}
+    return {
+        "id": item.id,
+        "kind": item.kind,
+        "title": item.title,
+        "status": item.status,
+        "severity": item.severity,
+        "requirement_id": item.requirement_id,
+    }

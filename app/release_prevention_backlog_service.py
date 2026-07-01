@@ -15,7 +15,14 @@ def risk_prevention_backlog(db: Session, project_id: int, limit: int = 5) -> dic
     trends = recurring_risk_trends(db, project_id, limit)
     saved = _saved_learning_items(db, project_id)
     rows = [_backlog_row(risk, saved) for risk in trends.get("recurring_risks", [])]
-    rows.sort(key=lambda row: (row["already_saved"], -_priority_rank(row["priority"]), -row["snapshot_occurrences"], row["rule_id"]))
+    rows.sort(
+        key=lambda row: (
+            row["already_saved"],
+            -_priority_rank(row["priority"]),
+            -row["snapshot_occurrences"],
+            row["rule_id"],
+        )
+    )
     data = {
         "project_id": project_id,
         "project_name": project.name if project else "Unknown project",
@@ -37,7 +44,9 @@ def auto_create_learning_items_from_backlog(db: Session, project_id: int, limit:
     skipped = []
     for row in data.get("backlog_items", []):
         if row.get("already_saved"):
-            skipped.append({"rule_id": row["rule_id"], "reason": "already_saved", "learning_item_id": row.get("learning_item_id")})
+            skipped.append(
+                {"rule_id": row["rule_id"], "reason": "already_saved", "learning_item_id": row.get("learning_item_id")}
+            )
             continue
         item = ReleaseLearningItem(
             project_id=project_id,
@@ -78,7 +87,10 @@ def prevention_backlog_markdown(data: dict) -> str:
         "",
         "## Action hints",
     ]
-    lines.extend([f"- {hint}" for hint in data.get("action_hints", [])] or ["- No recurring risk backlog item is needed right now."])
+    lines.extend(
+        [f"- {hint}" for hint in data.get("action_hints", [])]
+        or ["- No recurring risk backlog item is needed right now."]
+    )
     lines.extend(["", "## Backlog"])
     if not data.get("backlog_items"):
         lines.append("- No recurring risk prevention backlog item yet.")
@@ -141,7 +153,9 @@ def _priority(risk: dict) -> str:
 def _prevention_action(risk: dict, priority: str) -> str:
     affected = ", ".join(risk.get("affected_requirements", [])[:5]) or "affected requirements"
     if risk.get("blocking_occurrences", 0) > 0:
-        return f"Add a mandatory pre-signoff gate for {affected}; this recurring risk has blocked at least one snapshot."
+        return (
+            f"Add a mandatory pre-signoff gate for {affected}; this recurring risk has blocked at least one snapshot."
+        )
     if priority in {"Critical", "High"}:
         return f"Create owner/checklist coverage for {affected} before the next release review starts."
     return f"Track {affected} in the next release review and close the prevention item once the risk stops recurring."

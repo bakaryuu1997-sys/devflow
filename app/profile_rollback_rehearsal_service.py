@@ -143,7 +143,15 @@ def _digest(data: dict) -> str:
 
 
 def _rehearsal_markdown(data: dict) -> str:
-    lines = ["# v10.7 Manual Rollback Import Rehearsal", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Digest: `{data['snapshot_digest']}`", "", "## Validation"]
+    lines = [
+        "# v10.7 Manual Rollback Import Rehearsal",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Digest: `{data['snapshot_digest']}`",
+        "",
+        "## Validation",
+    ]
     checks = data["validation"]["checks"]
     lines.extend(f"- {name}: {value}" for name, value in checks.items())
     lines.extend(["", "## Dry-run restore steps"])
@@ -152,7 +160,14 @@ def _rehearsal_markdown(data: dict) -> str:
 
 
 def _checklist_markdown(data: dict) -> str:
-    lines = ["# v10.7 Manual Restore Checklist", "", f"Profile: {data['profile_id']}", f"Approval phrase: `{data['approval_phrase']}`", "", "## Checklist"]
+    lines = [
+        "# v10.7 Manual Restore Checklist",
+        "",
+        f"Profile: {data['profile_id']}",
+        f"Approval phrase: `{data['approval_phrase']}`",
+        "",
+        "## Checklist",
+    ]
     lines.extend(f"- {item}" for item in data["checklist"])
     lines.extend(["", "## Policy", *[f"- {item}" for item in data["rollback_policy"]]])
     return "\n".join(lines).strip() + "\n"

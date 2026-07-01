@@ -21,7 +21,17 @@ def compare_requirement_csv(db: Session, project_id: int, old_csv: str, new_csv:
             old_item = old[key]
             new_item = new[key]
             if old_item != new_item:
-                rows.append(_row(project_id, key, "Changed", old_item["title"], new_item["title"], old_item["priority"], new_item["priority"]))
+                rows.append(
+                    _row(
+                        project_id,
+                        key,
+                        "Changed",
+                        old_item["title"],
+                        new_item["title"],
+                        old_item["priority"],
+                        new_item["priority"],
+                    )
+                )
 
     for row in rows:
         db.add(row)

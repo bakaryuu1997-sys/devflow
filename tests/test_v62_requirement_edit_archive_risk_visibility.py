@@ -13,18 +13,26 @@ def auth_headers():
 
 def test_patch_requirement_updates_title_priority_and_status():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-EDIT",
-        "title": "Old requirement title",
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-EDIT",
+            "title": "Old requirement title",
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
 
-    response = client.patch(f"/api/requirements/{req['id']}", json={
-        "title": "New requirement title",
-        "priority": "Critical",
-        "status": "In Progress",
-    }, headers=headers)
+    response = client.patch(
+        f"/api/requirements/{req['id']}",
+        json={
+            "title": "New requirement title",
+            "priority": "Critical",
+            "status": "In Progress",
+        },
+        headers=headers,
+    )
 
     assert response.status_code == 200
     updated = response.json()
@@ -35,12 +43,16 @@ def test_patch_requirement_updates_title_priority_and_status():
 
 def test_archive_requirement_hides_it_from_risk_scan_and_dashboard_requirement_count():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-ARCHIVE-RISK",
-        "title": "Critical requirement with no task or test",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-ARCHIVE-RISK",
+            "title": "Critical requirement with no task or test",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
 
     before = client.post("/api/projects/1/risks/run", headers=headers).json()
     assert any(risk["requirement_id"] == req["id"] for risk in before)
@@ -69,5 +81,5 @@ def test_v62_static_ui_contains_requirement_edit_archive_and_risk_visibility():
     assert "showRequirementRisks" in requirement_js
     assert "summarizeRequirementRisks" in requirement_js
     assert "riskSummary" in requirement_js
-    assert "status !== \"Archived\"" in workitem_js
+    assert 'status !== "Archived"' in workitem_js
     assert "requirement-risk-pill" in requirement_css

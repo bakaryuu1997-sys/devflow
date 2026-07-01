@@ -46,7 +46,9 @@ def v11_1_export_fixture_example(db: Session, profile_id: str = "core-risk") -> 
     return data
 
 
-def v11_1_import_fixture_example(db: Session, profile_id: str = "core-risk", fixture_payload: dict | None = None) -> dict:
+def v11_1_import_fixture_example(
+    db: Session, profile_id: str = "core-risk", fixture_payload: dict | None = None
+) -> dict:
     payload = fixture_payload or v11_1_export_fixture_example(db, profile_id)["fixture_payload"]
     snapshot_export = payload.get("snapshot_export", payload)
     rehearsal = v10_7_manual_rollback_import_rehearsal(db, profile_id, snapshot_export)
@@ -85,8 +87,16 @@ def v11_1_operator_fixture_package(db: Session, profile_id: str = "core-risk") -
 
 def _operator_cards(profile_id: str, snapshot: dict, conflict: dict) -> list[dict]:
     return [
-        {"title": "1. Export snapshot", "state": snapshot["status"], "copy": "GET /api/release-governance/v10-6-rollback-snapshot"},
-        {"title": "2. Rehearse import", "state": "Dry-run only", "copy": "POST /api/release-governance/v11-1-import-fixture-example"},
+        {
+            "title": "1. Export snapshot",
+            "state": snapshot["status"],
+            "copy": "GET /api/release-governance/v10-6-rollback-snapshot",
+        },
+        {
+            "title": "2. Rehearse import",
+            "state": "Dry-run only",
+            "copy": "POST /api/release-governance/v11-1-import-fixture-example",
+        },
         {"title": "3. Lock digest", "state": conflict["status"], "copy": conflict["snapshot_digest_lock_required"]},
         {"title": "4. Restore manually", "state": "Guarded execution", "copy": restore_approval_phrase(profile_id)},
     ]
@@ -137,7 +147,14 @@ def _import_steps(profile_id: str) -> list[str]:
 
 
 def _summary_markdown(data: dict) -> str:
-    lines = ["# v11.1 Recovery UX Summary", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", "", "## Operator Cards"]
+    lines = [
+        "# v11.1 Recovery UX Summary",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        "",
+        "## Operator Cards",
+    ]
     for card in data["operator_cards"]:
         lines.append(f"- {card['title']}: {card['state']} — `{card['copy']}`")
     lines.extend(["", "## Safety Labels", *[f"- {item}" for item in data["safety_labels"]]])
@@ -145,13 +162,28 @@ def _summary_markdown(data: dict) -> str:
 
 
 def _fixture_markdown(data: dict) -> str:
-    lines = ["# v11.1 Export Fixture Example", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", "", "## Usage Notes"]
+    lines = [
+        "# v11.1 Export Fixture Example",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        "",
+        "## Usage Notes",
+    ]
     lines.extend(f"- {item}" for item in data["usage_notes"])
     lines.extend(["", "## Fixture JSON", "```json", data["fixture_json"], "```"])
     return "\n".join(lines).strip() + "\n"
 
 
 def _import_markdown(data: dict) -> str:
-    lines = ["# v11.1 Import Fixture Example", "", f"Status: {data['status']}", f"Fixture: {data['fixture_name']}", f"Snapshot digest: `{data['snapshot_digest']}`", "", "## Import Steps"]
+    lines = [
+        "# v11.1 Import Fixture Example",
+        "",
+        f"Status: {data['status']}",
+        f"Fixture: {data['fixture_name']}",
+        f"Snapshot digest: `{data['snapshot_digest']}`",
+        "",
+        "## Import Steps",
+    ]
     lines.extend(f"{index}. {item}" for index, item in enumerate(data["import_steps"], start=1))
     return "\n".join(lines).strip() + "\n"

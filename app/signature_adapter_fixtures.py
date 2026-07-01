@@ -16,15 +16,17 @@ def load_fixture_rows() -> list[dict]:
     for adapter, filename in FIXTURE_TYPES.items():
         path = FIXTURE_DIR / filename
         content = path.read_text(encoding="utf-8") if path.exists() else ""
-        rows.append({
-            "adapter": adapter,
-            "filename": filename,
-            "exists": path.exists(),
-            "size_bytes": len(content.encode("utf-8")),
-            "sha256": sha256(content.encode("utf-8")).hexdigest() if content else "",
-            "contains_private_key": _contains_private_key(content),
-            "purpose": "public contract-test fixture without private keys",
-        })
+        rows.append(
+            {
+                "adapter": adapter,
+                "filename": filename,
+                "exists": path.exists(),
+                "size_bytes": len(content.encode("utf-8")),
+                "sha256": sha256(content.encode("utf-8")).hexdigest() if content else "",
+                "contains_private_key": _contains_private_key(content),
+                "purpose": "public contract-test fixture without private keys",
+            }
+        )
     return rows
 
 

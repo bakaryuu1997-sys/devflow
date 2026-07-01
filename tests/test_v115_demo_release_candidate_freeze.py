@@ -43,6 +43,11 @@ def test_v115_operator_package_docs_ui_and_cli(tmp_path):
     assert "routes_v115" in " ".join(wired_route_modules())
     assert "governance_v115_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     out = tmp_path / "v11_5.md"
-    result = subprocess.run([sys.executable, "scripts/export_v11_5_operator_release_candidate_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v11_5_operator_release_candidate_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stderr
     assert "ACCEPT DEMO RC: demo-rc-v11.5" in out.read_text(encoding="utf-8")

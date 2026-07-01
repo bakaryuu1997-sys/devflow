@@ -24,7 +24,9 @@ def v12_0_baseline_freeze_summary(db: Session, profile_id: str = "core-risk") ->
     data = {
         "version": VERSION,
         "mode": "baseline-freeze-summary",
-        "status": "v11.9 baseline freeze confirmed" if all(c["pass"] for c in checks) else "v11.9 baseline freeze blocked",
+        "status": "v11.9 baseline freeze confirmed"
+        if all(c["pass"] for c in checks)
+        else "v11.9 baseline freeze blocked",
         "ready": all(c["pass"] for c in checks),
         "profile_id": profile_id,
         "baseline_version": BASELINE_VERSION,
@@ -64,7 +66,9 @@ def v12_0_operator_deployment_package(db: Session, profile_id: str = "core-risk"
     data = {
         "version": VERSION,
         "mode": "operator-deployment-package",
-        "status": "Operator deployment package ready" if freeze["ready"] and checklist["ready"] else "Operator deployment package blocked",
+        "status": "Operator deployment package ready"
+        if freeze["ready"] and checklist["ready"]
+        else "Operator deployment package blocked",
         "ready": freeze["ready"] and checklist["ready"],
         "profile_id": profile_id,
         "archive_name": PACKAGE_ARCHIVE,
@@ -72,20 +76,41 @@ def v12_0_operator_deployment_package(db: Session, profile_id: str = "core-risk"
         "release_tag": RELEASE_TAG,
         "decision": DECISION,
     }
-    data["content"] = "\n\n".join([
-        "# v12.0 Operator Deployment Package",
-        freeze["content"],
-        checklist["content"],
-    ]).strip() + "\n"
+    data["content"] = (
+        "\n\n".join(
+            [
+                "# v12.0 Operator Deployment Package",
+                freeze["content"],
+                checklist["content"],
+            ]
+        ).strip()
+        + "\n"
+    )
     return data
 
 
 def _hosting_options() -> list[dict]:
     return [
-        {"name": "Local portfolio demo", "fit": "best", "reason": "Keeps SQLite, FastAPI, and recovery demo behavior intact."},
-        {"name": "Vercel static/docs", "fit": "good", "reason": "Good for README, screenshots, quickstart, and portfolio landing page."},
-        {"name": "Vercel full API", "fit": "caution", "reason": "Needs serverless refactor and stateless data strategy before relying on it."},
-        {"name": "FastAPI host", "fit": "good", "reason": "Best when the interactive API and SQLite demo need to keep working."},
+        {
+            "name": "Local portfolio demo",
+            "fit": "best",
+            "reason": "Keeps SQLite, FastAPI, and recovery demo behavior intact.",
+        },
+        {
+            "name": "Vercel static/docs",
+            "fit": "good",
+            "reason": "Good for README, screenshots, quickstart, and portfolio landing page.",
+        },
+        {
+            "name": "Vercel full API",
+            "fit": "caution",
+            "reason": "Needs serverless refactor and stateless data strategy before relying on it.",
+        },
+        {
+            "name": "FastAPI host",
+            "fit": "good",
+            "reason": "Best when the interactive API and SQLite demo need to keep working.",
+        },
     ]
 
 

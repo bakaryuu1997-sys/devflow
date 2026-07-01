@@ -48,7 +48,9 @@ def v10_6_execute_profile_reset_with_audit(
 
 
 def v10_6_profile_reset_audit_trail(db: Session, profile_id: str = "core-risk") -> dict:
-    rows = db.scalars(select(ActivityLog).where(ActivityLog.action == AUDIT_ACTION).order_by(ActivityLog.id.desc())).all()
+    rows = db.scalars(
+        select(ActivityLog).where(ActivityLog.action == AUDIT_ACTION).order_by(ActivityLog.id.desc())
+    ).all()
     events = [_decode_event(row) for row in rows]
     filtered = [event for event in events if event.get("profile_id") == profile_id]
     data = {
@@ -67,7 +69,9 @@ def v10_6_operator_rollback_package(db: Session, profile_id: str = "core-risk") 
     snapshot = v10_6_rollback_snapshot_export(db, profile_id)
     audit = v10_6_profile_reset_audit_trail(db, profile_id)
     data = {"version": "10.6", "mode": "operator-rollback-package", "status": "Ready", "ready": True}
-    data["content"] = "# v10.6 Operator Rollback Snapshot Package\n\n" + "\n\n".join([snapshot["content"], audit["content"]])
+    data["content"] = "# v10.6 Operator Rollback Snapshot Package\n\n" + "\n\n".join(
+        [snapshot["content"], audit["content"]]
+    )
     return data
 
 
@@ -86,7 +90,14 @@ def _snapshot_profile_project(db: Session, profile_id: str) -> dict:
         if rows:
             tables[table.name] = [_clean_row(dict(row)) for row in rows]
     counts = {name: len(rows) for name, rows in tables.items()}
-    return {"ready": True, "status": "Snapshot ready", "profile_id": profile_id, "project_id": project.id, "tables": tables, "counts": counts}
+    return {
+        "ready": True,
+        "status": "Snapshot ready",
+        "profile_id": profile_id,
+        "project_id": project.id,
+        "tables": tables,
+        "counts": counts,
+    }
 
 
 def _write_audit(db: Session, profile_id: str, operator_name: str, before: dict, after: dict, result: dict) -> dict:
@@ -100,7 +111,11 @@ def _write_audit(db: Session, profile_id: str, operator_name: str, before: dict,
         "after_counts": after.get("counts", {}),
         "rollback_snapshot": before,
     }
-    db.add(ActivityLog(project_id=None, action=AUDIT_ACTION, message=json.dumps(event, default=_json_default, sort_keys=True)))
+    db.add(
+        ActivityLog(
+            project_id=None, action=AUDIT_ACTION, message=json.dumps(event, default=_json_default, sort_keys=True)
+        )
+    )
     db.commit()
     return {k: event[k] for k in event if k != "rollback_snapshot"}
 
@@ -126,7 +141,9 @@ def _decode_event(row: ActivityLog) -> dict:
 
 
 def _project_row(project: Project) -> dict:
-    return _clean_row({"id": project.id, "name": project.name, "description": project.description, "created_at": project.created_at})
+    return _clean_row(
+        {"id": project.id, "name": project.name, "description": project.description, "created_at": project.created_at}
+    )
 
 
 def _clean_row(row: dict) -> dict:
@@ -145,7 +162,15 @@ def _digest(data: dict) -> str:
 
 
 def _snapshot_markdown(data: dict) -> str:
-    lines = ["# v10.6 Rollback Snapshot Export", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Digest: `{data['snapshot_digest']}`", "", "## Counts"]
+    lines = [
+        "# v10.6 Rollback Snapshot Export",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Digest: `{data['snapshot_digest']}`",
+        "",
+        "## Counts",
+    ]
     counts = data["snapshot"].get("counts", {})
     lines.extend(f"- {name}: {count}" for name, count in counts.items())
     return "\n".join(lines).strip() + "\n"
@@ -161,7 +186,12 @@ def _audit_markdown(data: dict) -> str:
 
 
 def _execute_markdown(data: dict) -> str:
-    lines = ["# v10.6 Profile Reset With Audit", "", f"Status: {data.get('status')}", f"Profile: {data.get('profile_id')}"]
+    lines = [
+        "# v10.6 Profile Reset With Audit",
+        "",
+        f"Status: {data.get('status')}",
+        f"Profile: {data.get('profile_id')}",
+    ]
     if data.get("rollback_snapshot_digest"):
         lines.append(f"Rollback snapshot digest: `{data['rollback_snapshot_digest']}`")
     return "\n".join(lines).strip() + "\n"

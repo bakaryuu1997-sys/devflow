@@ -19,7 +19,12 @@ def policy_presets() -> dict:
 def verifier_profile_registry(db: Session) -> dict:
     rows = db.query(ExternalVerifierProfile).order_by(ExternalVerifierProfile.id.desc()).all()
     profiles = [_row(row) for row in rows] or [_default_profile()]
-    data = {"version": "9.7", "mode": "external-verifier-profile-registry", "count": len(profiles), "profiles": profiles}
+    data = {
+        "version": "9.7",
+        "mode": "external-verifier-profile-registry",
+        "count": len(profiles),
+        "profiles": profiles,
+    }
     data["content"] = _profiles_markdown(data)
     return data
 
@@ -44,24 +49,53 @@ def create_verifier_profile(db: Session, payload: dict) -> dict:
 
 
 def _preset(key: str, name: str, signature: bool, timestamp: bool, frozen_manifest: bool) -> dict:
-    return {"key": key, "name": name, "requires_signature": signature, "requires_timestamp": timestamp, "requires_frozen_manifest_match": frozen_manifest}
+    return {
+        "key": key,
+        "name": name,
+        "requires_signature": signature,
+        "requires_timestamp": timestamp,
+        "requires_frozen_manifest_match": frozen_manifest,
+    }
 
 
 def _default_profile() -> dict:
-    return {"id": 0, "name": "default-ed25519-operator", "adapter": "ed25519-public-key", "policy_preset": "standard-release", "key_reference": "configure-external-public-key", "status": "Template", "notes": "Create a real profile before production sign-off.", "created_at": ""}
+    return {
+        "id": 0,
+        "name": "default-ed25519-operator",
+        "adapter": "ed25519-public-key",
+        "policy_preset": "standard-release",
+        "key_reference": "configure-external-public-key",
+        "status": "Template",
+        "notes": "Create a real profile before production sign-off.",
+        "created_at": "",
+    }
 
 
 def _row(row: ExternalVerifierProfile) -> dict:
-    return {"id": row.id, "name": row.name, "adapter": row.adapter, "policy_preset": row.policy_preset, "key_reference": row.key_reference, "status": row.status, "notes": row.notes, "created_at": row.created_at.isoformat() if row.created_at else ""}
+    return {
+        "id": row.id,
+        "name": row.name,
+        "adapter": row.adapter,
+        "policy_preset": row.policy_preset,
+        "key_reference": row.key_reference,
+        "status": row.status,
+        "notes": row.notes,
+        "created_at": row.created_at.isoformat() if row.created_at else "",
+    }
 
 
 def _profiles_markdown(data: dict) -> str:
     lines = ["# v9.7 External Verifier Profile Registry", "", f"Count: {data['count']}"]
-    lines.extend(f"- {row['name']} · {row['adapter']} · {row['policy_preset']} · {row['status']}" for row in data["profiles"])
+    lines.extend(
+        f"- {row['name']} · {row['adapter']} · {row['policy_preset']} · {row['status']}" for row in data["profiles"]
+    )
     return "\n".join(lines).strip() + "\n"
 
 
 def _presets_markdown(data: dict) -> str:
     lines = ["# v9.7 Operator Policy Presets", ""]
-    lines.extend(f"- {row['key']}: signature={row['requires_signature']} timestamp={row['requires_timestamp']} frozen_manifest={row['requires_frozen_manifest_match']}" for row in data["presets"])
+    lines.extend(
+        f"- {row['key']}: signature={row['requires_signature']} timestamp={row['requires_timestamp']} frozen_manifest={row['requires_frozen_manifest_match']}"
+        for row in data["presets"]
+    )
     return "\n".join(lines).strip() + "\n"

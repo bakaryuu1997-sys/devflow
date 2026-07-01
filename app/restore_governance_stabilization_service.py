@@ -92,15 +92,33 @@ def v11_0_operator_recovery_package(db: Session, profile_id: str = "core-risk") 
     return data
 
 
-def _stability_gates(conflict: dict, rehearsal: dict, reset_audit: dict, restore_audit: dict, digest_audit: dict) -> list[dict]:
+def _stability_gates(
+    conflict: dict, rehearsal: dict, reset_audit: dict, restore_audit: dict, digest_audit: dict
+) -> list[dict]:
     critical = [item for item in conflict["conflicts"] if item.get("severity") == "critical"]
     return [
         {"id": "snapshot-ready", "ready": rehearsal["ready"], "detail": rehearsal["status"]},
-        {"id": "digest-lock-present", "ready": bool(conflict["snapshot_digest_lock_required"]), "detail": conflict["snapshot_digest_lock_required"]},
+        {
+            "id": "digest-lock-present",
+            "ready": bool(conflict["snapshot_digest_lock_required"]),
+            "detail": conflict["snapshot_digest_lock_required"],
+        },
         {"id": "no-critical-conflict", "ready": not critical, "detail": f"critical_conflicts={len(critical)}"},
-        {"id": "reset-audit-readable", "ready": "audit_events" in reset_audit, "detail": f"events={len(reset_audit.get('audit_events', []))}"},
-        {"id": "restore-audit-readable", "ready": "audit_events" in restore_audit, "detail": f"events={len(restore_audit.get('audit_events', []))}"},
-        {"id": "digest-audit-readable", "ready": "audit_events" in digest_audit, "detail": f"events={len(digest_audit.get('audit_events', []))}"},
+        {
+            "id": "reset-audit-readable",
+            "ready": "audit_events" in reset_audit,
+            "detail": f"events={len(reset_audit.get('audit_events', []))}",
+        },
+        {
+            "id": "restore-audit-readable",
+            "ready": "audit_events" in restore_audit,
+            "detail": f"events={len(restore_audit.get('audit_events', []))}",
+        },
+        {
+            "id": "digest-audit-readable",
+            "ready": "audit_events" in digest_audit,
+            "detail": f"events={len(digest_audit.get('audit_events', []))}",
+        },
     ]
 
 
@@ -140,7 +158,15 @@ def _recovery_sequence() -> list[str]:
 
 
 def _stability_markdown(data: dict) -> str:
-    lines = ["# v11.0 Restore Governance Stability Report", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Digest lock: `{data['snapshot_digest_lock_required']}`", "", "## Stability Gates"]
+    lines = [
+        "# v11.0 Restore Governance Stability Report",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Digest lock: `{data['snapshot_digest_lock_required']}`",
+        "",
+        "## Stability Gates",
+    ]
     for gate in data["stability_gates"]:
         mark = "PASS" if gate["ready"] else "BLOCKED"
         lines.append(f"- {mark}: {gate['id']} — {gate['detail']}")
@@ -148,7 +174,14 @@ def _stability_markdown(data: dict) -> str:
 
 
 def _runbook_markdown(data: dict) -> str:
-    lines = ["# v11.0 Final Operator Recovery Runbook", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", "", "## Required Inputs"]
+    lines = [
+        "# v11.0 Final Operator Recovery Runbook",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        "",
+        "## Required Inputs",
+    ]
     lines.extend(f"- {item}" for item in data["required_inputs"])
     lines.append("")
     lines.append("## Recovery Sequence")

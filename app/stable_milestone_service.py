@@ -11,7 +11,9 @@ def v10_stable_milestone_report(db: Session) -> dict:
     gate = verified_evidence_manifest_gate(db)
     bundle = final_signed_release_bundle_package(db)
     rehearsal = end_to_end_governance_rehearsal(db)
-    blockers = gate["blockers"] + ([] if bundle["ready"] else ["Final evidence bundle is blocked."]) + rehearsal["blockers"]
+    blockers = (
+        gate["blockers"] + ([] if bundle["ready"] else ["Final evidence bundle is blocked."]) + rehearsal["blockers"]
+    )
     data = {
         "version": "10.0",
         "mode": "stable-milestone-final-qa",
@@ -33,15 +35,38 @@ def v10_installer_checklist() -> dict:
 
 
 def _checks() -> list[str]:
-    return ["quality_check", "compileall", "pytest grouped", "security_check", "HTTP smoke", "CLI exports", "file-size rule"]
+    return [
+        "quality_check",
+        "compileall",
+        "pytest grouped",
+        "security_check",
+        "HTTP smoke",
+        "CLI exports",
+        "file-size rule",
+    ]
 
 
 def _installer_steps() -> list[str]:
-    return ["Create virtual environment", "Install requirements", "Copy .env.example to .env", "Run migration checker", "Run rollback drill on copy", "Start uvicorn app.main:app --reload", "Open /docs and local UI"]
+    return [
+        "Create virtual environment",
+        "Install requirements",
+        "Copy .env.example to .env",
+        "Run migration checker",
+        "Run rollback drill on copy",
+        "Start uvicorn app.main:app --reload",
+        "Open /docs and local UI",
+    ]
 
 
 def _markdown(data: dict) -> str:
-    lines = ["# v10.0 Stable Milestone Final QA", "", f"Status: {data['status']}", f"Ready: {data['ready']}", "", "## Blockers"]
+    lines = [
+        "# v10.0 Stable Milestone Final QA",
+        "",
+        f"Status: {data['status']}",
+        f"Ready: {data['ready']}",
+        "",
+        "## Blockers",
+    ]
     lines.extend(f"- {item}" for item in (data["blockers"] or ["No blockers."]))
     lines.extend(["", "## Final QA checks", *[f"- [ ] {item}" for item in data["final_qa_checks"]]])
     lines.extend(["", "## Installer steps", *[f"- [ ] {item}" for item in data["installer_steps"]]])

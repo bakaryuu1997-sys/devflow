@@ -98,4 +98,3 @@ def test_local_write_auth_required_blocks_unsafe_routes(monkeypatch):
     response = client.post("/api/demo/fix")
 
     assert response.status_code == 401
-

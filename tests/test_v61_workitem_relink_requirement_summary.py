@@ -13,25 +13,37 @@ def auth_headers():
 
 def test_patch_work_item_relinks_requirement_and_traceability_counts_move():
     headers = auth_headers()
-    req_a = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-REL-A",
-        "title": "Original requirement",
-        "priority": "High",
-        "status": "Open",
-    }, headers=headers).json()
-    req_b = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-REL-B",
-        "title": "New requirement",
-        "priority": "High",
-        "status": "Open",
-    }, headers=headers).json()
-    item = client.post("/api/projects/1/work-items", json={
-        "kind": "test",
-        "title": "Relinkable test",
-        "status": "Open",
-        "severity": "Medium",
-        "requirement_id": req_a["id"],
-    }, headers=headers).json()
+    req_a = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-REL-A",
+            "title": "Original requirement",
+            "priority": "High",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    req_b = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-REL-B",
+            "title": "New requirement",
+            "priority": "High",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    item = client.post(
+        "/api/projects/1/work-items",
+        json={
+            "kind": "test",
+            "title": "Relinkable test",
+            "status": "Open",
+            "severity": "Medium",
+            "requirement_id": req_a["id"],
+        },
+        headers=headers,
+    ).json()
 
     updated = client.patch(f"/api/work-items/{item['id']}", json={"requirement_id": req_b["id"]}, headers=headers)
 
@@ -47,17 +59,25 @@ def test_patch_work_item_relinks_requirement_and_traceability_counts_move():
 
 def test_patch_work_item_can_unlink_requirement():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-UNLINK",
-        "title": "Can be unlinked",
-        "priority": "Medium",
-        "status": "Open",
-    }, headers=headers).json()
-    item = client.post("/api/projects/1/work-items", json={
-        "kind": "task",
-        "title": "Temporary task",
-        "requirement_id": req["id"],
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-UNLINK",
+            "title": "Can be unlinked",
+            "priority": "Medium",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    item = client.post(
+        "/api/projects/1/work-items",
+        json={
+            "kind": "task",
+            "title": "Temporary task",
+            "requirement_id": req["id"],
+        },
+        headers=headers,
+    ).json()
 
     updated = client.patch(f"/api/work-items/{item['id']}", json={"requirement_id": None}, headers=headers)
 

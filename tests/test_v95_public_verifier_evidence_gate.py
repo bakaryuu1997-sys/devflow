@@ -20,7 +20,9 @@ def test_v95_public_verifier_evidence_package_endpoint():
 
 
 def test_v95_attach_verified_fixture_evidence_and_list_records():
-    data = client.post("/api/release-governance/public-verifier-evidence-attachments", json={"signer_name": "Fixture Operator"}).json()
+    data = client.post(
+        "/api/release-governance/public-verifier-evidence-attachments", json={"signer_name": "Fixture Operator"}
+    ).json()
     assert data["verification_status"] == "Verified"
     assert data["gate_status"] == "Gate-Ready"
     assert len(data["payload_hash"]) == 64
@@ -32,7 +34,9 @@ def test_v95_attach_verified_fixture_evidence_and_list_records():
 
 
 def test_v95_verified_signature_approval_gate_endpoint():
-    client.post("/api/release-governance/public-verifier-evidence-attachments", json={"signer_name": "Fixture Operator"})
+    client.post(
+        "/api/release-governance/public-verifier-evidence-attachments", json={"signer_name": "Fixture Operator"}
+    )
     data = client.get("/api/release-governance/verified-signature-approval-gate").json()
     assert data["version"] == "9.5"
     assert data["mode"] == "verified-signature-approval-gate"
@@ -54,8 +58,18 @@ def test_v95_static_ui_and_routes_are_wired():
 def test_v95_cli_exports(tmp_path):
     package_out = tmp_path / "PUBLIC_VERIFIER_EVIDENCE_PACKAGE.md"
     gate_out = tmp_path / "VERIFIED_SIGNATURE_APPROVAL_GATE.md"
-    package = subprocess.run([sys.executable, "scripts/export_public_verifier_evidence_package.py", str(package_out)], text=True, capture_output=True, check=False)
-    gate = subprocess.run([sys.executable, "scripts/export_verified_signature_approval_gate.py", str(gate_out)], text=True, capture_output=True, check=False)
+    package = subprocess.run(
+        [sys.executable, "scripts/export_public_verifier_evidence_package.py", str(package_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    gate = subprocess.run(
+        [sys.executable, "scripts/export_verified_signature_approval_gate.py", str(gate_out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert package.returncode == 0, package.stdout + package.stderr
     assert gate.returncode == 0, gate.stdout + gate.stderr
     assert "Public Verifier Evidence Package" in package_out.read_text(encoding="utf-8")

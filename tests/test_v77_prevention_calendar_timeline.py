@@ -15,7 +15,9 @@ def auth_headers():
 
 
 def _project(headers):
-    return client.post("/api/projects", json={"name": "Calendar Planning", "description": "v7.7"}, headers=headers).json()
+    return client.post(
+        "/api/projects", json={"name": "Calendar Planning", "description": "v7.7"}, headers=headers
+    ).json()
 
 
 def _learning_item(headers, project_id, title, status="Open", owner="", due_date=""):
@@ -27,7 +29,9 @@ def _learning_item(headers, project_id, title, status="Open", owner="", due_date
         "owner": owner,
         "due_date": due_date,
     }
-    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()["item"]
+    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()[
+        "item"
+    ]
 
 
 def test_v77_prevention_calendar_groups_due_dates_and_exports_markdown():

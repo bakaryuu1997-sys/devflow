@@ -18,7 +18,9 @@ def _snapshot():
 
 def test_v109_conflict_report_exposes_digest_lock():
     snapshot = _snapshot()
-    report = client.post("/api/release-governance/v10-9-restore-conflict-report?profile_id=core-risk", json=snapshot).json()
+    report = client.post(
+        "/api/release-governance/v10-9-restore-conflict-report?profile_id=core-risk", json=snapshot
+    ).json()
     assert report["version"] == "10.9"
     assert report["ready"] is True
     assert report["snapshot_digest_lock_required"] == snapshot["snapshot_digest"]
@@ -28,7 +30,9 @@ def test_v109_conflict_report_exposes_digest_lock():
 def test_v109_detects_snapshot_row_digest_conflict():
     snapshot = _snapshot()
     snapshot["snapshot"]["tables"]["projects"][0]["description"] = "changed stale snapshot"
-    report = client.post("/api/release-governance/v10-9-restore-conflict-report?profile_id=core-risk", json=snapshot).json()
+    report = client.post(
+        "/api/release-governance/v10-9-restore-conflict-report?profile_id=core-risk", json=snapshot
+    ).json()
     assert report["status"] == "Conflict detected"
     assert any(item["type"] == "row_digest_delta" for item in report["conflicts"])
 
@@ -61,6 +65,11 @@ def test_v109_routes_ui_docs_and_cli_export(tmp_path):
     assert "governance_v109_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_9_RESTORE_CONFLICT_DIGEST_LOCK.md").exists()
     out = tmp_path / "restore.md"
-    result = subprocess.run([sys.executable, "scripts/export_v10_9_restore_conflict_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v10_9_restore_conflict_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v10.9 Operator Restore Conflict Package" in out.read_text(encoding="utf-8")

@@ -13,12 +13,16 @@ def auth_headers():
 
 def test_requirement_risk_drilldown_shows_missing_task_and_test_placeholders():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-DRILL",
-        "title": "Critical billing flow",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-DRILL",
+            "title": "Critical billing flow",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
 
     response = client.get(f"/api/requirements/{req['id']}/risk-drilldown", headers=headers)
 
@@ -33,16 +37,22 @@ def test_requirement_risk_drilldown_shows_missing_task_and_test_placeholders():
 
 def test_one_click_placeholder_creation_is_idempotent_and_reduces_risk():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-PLACEHOLDER",
-        "title": "Critical payout flow",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-PLACEHOLDER",
+            "title": "Critical payout flow",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
 
     task = client.post(f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "task"}, headers=headers)
     test = client.post(f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "test"}, headers=headers)
-    duplicate_task = client.post(f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "task"}, headers=headers)
+    duplicate_task = client.post(
+        f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "task"}, headers=headers
+    )
 
     assert task.status_code == 200
     assert test.status_code == 200
@@ -58,16 +68,24 @@ def test_one_click_placeholder_creation_is_idempotent_and_reduces_risk():
 
 def test_placeholder_creation_rejects_archived_requirement_and_invalid_kind():
     headers = auth_headers()
-    req = client.post("/api/projects/1/requirements", json={
-        "key": "REQ-ARCH-PLACEHOLDER",
-        "title": "Archived placeholder flow",
-        "priority": "High",
-        "status": "Open",
-    }, headers=headers).json()
+    req = client.post(
+        "/api/projects/1/requirements",
+        json={
+            "key": "REQ-ARCH-PLACEHOLDER",
+            "title": "Archived placeholder flow",
+            "priority": "High",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
 
-    invalid = client.post(f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "bug"}, headers=headers)
+    invalid = client.post(
+        f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "bug"}, headers=headers
+    )
     client.post(f"/api/requirements/{req['id']}/archive", headers=headers)
-    archived = client.post(f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "task"}, headers=headers)
+    archived = client.post(
+        f"/api/requirements/{req['id']}/work-item-placeholders", json={"kind": "task"}, headers=headers
+    )
 
     assert invalid.status_code == 400
     assert archived.status_code == 400

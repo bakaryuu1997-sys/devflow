@@ -29,7 +29,9 @@ router = APIRouter(prefix="/api/projects/{project_id}", tags=["v4-risk-control"]
 
 
 @router.post("/trace-links", response_model=TraceLinkRead)
-def add_trace_link(project_id: int, payload: TraceLinkCreate, db: Session = Depends(get_db), _user: User = Depends(require_write)):
+def add_trace_link(
+    project_id: int, payload: TraceLinkCreate, db: Session = Depends(get_db), _user: User = Depends(require_write)
+):
     return create_trace_link(db, project_id, payload)
 
 
@@ -44,7 +46,12 @@ def traceability(project_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/requirement-changes", response_model=RequirementChangeRead)
-def add_requirement_change(project_id: int, payload: RequirementChangeCreate, db: Session = Depends(get_db), _user: User = Depends(require_write)):
+def add_requirement_change(
+    project_id: int,
+    payload: RequirementChangeCreate,
+    db: Session = Depends(get_db),
+    _user: User = Depends(require_write),
+):
     return record_requirement_change(db, project_id, payload)
 
 
@@ -59,7 +66,12 @@ def impact(project_id: int, requirement_key: str, db: Session = Depends(get_db))
 
 
 @router.post("/code-risk", response_model=list[CodeChangeRead])
-def code_risk(project_id: int, payload: CodeChangeAnalyzeRequest, db: Session = Depends(get_db), _user: User = Depends(require_write)):
+def code_risk(
+    project_id: int,
+    payload: CodeChangeAnalyzeRequest,
+    db: Session = Depends(get_db),
+    _user: User = Depends(require_write),
+):
     return analyze_code_changes(db, project_id, payload)
 
 

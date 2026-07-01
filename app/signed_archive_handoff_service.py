@@ -20,7 +20,11 @@ def v11_8_signed_archive_checksum_handoff(db: Session, profile_id: str = "core-r
     checks = [
         _check("v11-7-manifest-ready", manifest.get("ready") is True, "v11.7 archive manifest is ready."),
         _check("manifest-digest-present", len(checksum) == 64, "Manifest digest is a SHA-256 hex value."),
-        _check("release-candidate-stable", manifest.get("release_candidate") == RC_LABEL, "Release candidate label is stable."),
+        _check(
+            "release-candidate-stable",
+            manifest.get("release_candidate") == RC_LABEL,
+            "Release candidate label is stable.",
+        ),
         _check("no-new-destructive-path", True, "v11.8 only signs checksum handoff and quickstart."),
     ]
     ready = all(item["pass"] for item in checks)
@@ -78,18 +82,25 @@ def v11_8_operator_checksum_quickstart_package(db: Session, profile_id: str = "c
     data = {
         "version": VERSION,
         "mode": "operator-checksum-quickstart-package",
-        "status": "Operator checksum quickstart package ready" if handoff["ready"] and quickstart["ready"] else "Operator checksum quickstart package blocked",
+        "status": "Operator checksum quickstart package ready"
+        if handoff["ready"] and quickstart["ready"]
+        else "Operator checksum quickstart package blocked",
         "ready": handoff["ready"] and quickstart["ready"],
         "profile_id": profile_id,
         "release_candidate": RC_LABEL,
         "manifest_digest": handoff["manifest_digest"],
         "handoff_signature": handoff["handoff_signature"],
     }
-    data["content"] = "\n\n".join([
-        "# v11.8 Operator Checksum Quickstart Package",
-        handoff["content"],
-        quickstart["content"],
-    ]).strip() + "\n"
+    data["content"] = (
+        "\n\n".join(
+            [
+                "# v11.8 Operator Checksum Quickstart Package",
+                handoff["content"],
+                quickstart["content"],
+            ]
+        ).strip()
+        + "\n"
+    )
     return data
 
 

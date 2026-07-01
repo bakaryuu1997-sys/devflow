@@ -139,7 +139,14 @@ def _sql_script(statements: list[dict]) -> str:
 
 
 def _copy_apply_markdown(data: dict) -> str:
-    lines = ["# v8.4 Safe Migration Apply on Copied Database", "", f"Status: {data['status']}", f"Will modify original DB: {data['will_modify_original_database']}", "", "## Commands"]
+    lines = [
+        "# v8.4 Safe Migration Apply on Copied Database",
+        "",
+        f"Status: {data['status']}",
+        f"Will modify original DB: {data['will_modify_original_database']}",
+        "",
+        "## Commands",
+    ]
     lines.extend(f"```bash\n{command}\n```" for command in data["commands"])
     lines.extend(["", "## Copy apply steps"])
     lines.extend(f"- [ ] {step}" for step in data["copy_apply_steps"])
@@ -147,7 +154,14 @@ def _copy_apply_markdown(data: dict) -> str:
 
 
 def _rollback_markdown(data: dict) -> str:
-    lines = ["# v8.4 Rollback Drill Automation", "", f"Status: {data['status']}", f"Will modify original DB: {data['will_modify_original_database']}", "", "## Drill steps"]
+    lines = [
+        "# v8.4 Rollback Drill Automation",
+        "",
+        f"Status: {data['status']}",
+        f"Will modify original DB: {data['will_modify_original_database']}",
+        "",
+        "## Drill steps",
+    ]
     lines.extend(f"- [ ] {step}" for step in data["drill_steps"])
     lines.extend(["", "## Success criteria"])
     lines.extend(f"- {item}" for item in data["success_criteria"])

@@ -9,8 +9,14 @@ from app.release_signoff_service import release_signoff_snapshot
 
 MIGRATION_NOTES = [
     {"area": "ReleaseSignOff.snapshot_json", "action": "Add nullable Text column for structured sign-off snapshots."},
-    {"area": "ReleaseLearningItem.owner", "action": "Add nullable/default-empty String column for prevention item ownership."},
-    {"area": "ReleaseLearningItem.due_date", "action": "Add nullable/default-empty String column storing ISO date text."},
+    {
+        "area": "ReleaseLearningItem.owner",
+        "action": "Add nullable/default-empty String column for prevention item ownership.",
+    },
+    {
+        "area": "ReleaseLearningItem.due_date",
+        "action": "Add nullable/default-empty String column storing ISO date text.",
+    },
     {"area": "ScopeDecisionAudit", "action": "Create table for prevention scope decision history."},
 ]
 
@@ -59,10 +65,18 @@ def _checks(snapshot: dict, recommendation: dict, signoffs: list[ReleaseSignOff]
     return [
         _check("Structured snapshots", True, "Approval records store JSON snapshots and keep Markdown fallback."),
         _check("Migration notes", True, "v8.0 includes explicit migration notes for fields/tables added since v7.0."),
-        _check("Scope decision audit", audit_count > 0, "Record at least one real scope decision before an audit review."),
-        _check("Release sign-off gate", bool(snapshot.get("ready_for_signoff")), "All active requirements must pass done gates and have no blocking risks."),
+        _check(
+            "Scope decision audit", audit_count > 0, "Record at least one real scope decision before an audit review."
+        ),
+        _check(
+            "Release sign-off gate",
+            bool(snapshot.get("ready_for_signoff")),
+            "All active requirements must pass done gates and have no blocking risks.",
+        ),
         _check("Plan recommendation", bool(plan), "Recommendation engine must return a ranked release plan."),
-        _check("Approval history", bool(signoffs), "Create at least one approval record for traceable governance history."),
+        _check(
+            "Approval history", bool(signoffs), "Create at least one approval record for traceable governance history."
+        ),
     ]
 
 
@@ -105,7 +119,7 @@ def _markdown(data: dict) -> str:
         "",
         "## Governance checks",
     ]
-    lines.extend(f"- [{ 'x' if row['passed'] else ' ' }] {row['name']}: {row['detail']}" for row in data["checks"])
+    lines.extend(f"- [{'x' if row['passed'] else ' '}] {row['name']}: {row['detail']}" for row in data["checks"])
     lines.extend(["", "## Action hints"])
     lines.extend(f"- {hint}" for hint in data["action_hints"])
     lines.extend(["", "## Migration notes"])
@@ -114,7 +128,14 @@ def _markdown(data: dict) -> str:
 
 
 def _migration_markdown() -> str:
-    lines = ["# v8.0 Migration Notes", "", "Use these notes when upgrading an existing SQLite database outside demo/test mode.", ""]
+    lines = [
+        "# v8.0 Migration Notes",
+        "",
+        "Use these notes when upgrading an existing SQLite database outside demo/test mode.",
+        "",
+    ]
     lines.extend(f"- **{row['area']}** — {row['action']}" for row in MIGRATION_NOTES)
-    lines.extend(["", "Recommended path: back up the database, add nullable/default-safe columns first, then run smoke tests."])
+    lines.extend(
+        ["", "Recommended path: back up the database, add nullable/default-safe columns first, then run smoke tests."]
+    )
     return "\n".join(lines).strip() + "\n"

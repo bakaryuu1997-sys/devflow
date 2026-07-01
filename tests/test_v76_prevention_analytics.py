@@ -15,18 +15,24 @@ def auth_headers():
 
 
 def _create_project(headers):
-    return client.post("/api/projects", json={"name": "Prevention Analytics", "description": "v7.6"}, headers=headers).json()
+    return client.post(
+        "/api/projects", json={"name": "Prevention Analytics", "description": "v7.6"}, headers=headers
+    ).json()
 
 
 def _learning_item(headers, project_id, title, status="Open", owner="", due_date=""):
-    return client.post(f"/api/projects/{project_id}/release-learning-items", json={
-        "title": title,
-        "prevention_action": "Prevent recurring risk before release review.",
-        "source": "manual",
-        "status": status,
-        "owner": owner,
-        "due_date": due_date,
-    }, headers=headers).json()["item"]
+    return client.post(
+        f"/api/projects/{project_id}/release-learning-items",
+        json={
+            "title": title,
+            "prevention_action": "Prevent recurring risk before release review.",
+            "source": "manual",
+            "status": status,
+            "owner": owner,
+            "due_date": due_date,
+        },
+        headers=headers,
+    ).json()["item"]
 
 
 def test_v76_prevention_burndown_analytics_projection_and_markdown():
@@ -78,7 +84,10 @@ def test_v76_owner_workload_balance_flags_unassigned_and_overloaded():
 
 def test_v76_static_ui_and_routes_are_registered():
     index_html = open("static/index.html", encoding="utf-8").read()
-    ui_js = open("static/prevention_execution_ui.js", encoding="utf-8").read() + open("static/prevention_analytics_ui.js", encoding="utf-8").read()
+    ui_js = (
+        open("static/prevention_execution_ui.js", encoding="utf-8").read()
+        + open("static/prevention_analytics_ui.js", encoding="utf-8").read()
+    )
     routes_py = " ".join(wired_route_modules())
 
     assert "Prevention Burndown" in index_html

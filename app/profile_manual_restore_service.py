@@ -14,8 +14,10 @@ from app.sample_project_builder_data import SAMPLE_PROFILE_SEEDS
 
 RESTORE_AUDIT_ACTION = "v10_8_guarded_manual_restore"
 
+
 def restore_approval_phrase(profile_id: str) -> str:
     return f"RESTORE DEMO PROFILE: {profile_id}"
+
 
 def v10_8_guarded_restore_plan(db: Session, profile_id: str = "core-risk", snapshot_export: dict | None = None) -> dict:
     rehearsal = v10_7_manual_rollback_import_rehearsal(db, profile_id, snapshot_export)
@@ -32,6 +34,8 @@ def v10_8_guarded_restore_plan(db: Session, profile_id: str = "core-risk", snaps
     }
     data["content"] = _plan_markdown(data)
     return data
+
+
 def v10_8_execute_guarded_manual_restore(
     db: Session,
     profile_id: str = "core-risk",
@@ -67,8 +71,12 @@ def v10_8_execute_guarded_manual_restore(
     }
     data["content"] = _execute_markdown(data)
     return data
+
+
 def v10_8_restore_audit_trail(db: Session, profile_id: str = "core-risk") -> dict:
-    rows = db.scalars(select(ActivityLog).where(ActivityLog.action == RESTORE_AUDIT_ACTION).order_by(ActivityLog.id.desc())).all()
+    rows = db.scalars(
+        select(ActivityLog).where(ActivityLog.action == RESTORE_AUDIT_ACTION).order_by(ActivityLog.id.desc())
+    ).all()
     events = [_decode_event(row) for row in rows]
     data = {
         "version": "10.8",
@@ -80,15 +88,29 @@ def v10_8_restore_audit_trail(db: Session, profile_id: str = "core-risk") -> dic
     }
     data["content"] = _audit_markdown(data)
     return data
+
+
 def v10_8_operator_restore_execution_package(db: Session, profile_id: str = "core-risk") -> dict:
     plan = v10_8_guarded_restore_plan(db, profile_id)
     audit = v10_8_restore_audit_trail(db, profile_id)
-    data = {"version": "10.8", "mode": "operator-restore-execution-package", "status": plan["status"], "ready": plan["ready"]}
-    data["content"] = "# v10.8 Operator Restore Execution Package\n\n" + "\n\n".join([plan["content"], audit["content"]])
+    data = {
+        "version": "10.8",
+        "mode": "operator-restore-execution-package",
+        "status": plan["status"],
+        "ready": plan["ready"],
+    }
+    data["content"] = "# v10.8 Operator Restore Execution Package\n\n" + "\n\n".join(
+        [plan["content"], audit["content"]]
+    )
     return data
+
+
 def _current_snapshot_from_rehearsal(db: Session, profile_id: str) -> dict:
     from app.profile_reset_snapshot_service import v10_6_rollback_snapshot_export
+
     return v10_6_rollback_snapshot_export(db, profile_id)["snapshot"]
+
+
 def _delete_current_profile_rows(db: Session, profile_id: str) -> dict:
     seed = SAMPLE_PROFILE_SEEDS[profile_id]
     project = db.scalars(select(Project).where(Project.name == seed["project"][0])).first()
@@ -104,6 +126,8 @@ def _delete_current_profile_rows(db: Session, profile_id: str) -> dict:
     deleted["projects"] = result.rowcount or 0
     db.flush()
     return deleted
+
+
 def _insert_snapshot_rows(db: Session, snapshot: dict) -> dict:
     counts: dict[str, int] = {}
     tables = snapshot.get("tables", {})
@@ -115,12 +139,20 @@ def _insert_snapshot_rows(db: Session, snapshot: dict) -> dict:
         db.execute(table.insert(), clean_rows)
         counts[table.name] = len(clean_rows)
     return counts
+
+
 def _coerce_row(table, row: dict) -> dict:
     clean = {key: row[key] for key in row if key in table.c}
     for col in table.c:
-        if col.name in clean and getattr(col.type, "python_type", None) is datetime and isinstance(clean[col.name], str):
+        if (
+            col.name in clean
+            and getattr(col.type, "python_type", None) is datetime
+            and isinstance(clean[col.name], str)
+        ):
             clean[col.name] = datetime.fromisoformat(clean[col.name])
     return clean
+
+
 def _current_counts(db: Session, profile_id: str) -> dict:
     seed = SAMPLE_PROFILE_SEEDS.get(profile_id)
     project = db.scalars(select(Project).where(Project.name == seed["project"][0])).first() if seed else None
@@ -134,35 +166,89 @@ def _current_counts(db: Session, profile_id: str) -> dict:
         if rows:
             counts[table.name] = len(rows)
     return counts
-def _write_restore_audit(db: Session, profile_id: str, operator_name: str, rehearsal: dict, before: dict, after: dict, restored: dict) -> dict:
-    event = {"profile_id": profile_id, "operator_name": operator_name or "unknown", "snapshot_digest": rehearsal["snapshot_digest"], "before_counts": before, "after_counts": after, "restored_records": restored}
-    db.add(ActivityLog(project_id=None, action=RESTORE_AUDIT_ACTION, message=json.dumps(event, default=_json_default, sort_keys=True)))
+
+
+def _write_restore_audit(
+    db: Session, profile_id: str, operator_name: str, rehearsal: dict, before: dict, after: dict, restored: dict
+) -> dict:
+    event = {
+        "profile_id": profile_id,
+        "operator_name": operator_name or "unknown",
+        "snapshot_digest": rehearsal["snapshot_digest"],
+        "before_counts": before,
+        "after_counts": after,
+        "restored_records": restored,
+    }
+    db.add(
+        ActivityLog(
+            project_id=None,
+            action=RESTORE_AUDIT_ACTION,
+            message=json.dumps(event, default=_json_default, sort_keys=True),
+        )
+    )
     db.commit()
     event["audit_digest"] = _digest(event)
     return event
+
+
 def _blocked(profile_id: str, expected: str, rehearsal: dict, status: str) -> dict:
-    data = {"version": "10.8", "mode": "guarded-manual-restore-execution", "status": status, "ready": False, "profile_id": profile_id, "expected_restore_approval_phrase": expected, "rehearsal_ready": rehearsal.get("ready", False)}
+    data = {
+        "version": "10.8",
+        "mode": "guarded-manual-restore-execution",
+        "status": status,
+        "ready": False,
+        "profile_id": profile_id,
+        "expected_restore_approval_phrase": expected,
+        "rehearsal_ready": rehearsal.get("ready", False),
+    }
     data["content"] = f"# v10.8 Restore Blocked\n\nStatus: {status}\nExpected phrase: `{expected}`\n"
     return data
+
+
 def _decode_event(row: ActivityLog) -> dict:
     data = json.loads(row.message)
     data["audit_id"] = row.id
     data["created_at"] = _json_default(row.created_at)
     return data
+
+
 def _guardrails() -> list[str]:
-    return ["v10.8 requires the v10.7 rehearsal to be ready before restore.", "Restore uses a second phrase distinct from demo reset approval.", "The restore is profile-scoped and writes an ActivityLog audit event."]
+    return [
+        "v10.8 requires the v10.7 rehearsal to be ready before restore.",
+        "Restore uses a second phrase distinct from demo reset approval.",
+        "The restore is profile-scoped and writes an ActivityLog audit event.",
+    ]
+
+
 def _json_default(value):
     if isinstance(value, (datetime, date)):
         return value.isoformat()
     return value
+
+
 def _digest(data: dict) -> str:
     return hashlib.sha256(json.dumps(data, default=_json_default, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+
+
 def _plan_markdown(data: dict) -> str:
-    lines = ["# v10.8 Guarded Manual Restore Plan", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Restore phrase: `{data['restore_approval_phrase']}`", f"Snapshot digest: `{data['snapshot_digest']}`", "", "## Guardrails"]
+    lines = [
+        "# v10.8 Guarded Manual Restore Plan",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Restore phrase: `{data['restore_approval_phrase']}`",
+        f"Snapshot digest: `{data['snapshot_digest']}`",
+        "",
+        "## Guardrails",
+    ]
     lines.extend(f"- {item}" for item in data["guardrails"])
     return "\n".join(lines).strip() + "\n"
+
+
 def _execute_markdown(data: dict) -> str:
     return f"# v10.8 Guarded Manual Restore Result\n\nStatus: {data['status']}\nProfile: {data['profile_id']}\nDigest: `{data['snapshot_digest']}`\n"
+
+
 def _audit_markdown(data: dict) -> str:
     lines = ["# v10.8 Manual Restore Audit Trail", "", f"Profile: {data['profile_id']}"]
     if not data["audit_events"]:

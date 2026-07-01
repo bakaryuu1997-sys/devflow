@@ -67,7 +67,14 @@ def _rules() -> list[str]:
 
 
 def _markdown(data: dict) -> str:
-    lines = ["# v9.6 Verified Evidence Manifest Gate", "", f"Status: {data['status']}", f"Ready: {data['ready']}", "", "## Blockers"]
+    lines = [
+        "# v9.6 Verified Evidence Manifest Gate",
+        "",
+        f"Status: {data['status']}",
+        f"Ready: {data['ready']}",
+        "",
+        "## Blockers",
+    ]
     lines.extend(f"- {item}" for item in (data["blockers"] or ["No blockers."]))
     lines.extend(["", "## Hardening rules", *[f"- {rule}" for rule in data["hardening_rules"]]])
     return "\n".join(lines).strip() + "\n"

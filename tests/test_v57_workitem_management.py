@@ -14,13 +14,17 @@ def auth_headers():
 def test_create_and_update_work_item_from_api():
     headers = auth_headers()
 
-    created = client.post("/api/projects/1/work-items", json={
-        "kind": "test",
-        "title": "Add login regression test",
-        "status": "Open",
-        "severity": "High",
-        "requirement_id": None,
-    }, headers=headers)
+    created = client.post(
+        "/api/projects/1/work-items",
+        json={
+            "kind": "test",
+            "title": "Add login regression test",
+            "status": "Open",
+            "severity": "High",
+            "requirement_id": None,
+        },
+        headers=headers,
+    )
 
     assert created.status_code == 200
     item_id = created.json()["id"]
@@ -34,13 +38,17 @@ def test_create_and_update_work_item_from_api():
 def test_work_items_list_contains_created_item():
     headers = auth_headers()
 
-    client.post("/api/projects/1/work-items", json={
-        "kind": "bug",
-        "title": "Fix release blocker",
-        "status": "Open",
-        "severity": "Critical",
-        "requirement_id": None,
-    }, headers=headers)
+    client.post(
+        "/api/projects/1/work-items",
+        json={
+            "kind": "bug",
+            "title": "Fix release blocker",
+            "status": "Open",
+            "severity": "Critical",
+            "requirement_id": None,
+        },
+        headers=headers,
+    )
     items = client.get("/api/projects/1/work-items", headers=headers).json()
 
     assert any(item["title"] == "Fix release blocker" for item in items)

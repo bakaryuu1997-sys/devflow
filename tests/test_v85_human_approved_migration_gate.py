@@ -34,7 +34,9 @@ def test_v85_real_migration_gate_cli_blocks_without_exact_approval(tmp_path):
     db_path = tmp_path / "legacy.db"
     create_legacy_database(db_path)
     before = db_path.read_bytes()
-    result = subprocess.run([sys.executable, "scripts/real_migration_gate.py", str(db_path)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/real_migration_gate.py", str(db_path)], text=True, capture_output=True, check=False
+    )
     assert result.returncode == 3
     assert "human approval required" in result.stdout.lower()
     assert db_path.read_bytes() == before
@@ -44,13 +46,18 @@ def test_v85_real_migration_gate_cli_blocks_without_exact_approval(tmp_path):
 def test_v85_real_migration_gate_cli_applies_after_approval_and_creates_backup(tmp_path):
     db_path = tmp_path / "legacy.db"
     create_legacy_database(db_path)
-    result = subprocess.run([
-        sys.executable,
-        "scripts/real_migration_gate.py",
-        str(db_path),
-        "--approve",
-        "I_APPROVE_PRODUCTION_MIGRATION",
-    ], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/real_migration_gate.py",
+            str(db_path),
+            "--approve",
+            "I_APPROVE_PRODUCTION_MIGRATION",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "PRODUCTION MIGRATION VERIFIED" in result.stdout
     assert list(tmp_path.glob("legacy.v8_5_prod_backup_*.db"))
@@ -62,7 +69,12 @@ def test_v85_real_migration_gate_cli_applies_after_approval_and_creates_backup(t
 def test_v85_production_upgrade_checklist_cli_and_static_ui_are_wired(tmp_path):
     db_path = tmp_path / "legacy.db"
     create_legacy_database(db_path)
-    result = subprocess.run([sys.executable, "scripts/production_upgrade_checklist.py", str(db_path)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/production_upgrade_checklist.py", str(db_path)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     index_html = Path("static/index.html").read_text(encoding="utf-8")
     ui_js = Path("static/migration_apply_ui.js").read_text(encoding="utf-8")
     routes_py = " ".join(wired_route_modules())

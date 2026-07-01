@@ -18,10 +18,7 @@ def readiness_markdown(data: dict) -> str:
 
 def fixture_markdown(data: dict) -> str:
     lines = ["# v9.4 Public-Key Verifier Fixture Package", "", f"Status: {data['status']}", "", "## Files"]
-    lines.extend(
-        f"- {row['name']}: `{row['path']}` sha256=`{row['sha256']}`"
-        for row in data["fixture"]["files"]
-    )
+    lines.extend(f"- {row['name']}: `{row['path']}` sha256=`{row['sha256']}`" for row in data["fixture"]["files"])
     lines.extend(["", "## Rules", *[f"- {rule}" for rule in data["rules"]]])
     return "\n".join(lines).strip() + "\n"
 

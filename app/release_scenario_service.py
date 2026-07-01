@@ -21,9 +21,27 @@ def release_readiness_scenarios(db: Session, project_id: int, target_days: int =
     active = [row for row in rows if row["is_active_scope"]]
     scenarios = [
         _scenario("Baseline", "Current release prevention scope.", active, active, target_days),
-        _scenario("Complete overdue first", "Assume overdue items are closed before release review.", active, [r for r in active if not r["is_overdue"]], target_days),
-        _scenario("Defer unscheduled", "Move unscheduled items out of current release scope.", active, [r for r in active if r["due_date"]], target_days),
-        _scenario("Fast-track target window", f"Assume items due within {target_days} day(s) are completed.", active, [r for r in active if not _within_target(r, target_days)], target_days),
+        _scenario(
+            "Complete overdue first",
+            "Assume overdue items are closed before release review.",
+            active,
+            [r for r in active if not r["is_overdue"]],
+            target_days,
+        ),
+        _scenario(
+            "Defer unscheduled",
+            "Move unscheduled items out of current release scope.",
+            active,
+            [r for r in active if r["due_date"]],
+            target_days,
+        ),
+        _scenario(
+            "Fast-track target window",
+            f"Assume items due within {target_days} day(s) are completed.",
+            active,
+            [r for r in active if not _within_target(r, target_days)],
+            target_days,
+        ),
     ]
     data = {
         "project_id": project_id,
@@ -40,7 +58,9 @@ def release_readiness_scenarios(db: Session, project_id: int, target_days: int =
     return data
 
 
-def adjust_prevention_scope(db: Session, item_id: int, status: str, owner: str = "", due_date: str = "", reason: str = "") -> dict | None:
+def adjust_prevention_scope(
+    db: Session, item_id: int, status: str, owner: str = "", due_date: str = "", reason: str = ""
+) -> dict | None:
     item = db.get(ReleaseLearningItem, item_id)
     if not item:
         return None
@@ -54,16 +74,23 @@ def adjust_prevention_scope(db: Session, item_id: int, status: str, owner: str =
     clean_reason = reason.strip()
     if clean_reason:
         item.prevention_action = _append_scope_note(item.prevention_action, clean_reason)
-    db.add(ScopeDecisionAudit(
-        project_id=item.project_id,
-        learning_item_id=item.id,
-        old_status=old_status,
-        new_status=new_status,
-        reason=clean_reason or "Scope adjusted without reason.",
-    ))
+    db.add(
+        ScopeDecisionAudit(
+            project_id=item.project_id,
+            learning_item_id=item.id,
+            old_status=old_status,
+            new_status=new_status,
+            reason=clean_reason or "Scope adjusted without reason.",
+        )
+    )
     db.commit()
     db.refresh(item)
-    data = {"updated": True, "message": "Prevention scope adjusted.", "reason": clean_reason, "item": _learning_item_dict(item)}
+    data = {
+        "updated": True,
+        "message": "Prevention scope adjusted.",
+        "reason": clean_reason,
+        "item": _learning_item_dict(item),
+    }
     data["content"] = scope_adjustment_markdown(data)
     return data
 
@@ -88,9 +115,13 @@ def scope_decision_audit_trail(db: Session, project_id: int, limit: int = 50) ->
 
 
 def _items(db: Session, project_id: int) -> list[ReleaseLearningItem]:
-    return list(db.scalars(
-        select(ReleaseLearningItem).where(ReleaseLearningItem.project_id == project_id).order_by(ReleaseLearningItem.id.asc())
-    ).all())
+    return list(
+        db.scalars(
+            select(ReleaseLearningItem)
+            .where(ReleaseLearningItem.project_id == project_id)
+            .order_by(ReleaseLearningItem.id.asc())
+        ).all()
+    )
 
 
 def _row(item: ReleaseLearningItem, today: date) -> dict:
@@ -130,10 +161,10 @@ def _scenario(name: str, note: str, baseline: list[dict], scoped: list[dict], ta
     }
 
 
-
 def _within_target(row: dict, target_days: int) -> bool:
     days = row.get("days_until_due")
     return days is not None and days <= target_days
+
 
 def _parse_date(value: str) -> date | None:
     if not value:
@@ -190,9 +221,17 @@ def _audit_row(db: Session, audit: ScopeDecisionAudit) -> dict:
 
 
 def _audit_markdown(data: dict) -> str:
-    lines = ["# Scope Decision Audit Trail", "", f"Project: {data['project_name']} (#{data['project_id']})", "", "## Decisions"]
+    lines = [
+        "# Scope Decision Audit Trail",
+        "",
+        f"Project: {data['project_name']} (#{data['project_id']})",
+        "",
+        "## Decisions",
+    ]
     if not data["decisions"]:
         lines.append("- No scope decisions recorded yet.")
     for row in data["decisions"]:
-        lines.append(f"- #{row['id']} item #{row['learning_item_id']} {row['item_title']}: {row['old_status']} → {row['new_status']} — {row['reason']}")
+        lines.append(
+            f"- #{row['id']} item #{row['learning_item_id']} {row['item_title']}: {row['old_status']} → {row['new_status']} — {row['reason']}"
+        )
     return "\n".join(lines).strip() + "\n"

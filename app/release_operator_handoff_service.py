@@ -98,15 +98,37 @@ def _handoff_manifest(runbook: dict, safety: dict) -> dict:
 
 def _handoff_sections(runbook: dict, safety: dict) -> list[dict]:
     return [
-        {"name": "Operator objective", "items": ["Upgrade an existing local SQLite database without touching it until human approval is explicit."]},
-        {"name": "Required evidence", "items": ["Backup exists", "Safe copy migration passed", "Rollback drill passed", "Post-migration verify command is ready"]},
+        {
+            "name": "Operator objective",
+            "items": [
+                "Upgrade an existing local SQLite database without touching it until human approval is explicit."
+            ],
+        },
+        {
+            "name": "Required evidence",
+            "items": [
+                "Backup exists",
+                "Safe copy migration passed",
+                "Rollback drill passed",
+                "Post-migration verify command is ready",
+            ],
+        },
         {"name": "Runbook phases", "items": [phase["name"] for phase in runbook["phases"]]},
-        {"name": "Safety status", "items": [safety.get("status", "unknown"), f"Risk score: {safety.get('risk_score', 'unknown')}"]},
+        {
+            "name": "Safety status",
+            "items": [safety.get("status", "unknown"), f"Risk score: {safety.get('risk_score', 'unknown')}"],
+        },
     ]
 
 
 def _runbook_markdown(data: dict) -> str:
-    lines = ["# v8.6 Production Upgrade Runbook", "", f"Status: {data['status']}", f"Database: {data['source_database']}", ""]
+    lines = [
+        "# v8.6 Production Upgrade Runbook",
+        "",
+        f"Status: {data['status']}",
+        f"Database: {data['source_database']}",
+        "",
+    ]
     lines.extend(["## Go / No-Go", data["go_no_go"], ""])
     for phase in data["phases"]:
         lines.extend([f"## {phase['name']}"])

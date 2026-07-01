@@ -84,7 +84,13 @@ def _contract_blockers(cases: list[dict], fixtures: list[dict]) -> list[str]:
 
 
 def _contract_markdown(data: dict) -> str:
-    lines = ["# v9.3 Signature Adapter Contract Tests", "", f"Status: {data['status']}", "", "## Required result fields"]
+    lines = [
+        "# v9.3 Signature Adapter Contract Tests",
+        "",
+        f"Status: {data['status']}",
+        "",
+        "## Required result fields",
+    ]
     lines.extend(f"- `{field}`" for field in data["required_result_fields"])
     lines.extend(["", "## Contract cases"])
     lines.extend(f"- {case['adapter']} / {case['fixture']}: {case['status']}" for case in data["cases"])
@@ -96,7 +102,9 @@ def _contract_markdown(data: dict) -> str:
 def _fixtures_markdown(data: dict) -> str:
     lines = ["# v9.3 Sample Signature Fixtures", "", f"Status: {data['status']}", "", "## Fixtures"]
     for row in data["fixtures"]:
-        lines.append(f"- {row['adapter']} -> `{row['filename']}` sha256=`{row['sha256']}` private_key={row['contains_private_key']}")
+        lines.append(
+            f"- {row['adapter']} -> `{row['filename']}` sha256=`{row['sha256']}` private_key={row['contains_private_key']}"
+        )
     lines.extend(["", "## Rules"])
     lines.extend(f"- {rule}" for rule in data["rules"])
     return "\n".join(lines).strip() + "\n"

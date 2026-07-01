@@ -11,7 +11,9 @@ client = TestClient(app)
 
 
 def test_v96_verified_evidence_manifest_gate_endpoint():
-    client.post("/api/release-governance/public-verifier-evidence-attachments", json={"signer_name": "Fixture Operator"})
+    client.post(
+        "/api/release-governance/public-verifier-evidence-attachments", json={"signer_name": "Fixture Operator"}
+    )
     client.post("/api/release-governance/evidence-manifests", json={"notes": "freeze for v9.6"})
     data = client.get("/api/release-governance/verified-evidence-manifest-gate").json()
     assert data["version"] == "9.6"
@@ -21,7 +23,10 @@ def test_v96_verified_evidence_manifest_gate_endpoint():
 
 
 def test_v97_verifier_profiles_and_policy_presets():
-    created = client.post("/api/release-governance/external-verifier-profiles", json={"name": "ops-ed25519", "key_reference": "ops-public-key"}).json()
+    created = client.post(
+        "/api/release-governance/external-verifier-profiles",
+        json={"name": "ops-ed25519", "key_reference": "ops-public-key"},
+    ).json()
     assert created["name"] == "ops-ed25519"
     profiles = client.get("/api/release-governance/external-verifier-profiles").json()
     assert profiles["version"] == "9.7"

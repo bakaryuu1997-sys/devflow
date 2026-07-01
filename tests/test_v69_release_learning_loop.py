@@ -13,31 +13,61 @@ def auth_headers():
 
 def test_release_learning_loop_generates_prevention_items_from_retrospective_and_risks():
     headers = auth_headers()
-    project = client.post("/api/projects", json={"name": "Learning Loop Project", "description": "v6.9"}, headers=headers).json()
-    req1 = client.post(f"/api/projects/{project['id']}/requirements", json={
-        "key": "REQ-LEARN-1",
-        "title": "High risk checkout",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
-    req2 = client.post(f"/api/projects/{project['id']}/requirements", json={
-        "key": "REQ-LEARN-2",
-        "title": "High risk billing",
-        "priority": "Critical",
-        "status": "Open",
-    }, headers=headers).json()
-    client.post(f"/api/projects/{project['id']}/work-items", json={
-        "requirement_id": req1["id"], "kind": "task", "title": "Build checkout", "status": "Done", "severity": "Medium"
-    }, headers=headers)
-    client.post(f"/api/projects/{project['id']}/work-items", json={
-        "requirement_id": req2["id"], "kind": "task", "title": "Build billing", "status": "Done", "severity": "Medium"
-    }, headers=headers)
-    client.post(f"/api/projects/{project['id']}/release-retrospectives", json={
-        "author": "PM",
-        "what_went_well": "Risk dashboard was useful.",
-        "what_to_improve": "Start test planning before sign-off week.",
-        "action_items": "Add test owner during requirement intake.\nReview recurring blocking bugs weekly.",
-    }, headers=headers)
+    project = client.post(
+        "/api/projects", json={"name": "Learning Loop Project", "description": "v6.9"}, headers=headers
+    ).json()
+    req1 = client.post(
+        f"/api/projects/{project['id']}/requirements",
+        json={
+            "key": "REQ-LEARN-1",
+            "title": "High risk checkout",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    req2 = client.post(
+        f"/api/projects/{project['id']}/requirements",
+        json={
+            "key": "REQ-LEARN-2",
+            "title": "High risk billing",
+            "priority": "Critical",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
+    client.post(
+        f"/api/projects/{project['id']}/work-items",
+        json={
+            "requirement_id": req1["id"],
+            "kind": "task",
+            "title": "Build checkout",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
+    client.post(
+        f"/api/projects/{project['id']}/work-items",
+        json={
+            "requirement_id": req2["id"],
+            "kind": "task",
+            "title": "Build billing",
+            "status": "Done",
+            "severity": "Medium",
+        },
+        headers=headers,
+    )
+    client.post(
+        f"/api/projects/{project['id']}/release-retrospectives",
+        json={
+            "author": "PM",
+            "what_went_well": "Risk dashboard was useful.",
+            "what_to_improve": "Start test planning before sign-off week.",
+            "action_items": "Add test owner during requirement intake.\nReview recurring blocking bugs weekly.",
+        },
+        headers=headers,
+    )
 
     learning = client.get(f"/api/projects/{project['id']}/release-learning-loop", headers=headers).json()
     assert learning["retrospective_count"] == 1
@@ -49,17 +79,25 @@ def test_release_learning_loop_generates_prevention_items_from_retrospective_and
 
 def test_save_and_update_release_learning_item_status():
     headers = auth_headers()
-    project = client.post("/api/projects", json={"name": "Saved Learning Project", "description": "v6.9"}, headers=headers).json()
-    created = client.post(f"/api/projects/{project['id']}/release-learning-items", json={
-        "title": "Create pre-release bug review",
-        "prevention_action": "Review High/Critical bugs before release review starts.",
-        "source": "manual",
-        "status": "Open",
-    }, headers=headers).json()
+    project = client.post(
+        "/api/projects", json={"name": "Saved Learning Project", "description": "v6.9"}, headers=headers
+    ).json()
+    created = client.post(
+        f"/api/projects/{project['id']}/release-learning-items",
+        json={
+            "title": "Create pre-release bug review",
+            "prevention_action": "Review High/Critical bugs before release review starts.",
+            "source": "manual",
+            "status": "Open",
+        },
+        headers=headers,
+    ).json()
     assert created["created"] is True
     item_id = created["item"]["id"]
 
-    updated = client.patch(f"/api/release-learning-items/{item_id}", json={"status": "Prevented"}, headers=headers).json()
+    updated = client.patch(
+        f"/api/release-learning-items/{item_id}", json={"status": "Prevented"}, headers=headers
+    ).json()
     assert updated["item"]["status"] == "Prevented"
 
     learning = client.get(f"/api/projects/{project['id']}/release-learning-loop", headers=headers).json()

@@ -19,7 +19,11 @@ def v11_9_final_release_tag_preparation(db: Session, profile_id: str = "core-ris
     checks = [
         _check("v11-8-handoff-ready", handoff.get("ready") is True, "Signed checksum handoff is ready."),
         _check("manifest-digest-present", len(handoff.get("manifest_digest", "")) == 64, "Manifest digest is locked."),
-        _check("handoff-signature-present", len(handoff.get("handoff_signature", "")) == 64, "Handoff signature is present."),
+        _check(
+            "handoff-signature-present",
+            len(handoff.get("handoff_signature", "")) == 64,
+            "Handoff signature is present.",
+        ),
         _check("no-new-destructive-path", True, "v11.9 only prepares release tag and demo script."),
     ]
     ready = all(item["pass"] for item in checks)
@@ -68,35 +72,58 @@ def v11_9_operator_final_release_package(db: Session, profile_id: str = "core-ri
     data = {
         "version": VERSION,
         "mode": "operator-final-release-package",
-        "status": "Operator final release package ready" if prep["ready"] and script["ready"] else "Operator final release package blocked",
+        "status": "Operator final release package ready"
+        if prep["ready"] and script["ready"]
+        else "Operator final release package blocked",
         "ready": prep["ready"] and script["ready"],
         "profile_id": profile_id,
         "release_tag": RELEASE_TAG,
         "manifest_digest": prep["manifest_digest"],
         "tag_signoff_phrase": TAG_SIGNOFF,
     }
-    data["content"] = "\n\n".join([
-        "# v11.9 Operator Final Release Package",
-        prep["content"],
-        script["content"],
-    ]).strip() + "\n"
+    data["content"] = (
+        "\n\n".join(
+            [
+                "# v11.9 Operator Final Release Package",
+                prep["content"],
+                script["content"],
+            ]
+        ).strip()
+        + "\n"
+    )
     return data
 
 
 def _git_commands() -> list[str]:
     return [
         "git status --short",
-        f"git tag -a {RELEASE_TAG} -m \"{TAG_SIGNOFF}\"",
+        f'git tag -a {RELEASE_TAG} -m "{TAG_SIGNOFF}"',
         f"git show {RELEASE_TAG} --stat",
     ]
 
 
 def _script_sections(prep: dict) -> list[dict]:
     return [
-        {"title": "Open with the problem", "duration": "30s", "say": "Show that release demos fail when reset and restore paths are unsafe."},
-        {"title": "Show guarded recovery", "duration": "60s", "say": "Walk through reset phrase, restore phrase, digest lock, and audit trail."},
-        {"title": "Prove evidence", "duration": "60s", "say": f"Display manifest digest {prep['manifest_digest'][:12]}... and checksum handoff."},
-        {"title": "Finish with quickstart", "duration": "30s", "say": "Run install verification and explain the final release tag."},
+        {
+            "title": "Open with the problem",
+            "duration": "30s",
+            "say": "Show that release demos fail when reset and restore paths are unsafe.",
+        },
+        {
+            "title": "Show guarded recovery",
+            "duration": "60s",
+            "say": "Walk through reset phrase, restore phrase, digest lock, and audit trail.",
+        },
+        {
+            "title": "Prove evidence",
+            "duration": "60s",
+            "say": f"Display manifest digest {prep['manifest_digest'][:12]}... and checksum handoff.",
+        },
+        {
+            "title": "Finish with quickstart",
+            "duration": "30s",
+            "say": "Run install verification and explain the final release tag.",
+        },
     ]
 
 
@@ -144,7 +171,14 @@ def _tag_markdown(data: dict) -> str:
 
 
 def _script_markdown(data: dict) -> str:
-    lines = ["# v11.9 Portfolio Demo Script", "", f"Title: {data['title']}", f"Release tag: `{data['release_tag']}`", "", "## Demo Flow"]
+    lines = [
+        "# v11.9 Portfolio Demo Script",
+        "",
+        f"Title: {data['title']}",
+        f"Release tag: `{data['release_tag']}`",
+        "",
+        "## Demo Flow",
+    ]
     lines.extend(f"- {item['duration']} — {item['title']}: {item['say']}" for item in data["script_sections"])
     lines.extend(["", "## Talk Track"])
     lines.extend(f"- {item}" for item in data["talk_track"])

@@ -26,7 +26,16 @@ def build_manifest(db_path: Path) -> dict:
         items.extend(_item("operator_approval_records", row) for row in approvals)
     manifest_hash = _hash_json({"items": items})
     bundle_hash = _hash_text(_bundle_source(items, manifest_hash))
-    return {"version": "8.9", "algorithm": "sha256", "item_count": len(items), "artifact_count": len(artifacts), "approval_count": len(approvals), "manifest_hash": manifest_hash, "bundle_hash": bundle_hash, "items": items}
+    return {
+        "version": "8.9",
+        "algorithm": "sha256",
+        "item_count": len(items),
+        "artifact_count": len(artifacts),
+        "approval_count": len(approvals),
+        "manifest_hash": manifest_hash,
+        "bundle_hash": bundle_hash,
+        "items": items,
+    }
 
 
 def latest_frozen_manifest(db_path: Path) -> dict | None:
@@ -38,8 +47,19 @@ def latest_frozen_manifest(db_path: Path) -> dict | None:
 
 
 def render_manifest(data: dict) -> str:
-    lines = ["# v8.9 Evidence Manifest", "", f"Algorithm: {data['algorithm']}", f"Manifest hash: `{data['manifest_hash']}`", f"Bundle hash: `{data['bundle_hash']}`", f"Items: {data['item_count']}", "", "## Items"]
-    lines.extend(f"- {item['table']}#{item['id']} status={item['status']} hash={item['record_hash']}" for item in data["items"])
+    lines = [
+        "# v8.9 Evidence Manifest",
+        "",
+        f"Algorithm: {data['algorithm']}",
+        f"Manifest hash: `{data['manifest_hash']}`",
+        f"Bundle hash: `{data['bundle_hash']}`",
+        f"Items: {data['item_count']}",
+        "",
+        "## Items",
+    ]
+    lines.extend(
+        f"- {item['table']}#{item['id']} status={item['status']} hash={item['record_hash']}" for item in data["items"]
+    )
     if not data["items"]:
         lines.append("- No signed evidence or approval records found.")
     return "\n".join(lines).strip() + "\n"
@@ -53,7 +73,13 @@ def _rows(con: sqlite3.Connection, table: str) -> list[sqlite3.Row]:
 
 def _item(table: str, row: sqlite3.Row) -> dict:
     payload = {key: row[key] for key in row.keys() if key != "id"}
-    return {"table": table, "id": row["id"], "status": payload.get("status", ""), "created_at": payload.get("created_at", ""), "record_hash": _hash_json(payload)}
+    return {
+        "table": table,
+        "id": row["id"],
+        "status": payload.get("status", ""),
+        "created_at": payload.get("created_at", ""),
+        "record_hash": _hash_json(payload),
+    }
 
 
 def _hash_json(value: Any) -> str:

@@ -94,11 +94,26 @@ def _count(db: Session, column) -> int:
 def _wizard_steps(inventory: dict) -> list[dict]:
     has_data = inventory["projects"] > 0
     return [
-        _step(1, "Confirm local mode", "Open the app locally and verify you are not operating against production.", "Ready"),
+        _step(
+            1,
+            "Confirm local mode",
+            "Open the app locally and verify you are not operating against production.",
+            "Ready",
+        ),
         _step(2, "Review reset safety", "Open Demo Reset Safety before rebuilding sample data.", "Ready"),
         _step(3, "Create or reset demo data", "Use demo reset only after reviewing the approval phrase.", "Ready"),
-        _step(4, "Select project/release", "Choose the demo project and release from the workspace selector.", "Ready" if has_data else "Blocked"),
-        _step(5, "Run governance tour", "Open v10.1 Quickstart, Evidence Manifest, Verified Gate, and Final Bundle.", "Ready" if has_data else "Blocked"),
+        _step(
+            4,
+            "Select project/release",
+            "Choose the demo project and release from the workspace selector.",
+            "Ready" if has_data else "Blocked",
+        ),
+        _step(
+            5,
+            "Run governance tour",
+            "Open v10.1 Quickstart, Evidence Manifest, Verified Gate, and Final Bundle.",
+            "Ready" if has_data else "Blocked",
+        ),
         _step(6, "Export first-run package", "Export this wizard package for operator handoff.", "Ready"),
     ]
 

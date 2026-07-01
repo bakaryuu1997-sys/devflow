@@ -63,7 +63,12 @@ def v10_5_execute_profile_reset(
 
 def v10_5_operator_reset_package(db: Session, profile_id: str = "core-risk") -> dict:
     plan = v10_5_profile_reset_plan(db, profile_id)
-    data = {"version": "10.5", "mode": "operator-profile-reset-package", "status": plan["status"], "ready": plan["ready"]}
+    data = {
+        "version": "10.5",
+        "mode": "operator-profile-reset-package",
+        "status": plan["status"],
+        "ready": plan["ready"],
+    }
     data["content"] = "# v10.5 Operator Profile Reset Package\n\n" + plan["content"]
     return data
 
@@ -126,7 +131,13 @@ def _guardrails() -> list[str]:
 
 
 def _error(profile_id: str, status: str) -> dict:
-    return {"version": "10.5", "mode": "profile-specific-demo-reset-execution", "status": status, "ready": False, "profile_id": profile_id}
+    return {
+        "version": "10.5",
+        "mode": "profile-specific-demo-reset-execution",
+        "status": status,
+        "ready": False,
+        "profile_id": profile_id,
+    }
 
 
 def _blocked(profile_id: str, expected: str) -> dict:
@@ -137,7 +148,15 @@ def _blocked(profile_id: str, expected: str) -> dict:
 
 
 def _plan_markdown(data: dict) -> str:
-    lines = ["# v10.5 Profile-specific Demo Reset Plan", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Approval phrase: `{data['approval_phrase']}`", "", "## Scope"]
+    lines = [
+        "# v10.5 Profile-specific Demo Reset Plan",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Approval phrase: `{data['approval_phrase']}`",
+        "",
+        "## Scope",
+    ]
     lines.extend(f"- {item}" for item in data["destructive_scope"])
     lines.extend(["", "## Steps"])
     lines.extend(f"{i}. {item}" for i, item in enumerate(data["orchestration_steps"], 1))

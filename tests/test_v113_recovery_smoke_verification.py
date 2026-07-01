@@ -42,13 +42,20 @@ def test_v113_post_restore_verification_compares_snapshot_and_current_rows():
 
 def test_v113_operator_package_docs_ui_and_cli(tmp_path):
     _snapshot_export()
-    package = client.get("/api/release-governance/v11-3-operator-smoke-verification-package?profile_id=core-risk").json()
+    package = client.get(
+        "/api/release-governance/v11-3-operator-smoke-verification-package?profile_id=core-risk"
+    ).json()
     assert package["version"] == "11.3"
     assert "Operator Smoke Verification Package" in package["content"]
     assert Path("docs/V11_3_RECOVERY_SMOKE_VERIFICATION.md").exists()
     assert "routes_v113" in " ".join(wired_route_modules())
     assert "governance_v113_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     out = tmp_path / "smoke.md"
-    result = subprocess.run([sys.executable, "scripts/export_v11_3_operator_smoke_verification_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v11_3_operator_smoke_verification_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v11.3 Operator Smoke Verification Package" in out.read_text(encoding="utf-8")

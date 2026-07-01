@@ -17,7 +17,9 @@ def test_v104_sample_builder_preview_and_build_are_safe():
     assert preview["version"] == "10.4"
     assert preview["ready"] is True
     assert preview["sample_preview"]["requirements"] == 1
-    built = client.post("/api/release-governance/v10-4-build-sample-project?profile_id=core-risk&operator_name=Long").json()
+    built = client.post(
+        "/api/release-governance/v10-4-build-sample-project?profile_id=core-risk&operator_name=Long"
+    ).json()
     assert built["status"] == "Built"
     assert built["project_id"] > 0
     assert built["created_or_reused"]["requirements"] == 1
@@ -45,6 +47,11 @@ def test_v104_routes_ui_docs_and_cli_export(tmp_path):
     assert "governance_v104_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_4_GUIDED_SAMPLE_PROJECT_BUILDER.md").exists()
     out = tmp_path / "builder.md"
-    result = subprocess.run([sys.executable, "scripts/export_v10_4_operator_sample_builder_package.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v10_4_operator_sample_builder_package.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v10.4 Operator Sample Builder Package" in out.read_text(encoding="utf-8")

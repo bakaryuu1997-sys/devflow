@@ -79,7 +79,10 @@ def _rehearsal_steps(copy_plan: dict, rollback: dict, checklist: dict) -> list[d
         {"name": "1. Confirm production backup", "items": checklist.get("sections", [{}])[0].get("items", [])},
         {"name": "2. Apply migration on copied database", "items": copy_plan.get("commands", [])},
         {"name": "3. Run rollback drill", "items": rollback.get("commands", [])},
-        {"name": "4. Capture operator notes", "items": ["Record start time", "Record command outputs", "Record final go/no-go decision"]},
+        {
+            "name": "4. Capture operator notes",
+            "items": ["Record start time", "Record command outputs", "Record final go/no-go decision"],
+        },
     ]
 
 
@@ -98,7 +101,11 @@ def _required_signoffs(rehearsal: dict, checklist: dict) -> list[dict]:
     return [
         {"role": "Operator", "item": "I ran the rehearsal commands on a copy database.", "required": True},
         {"role": "Operator", "item": "I verified rollback drill output and preserved backups.", "required": True},
-        {"role": "Reviewer", "item": checklist.get("final_go_no_go", "Review final production checklist."), "required": True},
+        {
+            "role": "Reviewer",
+            "item": checklist.get("final_go_no_go", "Review final production checklist."),
+            "required": True,
+        },
         {"role": "Approver", "item": f"I understand real migration requires `{APPROVAL_PHRASE}`.", "required": True},
     ]
 
@@ -120,7 +127,14 @@ def _blocked_until(rehearsal: dict) -> list[str]:
 
 
 def _rehearsal_markdown(data: dict) -> str:
-    lines = ["# v8.7 Production Upgrade Rehearsal Report", "", f"Status: {data['status']}", f"Score: {data['rehearsal_score']}", f"Decision: {data['go_no_go']}", ""]
+    lines = [
+        "# v8.7 Production Upgrade Rehearsal Report",
+        "",
+        f"Status: {data['status']}",
+        f"Score: {data['rehearsal_score']}",
+        f"Decision: {data['go_no_go']}",
+        "",
+    ]
     lines.extend(["## Evidence"] + [f"- {row['name']}: {row['status']}" for row in data["evidence"]] + [""])
     for step in data["rehearsal_steps"]:
         lines.append(f"## {step['name']}")
@@ -131,7 +145,14 @@ def _rehearsal_markdown(data: dict) -> str:
 
 
 def _signoff_markdown(data: dict) -> str:
-    lines = ["# v8.7 Operator Sign-off Checklist", "", f"Status: {data['status']}", f"Approval phrase: `{data['approval_phrase']}`", "", "## Required sign-offs"]
+    lines = [
+        "# v8.7 Operator Sign-off Checklist",
+        "",
+        f"Status: {data['status']}",
+        f"Approval phrase: `{data['approval_phrase']}`",
+        "",
+        "## Required sign-offs",
+    ]
     lines.extend(f"- [ ] {row['role']}: {row['item']}" for row in data["required_signoffs"])
     lines.extend(["", "## Operator attestations"])
     lines.extend(f"- [ ] {item}" for item in data["operator_attestations"])

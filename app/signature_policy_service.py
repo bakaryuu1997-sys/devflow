@@ -127,26 +127,55 @@ def _dry_run_findings(policy: dict, adapter: str, payload_hash: str, signature_h
 
 def _dry_run_next_steps(findings: list[str]) -> list[str]:
     if findings:
-        return ["Resolve findings before enabling a real vendor adapter.", "Re-run signed payload + timestamp integrity check.", "Repeat adapter dry-run with the exact production policy."]
-    return ["Keep this adapter in stub mode until vendor parser is selected.", "Document public verifier reference.", "Run production rehearsal before real migration or release approval."]
+        return [
+            "Resolve findings before enabling a real vendor adapter.",
+            "Re-run signed payload + timestamp integrity check.",
+            "Repeat adapter dry-run with the exact production policy.",
+        ]
+    return [
+        "Keep this adapter in stub mode until vendor parser is selected.",
+        "Document public verifier reference.",
+        "Run production rehearsal before real migration or release approval.",
+    ]
 
 
 def _adapters_markdown(data: dict) -> str:
-    lines = ["# v9.2 Signature Verification Adapter Stubs", "", f"Payload hash: `{data['payload_hash']}`", "", "## Adapters"]
+    lines = [
+        "# v9.2 Signature Verification Adapter Stubs",
+        "",
+        f"Payload hash: `{data['payload_hash']}`",
+        "",
+        "## Adapters",
+    ]
     lines.extend(f"- {row['name']}: {row['description']}" for row in data["adapters"])
     lines.extend(["", "## Rules", *[f"- {rule}" for rule in data["rules"]]])
     return "\n".join(lines).strip() + "\n"
 
 
 def _policy_markdown(data: dict) -> str:
-    lines = ["# v9.2 Policy-Based Verification Checklist", "", f"Status: {data['status']}", f"Payload hash: `{data['payload_hash']}`", "", "## Checklist"]
+    lines = [
+        "# v9.2 Policy-Based Verification Checklist",
+        "",
+        f"Status: {data['status']}",
+        f"Payload hash: `{data['payload_hash']}`",
+        "",
+        "## Checklist",
+    ]
     lines.extend(f"- [{item['status']}] {item['title']}" for item in data["checklist"])
-    lines.extend(["", "## Blockers", *[f"- {item}" for item in (data["blockers"] or ["No blockers."]) ]])
+    lines.extend(["", "## Blockers", *[f"- {item}" for item in (data["blockers"] or ["No blockers."])]])
     return "\n".join(lines).strip() + "\n"
 
 
 def _dry_run_markdown(data: dict) -> str:
-    lines = ["# v9.2 Signature Adapter Dry Run", "", f"Status: {data['status']}", f"Adapter: {data['adapter']}", f"Payload hash: `{data['payload_hash']}`", "", "## Findings"]
+    lines = [
+        "# v9.2 Signature Adapter Dry Run",
+        "",
+        f"Status: {data['status']}",
+        f"Adapter: {data['adapter']}",
+        f"Payload hash: `{data['payload_hash']}`",
+        "",
+        "## Findings",
+    ]
     lines.extend(f"- {item}" for item in (data["findings"] or ["No findings."]))
     lines.extend(["", "## Next steps", *[f"- {step}" for step in data["next_steps"]]])
     return "\n".join(lines).strip() + "\n"

@@ -68,14 +68,17 @@ def v11_4_operator_demo_handoff_package(db: Session, profile_id: str = "core-ris
         "ready": bundle["ready"] and handoff["ready"],
         "profile_id": profile_id,
     }
-    data["content"] = "\n\n".join(
-        [
-            "# v11.4 Operator Demo Handoff Package",
-            bundle["content"],
-            handoff["content"],
-            smoke_package["content"],
-        ]
-    ).strip() + "\n"
+    data["content"] = (
+        "\n\n".join(
+            [
+                "# v11.4 Operator Demo Handoff Package",
+                bundle["content"],
+                handoff["content"],
+                smoke_package["content"],
+            ]
+        ).strip()
+        + "\n"
+    )
     return data
 
 
@@ -85,7 +88,9 @@ def _evidence_sections(snapshot: dict, fixture: dict, smoke: dict, verify: dict,
         _section("fixture-example", fixture.get("ready"), True, "v11.1 fixture JSON can be saved."),
         _section("smoke-test", smoke.get("ready"), True, "v11.3 smoke test passes safe chain."),
         _section("post-restore-verification", verify.get("ready"), True, "v11.3 verification report is available."),
-        _section("digest-lock", bool(conflict.get("snapshot_digest_lock_required")), True, "v10.9 digest lock is present."),
+        _section(
+            "digest-lock", bool(conflict.get("snapshot_digest_lock_required")), True, "v10.9 digest lock is present."
+        ),
     ]
 
 
@@ -142,13 +147,23 @@ def _bundle_markdown(data: dict) -> str:
         "",
         "## Evidence Sections",
     ]
-    lines.extend(f"- {'READY' if item['ready'] else 'BLOCKED'}: {item['id']} — {item['detail']}" for item in data["evidence_sections"])
+    lines.extend(
+        f"- {'READY' if item['ready'] else 'BLOCKED'}: {item['id']} — {item['detail']}"
+        for item in data["evidence_sections"]
+    )
     lines.append(f"\nHandoff gate: `{data['handoff_gate']}`")
     return "\n".join(lines).strip() + "\n"
 
 
 def _handoff_markdown(data: dict) -> str:
-    lines = ["# v11.4 Final Demo Handoff Polish", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", "", "## Demo Cards"]
+    lines = [
+        "# v11.4 Final Demo Handoff Polish",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        "",
+        "## Demo Cards",
+    ]
     lines.extend(f"- {card['title']}: {card['state']} — `{card['copy']}`" for card in data["demo_cards"])
     lines.extend(["", "## Operator Script"])
     lines.extend(f"{index}. {item}" for index, item in enumerate(data["operator_script"], start=1))

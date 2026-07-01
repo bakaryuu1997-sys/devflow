@@ -68,17 +68,24 @@ def v11_7_operator_release_package(db: Session, profile_id: str = "core-risk") -
     data = {
         "version": VERSION,
         "mode": "operator-release-package",
-        "status": "Operator release package ready" if manifest["ready"] and notes["ready"] else "Operator release package blocked",
+        "status": "Operator release package ready"
+        if manifest["ready"] and notes["ready"]
+        else "Operator release package blocked",
         "ready": manifest["ready"] and notes["ready"],
         "profile_id": profile_id,
         "release_candidate": RC_LABEL,
         "manifest_digest": manifest["manifest_digest"],
     }
-    data["content"] = "\n\n".join([
-        "# v11.7 Operator Release Package",
-        manifest["content"],
-        notes["content"],
-    ]).strip() + "\n"
+    data["content"] = (
+        "\n\n".join(
+            [
+                "# v11.7 Operator Release Package",
+                manifest["content"],
+                notes["content"],
+            ]
+        ).strip()
+        + "\n"
+    )
     return data
 
 
@@ -98,11 +105,31 @@ def _file_record(path: str) -> dict:
 
 def _manifest_checks(final_package: dict, manifest: list[dict]) -> list[dict]:
     return [
-        _check("v11-6-final-package-exportable", "v11.6 Operator Final Package" in final_package.get("content", ""), "v11.6 final package remains exportable."),
-        _check("all-essential-files-present", all(item["exists"] for item in manifest), "Essential release files are present."),
-        _check("version-current-or-newer", any(v in _read("VERSION.md") for v in ["v11.7", "v11.8", "v11.9"]), "VERSION.md names v11.7 or newer."),
-        _check("readme-current-or-newer", any(v in _read("README.md") for v in ["v11.7", "v11.8", "v11.9"]), "README names v11.7 or newer."),
-        _check("release-notes-doc-present", Path("docs/V11_7_ARCHIVE_INTEGRITY_RELEASE_NOTES.md").exists(), "v11.7 release notes docs are present."),
+        _check(
+            "v11-6-final-package-exportable",
+            "v11.6 Operator Final Package" in final_package.get("content", ""),
+            "v11.6 final package remains exportable.",
+        ),
+        _check(
+            "all-essential-files-present",
+            all(item["exists"] for item in manifest),
+            "Essential release files are present.",
+        ),
+        _check(
+            "version-current-or-newer",
+            any(v in _read("VERSION.md") for v in ["v11.7", "v11.8", "v11.9"]),
+            "VERSION.md names v11.7 or newer.",
+        ),
+        _check(
+            "readme-current-or-newer",
+            any(v in _read("README.md") for v in ["v11.7", "v11.8", "v11.9"]),
+            "README names v11.7 or newer.",
+        ),
+        _check(
+            "release-notes-doc-present",
+            Path("docs/V11_7_ARCHIVE_INTEGRITY_RELEASE_NOTES.md").exists(),
+            "v11.7 release notes docs are present.",
+        ),
         _check("no-new-destructive-path", True, "v11.7 only records integrity and release notes."),
     ]
 
@@ -150,7 +177,14 @@ def _read(path: str) -> str:
 
 
 def _manifest_markdown(data: dict) -> str:
-    lines = ["# v11.7 Archive Integrity Manifest", "", f"Status: {data['status']}", f"Manifest digest: `{data['manifest_digest']}`", "", "## Files"]
+    lines = [
+        "# v11.7 Archive Integrity Manifest",
+        "",
+        f"Status: {data['status']}",
+        f"Manifest digest: `{data['manifest_digest']}`",
+        "",
+        "## Files",
+    ]
     lines.extend(f"- `{item['path']}` — {item['size_bytes']} bytes — `{item['sha256']}`" for item in data["manifest"])
     lines.extend(["", "## Checks"])
     lines.extend(f"- {'PASS' if item['pass'] else 'BLOCK'}: {item['id']} — {item['detail']}" for item in data["checks"])
@@ -158,7 +192,14 @@ def _manifest_markdown(data: dict) -> str:
 
 
 def _release_notes_markdown(data: dict) -> str:
-    lines = ["# v11.7 Release Notes", "", f"Release candidate: `{data['release_candidate']}`", f"Manifest digest: `{data['manifest_digest']}`", "", "## Highlights"]
+    lines = [
+        "# v11.7 Release Notes",
+        "",
+        f"Release candidate: `{data['release_candidate']}`",
+        f"Manifest digest: `{data['manifest_digest']}`",
+        "",
+        "## Highlights",
+    ]
     lines.extend(f"- {item}" for item in data["highlights"])
     lines.extend(["", "## Upgrade Notes"])
     lines.extend(f"- {item}" for item in data["upgrade_notes"])

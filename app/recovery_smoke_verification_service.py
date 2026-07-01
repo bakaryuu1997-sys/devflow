@@ -37,13 +37,17 @@ def v11_3_recovery_smoke_test_automation(db: Session, profile_id: str = "core-ri
         "profile_id": profile_id,
         "snapshot_digest_lock": conflict.get("snapshot_digest_lock_required", ""),
         "checks": checks,
-        "next_safe_action": "Run v10.9 guarded restore only with phrase and digest lock" if ready else "Fix failed smoke-test checks first",
+        "next_safe_action": "Run v10.9 guarded restore only with phrase and digest lock"
+        if ready
+        else "Fix failed smoke-test checks first",
     }
     data["content"] = _smoke_markdown(data)
     return data
 
 
-def v11_3_post_restore_verification_report(db: Session, profile_id: str = "core-risk", snapshot_export: dict | None = None) -> dict:
+def v11_3_post_restore_verification_report(
+    db: Session, profile_id: str = "core-risk", snapshot_export: dict | None = None
+) -> dict:
     source = snapshot_export or v11_1_export_fixture_example(db, profile_id)["fixture_payload"]["snapshot_export"]
     expected_snapshot = source.get("snapshot", {}) if isinstance(source, dict) else {}
     current_export = v10_6_rollback_snapshot_export(db, profile_id)
@@ -54,7 +58,16 @@ def v11_3_post_restore_verification_report(db: Session, profile_id: str = "core-
     current_counts = current_snapshot.get("counts", {}) if isinstance(current_snapshot, dict) else {}
     restore_audit = v10_8_restore_audit_trail(db, profile_id)
     lock_audit = v10_9_restore_digest_lock_audit_trail(db, profile_id)
-    checks = _post_restore_checks(expected_snapshot, current_snapshot, expected_digest, current_digest, reset_counts, current_counts, restore_audit, lock_audit)
+    checks = _post_restore_checks(
+        expected_snapshot,
+        current_snapshot,
+        expected_digest,
+        current_digest,
+        reset_counts,
+        current_counts,
+        restore_audit,
+        lock_audit,
+    )
     errors = [item for item in checks if item["severity"] == "error" and not item["pass"]]
     data = {
         "version": "11.3",
@@ -75,32 +88,75 @@ def v11_3_post_restore_verification_report(db: Session, profile_id: str = "core-
 def v11_3_operator_smoke_verification_package(db: Session, profile_id: str = "core-risk") -> dict:
     smoke = v11_3_recovery_smoke_test_automation(db, profile_id)
     verification = v11_3_post_restore_verification_report(db, profile_id)
-    data = {"version": "11.3", "mode": "operator-smoke-verification-package", "status": smoke["status"], "ready": smoke["ready"] and verification["ready"], "profile_id": profile_id}
-    data["content"] = "# v11.3 Operator Smoke Verification Package\n\n" + "\n\n".join([smoke["content"], verification["content"]])
+    data = {
+        "version": "11.3",
+        "mode": "operator-smoke-verification-package",
+        "status": smoke["status"],
+        "ready": smoke["ready"] and verification["ready"],
+        "profile_id": profile_id,
+    }
+    data["content"] = "# v11.3 Operator Smoke Verification Package\n\n" + "\n\n".join(
+        [smoke["content"], verification["content"]]
+    )
     return data
 
 
-def _smoke_checks(build: dict, fixture: dict, validation: dict, rehearsal: dict, conflict: dict, plan: dict) -> list[dict]:
+def _smoke_checks(
+    build: dict, fixture: dict, validation: dict, rehearsal: dict, conflict: dict, plan: dict
+) -> list[dict]:
     return [
         _check("sample-project-built", build.get("ready"), "error", "v10.4 sample project exists before smoke test."),
         _check("fixture-export-ready", fixture.get("ready"), "error", "v11.1 fixture export is available."),
         _check("fixture-validation-ready", validation.get("ready"), "error", "v11.2 hardened validation passes."),
-        _check("import-rehearsal-dry-run", rehearsal.get("ready") and rehearsal.get("dry_run", True), "error", "Import rehearsal stays non-mutating."),
-        _check("digest-lock-present", bool(conflict.get("snapshot_digest_lock_required")), "error", "v10.9 digest lock can be copied."),
+        _check(
+            "import-rehearsal-dry-run",
+            rehearsal.get("ready") and rehearsal.get("dry_run", True),
+            "error",
+            "Import rehearsal stays non-mutating.",
+        ),
+        _check(
+            "digest-lock-present",
+            bool(conflict.get("snapshot_digest_lock_required")),
+            "error",
+            "v10.9 digest lock can be copied.",
+        ),
         _check("guarded-plan-ready", plan.get("ready"), "error", "v10.9 restore plan is ready but not executed."),
     ]
 
 
-def _post_restore_checks(expected: dict, current: dict, expected_digest: str, current_digest: str, expected_counts: dict, current_counts: dict, restore_audit: dict, lock_audit: dict) -> list[dict]:
+def _post_restore_checks(
+    expected: dict,
+    current: dict,
+    expected_digest: str,
+    current_digest: str,
+    expected_counts: dict,
+    current_counts: dict,
+    restore_audit: dict,
+    lock_audit: dict,
+) -> list[dict]:
     restore_events = restore_audit.get("audit_events", [])
     lock_events = lock_audit.get("audit_events", [])
     return [
         _check("expected-snapshot-ready", expected.get("ready"), "error", "Expected rollback snapshot is ready."),
         _check("current-snapshot-ready", current.get("ready"), "error", "Current profile snapshot is readable."),
-        _check("digest-match", expected_digest == current_digest, "error", "Current rows match expected snapshot digest."),
-        _check("count-match", expected_counts == current_counts, "error", "Current table counts match expected snapshot counts."),
-        _check("restore-audit-present", bool(restore_events), "warning", "At least one v10.8 restore audit event exists."),
-        _check("digest-lock-audit-present", bool(lock_events), "warning", "At least one v10.9 digest-lock audit event exists."),
+        _check(
+            "digest-match", expected_digest == current_digest, "error", "Current rows match expected snapshot digest."
+        ),
+        _check(
+            "count-match",
+            expected_counts == current_counts,
+            "error",
+            "Current table counts match expected snapshot counts.",
+        ),
+        _check(
+            "restore-audit-present", bool(restore_events), "warning", "At least one v10.8 restore audit event exists."
+        ),
+        _check(
+            "digest-lock-audit-present",
+            bool(lock_events),
+            "warning",
+            "At least one v10.9 digest-lock audit event exists.",
+        ),
     ]
 
 
@@ -119,13 +175,33 @@ def _digest(data: dict) -> str:
 
 
 def _smoke_markdown(data: dict) -> str:
-    lines = ["# v11.3 Recovery Smoke-Test Automation", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Digest lock: `{data['snapshot_digest_lock']}`", "", "## Checks"]
+    lines = [
+        "# v11.3 Recovery Smoke-Test Automation",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Digest lock: `{data['snapshot_digest_lock']}`",
+        "",
+        "## Checks",
+    ]
     lines.extend(f"- {'PASS' if item['pass'] else 'BLOCK'}: {item['id']} — {item['detail']}" for item in data["checks"])
     lines.append(f"\nNext safe action: {data['next_safe_action']}")
     return "\n".join(lines).strip() + "\n"
 
 
 def _verify_markdown(data: dict) -> str:
-    lines = ["# v11.3 Post-Restore Verification Report", "", f"Status: {data['status']}", f"Profile: {data['profile_id']}", f"Expected digest: `{data['expected_snapshot_digest']}`", f"Current digest: `{data['current_snapshot_digest']}`", "", "## Checks"]
-    lines.extend(f"- {'PASS' if item['pass'] else item['severity'].upper()}: {item['id']} — {item['detail']}" for item in data["checks"])
+    lines = [
+        "# v11.3 Post-Restore Verification Report",
+        "",
+        f"Status: {data['status']}",
+        f"Profile: {data['profile_id']}",
+        f"Expected digest: `{data['expected_snapshot_digest']}`",
+        f"Current digest: `{data['current_snapshot_digest']}`",
+        "",
+        "## Checks",
+    ]
+    lines.extend(
+        f"- {'PASS' if item['pass'] else item['severity'].upper()}: {item['id']} — {item['detail']}"
+        for item in data["checks"]
+    )
     return "\n".join(lines).strip() + "\n"

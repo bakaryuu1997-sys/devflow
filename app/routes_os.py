@@ -17,7 +17,9 @@ def api_today(project_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/projects/{project_id}/inbox", response_model=InboxItemRead)
-def api_create_inbox(project_id: int, payload: InboxItemCreate, db: Session = Depends(get_db), _user: User = Depends(require_write)):
+def api_create_inbox(
+    project_id: int, payload: InboxItemCreate, db: Session = Depends(get_db), _user: User = Depends(require_write)
+):
     item = InboxItem(project_id=project_id, **payload.model_dump())
     db.add(item)
     db.commit()
@@ -40,7 +42,9 @@ def api_close_inbox(item_id: int, db: Session = Depends(get_db), _user: User = D
 
 
 @router.post("/projects/{project_id}/decisions", response_model=DecisionRead)
-def api_create_decision(project_id: int, payload: DecisionCreate, db: Session = Depends(get_db), _user: User = Depends(require_write)):
+def api_create_decision(
+    project_id: int, payload: DecisionCreate, db: Session = Depends(get_db), _user: User = Depends(require_write)
+):
     decision = Decision(project_id=project_id, **payload.model_dump())
     db.add(decision)
     db.commit()

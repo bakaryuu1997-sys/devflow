@@ -33,15 +33,17 @@ def import_git_items(db: Session, project_id: int, content: str, item_type: str 
         db.add(item)
         rows.append(item)
         if linked_key:
-            db.add(TraceLink(
-                project_id=project_id,
-                requirement_key=_requirement_key(linked_key),
-                link_type="commit" if item_type == "commit" else "pr",
-                target_key=item.ref,
-                title=title,
-                status=item.status,
-                module="git",
-            ))
+            db.add(
+                TraceLink(
+                    project_id=project_id,
+                    requirement_key=_requirement_key(linked_key),
+                    link_type="commit" if item_type == "commit" else "pr",
+                    target_key=item.ref,
+                    title=title,
+                    status=item.status,
+                    module="git",
+                )
+            )
     db.commit()
     for row in rows:
         db.refresh(row)

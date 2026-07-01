@@ -63,11 +63,13 @@ _CHECKPOINTS = [("Today", 0), ("7 days", 7), ("14 days", 14), ("30 days", 30)]
 
 
 def _items(db: Session, project_id: int) -> list[ReleaseLearningItem]:
-    return list(db.scalars(
-        select(ReleaseLearningItem)
-        .where(ReleaseLearningItem.project_id == project_id)
-        .order_by(ReleaseLearningItem.created_at.asc(), ReleaseLearningItem.id.asc())
-    ).all())
+    return list(
+        db.scalars(
+            select(ReleaseLearningItem)
+            .where(ReleaseLearningItem.project_id == project_id)
+            .order_by(ReleaseLearningItem.created_at.asc(), ReleaseLearningItem.id.asc())
+        ).all()
+    )
 
 
 def _calendar_row(item: ReleaseLearningItem, today: date) -> dict:
@@ -96,7 +98,9 @@ def _calendar_days(scheduled: list[dict]) -> list[dict]:
     result = []
     for due_day in sorted(buckets):
         items = sorted(buckets[due_day], key=lambda row: (row["owner"] or "~", row["id"]))
-        result.append({"date": due_day, "bucket": _bucket(items[0]["days_until_due"]), "count": len(items), "items": items})
+        result.append(
+            {"date": due_day, "bucket": _bucket(items[0]["days_until_due"]), "count": len(items), "items": items}
+        )
     return result
 
 

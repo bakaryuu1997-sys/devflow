@@ -49,6 +49,11 @@ def test_v107_restore_checklist_routes_ui_docs_and_cli_export(tmp_path):
     assert "governance_v107_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
     assert Path("docs/V10_7_MANUAL_ROLLBACK_IMPORT_REHEARSAL.md").exists()
     out = tmp_path / "restore.md"
-    result = subprocess.run([sys.executable, "scripts/export_v10_7_restore_rehearsal.py", str(out)], text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/export_v10_7_restore_rehearsal.py", str(out)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "v10.7 Operator Manual Restore Package" in out.read_text(encoding="utf-8")

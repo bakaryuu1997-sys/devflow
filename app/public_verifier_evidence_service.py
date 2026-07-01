@@ -52,7 +52,12 @@ def attach_public_verifier_evidence(db: Session, payload: dict) -> dict:
 
 def list_public_verifier_evidence(db: Session) -> dict:
     rows = db.query(PublicVerifierEvidenceAttachment).order_by(PublicVerifierEvidenceAttachment.id.desc()).all()
-    data = {"version": "9.5", "mode": "public-verifier-evidence-attachments", "count": len(rows), "records": [_row(row) for row in rows]}
+    data = {
+        "version": "9.5",
+        "mode": "public-verifier-evidence-attachments",
+        "count": len(rows),
+        "records": [_row(row) for row in rows],
+    }
     data["content"] = _list_markdown(data)
     return data
 
@@ -98,7 +103,11 @@ def _attachment_rules() -> list[str]:
 def _approval_steps(blockers: list[str]) -> list[str]:
     if blockers:
         return ["Resolve blockers.", "Re-run public-key verifier dry-run.", "Attach verified evidence again."]
-    return ["Freeze or export evidence bundle.", "Record operator approval with verified-signature gate evidence.", "Keep private keys outside DevFlow Guard."]
+    return [
+        "Freeze or export evidence bundle.",
+        "Record operator approval with verified-signature gate evidence.",
+        "Keep private keys outside DevFlow Guard.",
+    ]
 
 
 def _row(row: PublicVerifierEvidenceAttachment | None) -> dict:
@@ -123,7 +132,14 @@ def _row(row: PublicVerifierEvidenceAttachment | None) -> dict:
 
 
 def _package_markdown(data: dict) -> str:
-    lines = ["# v9.5 Public Verifier Evidence Package", "", f"Status: {data['status']}", f"Adapter: {data['adapter']}", "", "## Rules"]
+    lines = [
+        "# v9.5 Public Verifier Evidence Package",
+        "",
+        f"Status: {data['status']}",
+        f"Adapter: {data['adapter']}",
+        "",
+        "## Rules",
+    ]
     lines.extend(f"- {rule}" for rule in data["rules"])
     return "\n".join(lines).strip() + "\n"
 
@@ -134,12 +150,22 @@ def _record_markdown(row: dict) -> str:
 
 def _list_markdown(data: dict) -> str:
     lines = ["# v9.5 Public Verifier Evidence Attachments", "", f"Count: {data['count']}"]
-    lines.extend(f"- #{row['id']} {row['verification_status']} signer={row['signer_name']} payload={row['payload_hash']}" for row in data["records"])
+    lines.extend(
+        f"- #{row['id']} {row['verification_status']} signer={row['signer_name']} payload={row['payload_hash']}"
+        for row in data["records"]
+    )
     return "\n".join(lines).strip() + "\n"
 
 
 def _gate_markdown(data: dict) -> str:
-    lines = ["# v9.5 Verified-Signature Approval Gate", "", f"Status: {data['status']}", f"Ready: {data['ready']}", "", "## Blockers"]
+    lines = [
+        "# v9.5 Verified-Signature Approval Gate",
+        "",
+        f"Status: {data['status']}",
+        f"Ready: {data['ready']}",
+        "",
+        "## Blockers",
+    ]
     lines.extend(f"- {item}" for item in (data["blockers"] or ["No blockers."]))
     lines.extend(["", "## Approval steps", *[f"- [ ] {step}" for step in data["approval_steps"]]])
     return "\n".join(lines).strip() + "\n"

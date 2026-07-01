@@ -28,7 +28,9 @@ def _learning_item(headers, project_id, due_date=""):
         "owner": "QA",
         "due_date": due_date,
     }
-    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()["item"]
+    return client.post(f"/api/projects/{project_id}/release-learning-items", json=payload, headers=headers).json()[
+        "item"
+    ]
 
 
 def test_v80_governance_readiness_exposes_checks_and_migration_notes():

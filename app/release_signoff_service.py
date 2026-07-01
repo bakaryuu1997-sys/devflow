@@ -25,19 +25,21 @@ def release_signoff_snapshot(db: Session, project_id: int) -> dict:
     risk_dashboard = release_risk_dashboard(db, project_id)
     checklist = release_review_checklist(db, project_id)
     ready = bool(completion["release_review_complete"] and risk_dashboard["blocking_risks"] == 0)
-    return attach_structured_snapshot({
-        "project_id": project_id,
-        "project_name": project.name if project else "Unknown project",
-        "release_id": latest_release.id if latest_release else None,
-        "release_version": latest_release.version if latest_release else "unassigned",
-        "generated_at": utc_now().isoformat(),
-        "ready_for_signoff": ready,
-        "decision": "APPROVE" if ready else "WAIT",
-        "completion": completion,
-        "risk_dashboard": risk_dashboard,
-        "checklist_markdown": checklist["content"],
-        "signoff_blockers": _signoff_blockers(completion, risk_dashboard),
-    })
+    return attach_structured_snapshot(
+        {
+            "project_id": project_id,
+            "project_name": project.name if project else "Unknown project",
+            "release_id": latest_release.id if latest_release else None,
+            "release_version": latest_release.version if latest_release else "unassigned",
+            "generated_at": utc_now().isoformat(),
+            "ready_for_signoff": ready,
+            "decision": "APPROVE" if ready else "WAIT",
+            "completion": completion,
+            "risk_dashboard": risk_dashboard,
+            "checklist_markdown": checklist["content"],
+            "signoff_blockers": _signoff_blockers(completion, risk_dashboard),
+        }
+    )
 
 
 def create_release_signoff(db: Session, project_id: int, approved_by: str, approval_note: str = "") -> dict:

@@ -13,14 +13,34 @@ def log_activity(db: Session, action: str, message: str, project_id: int | None 
 
 
 def today_focus(db: Session, project_id: int) -> dict:
-    inbox = list(db.scalars(select(InboxItem).where(InboxItem.project_id == project_id, InboxItem.status == "Open")).all())
-    risks = list(db.scalars(select(RiskEvent).where(RiskEvent.project_id == project_id, RiskEvent.blocking.is_(True))).all())
-    bugs = list(db.scalars(select(WorkItem).where(WorkItem.project_id == project_id, WorkItem.kind == "bug", WorkItem.status != "Closed")).all())
-    return {"project_id": project_id, "open_inbox": inbox[:5], "blocking_risks": risks[:5], "open_bugs": bugs[:5], "next_actions": _next_actions(inbox, risks, bugs)}
+    inbox = list(
+        db.scalars(select(InboxItem).where(InboxItem.project_id == project_id, InboxItem.status == "Open")).all()
+    )
+    risks = list(
+        db.scalars(select(RiskEvent).where(RiskEvent.project_id == project_id, RiskEvent.blocking.is_(True))).all()
+    )
+    bugs = list(
+        db.scalars(
+            select(WorkItem).where(
+                WorkItem.project_id == project_id, WorkItem.kind == "bug", WorkItem.status != "Closed"
+            )
+        ).all()
+    )
+    return {
+        "project_id": project_id,
+        "open_inbox": inbox[:5],
+        "blocking_risks": risks[:5],
+        "open_bugs": bugs[:5],
+        "next_actions": _next_actions(inbox, risks, bugs),
+    }
 
 
 def count_inbox_open(db: Session, project_id: int) -> int:
-    stmt = select(func.count()).select_from(InboxItem).where(InboxItem.project_id == project_id, InboxItem.status == "Open")
+    stmt = (
+        select(func.count())
+        .select_from(InboxItem)
+        .where(InboxItem.project_id == project_id, InboxItem.status == "Open")
+    )
     return int(db.scalar(stmt) or 0)
 
 

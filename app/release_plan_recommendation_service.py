@@ -29,13 +29,19 @@ def release_plan_recommendation(db: Session, project_id: int, target_days: int =
 
 def _rank_key(row: dict) -> tuple[int, int, int]:
     status_bonus = {"Ready Candidate": 30, "Needs Scope Decision": 10, "At Risk": 0}.get(row.get("status"), 0)
-    return (row.get("readiness_score", 0) + status_bonus, -row.get("overdue_items", 0), -row.get("unscheduled_items", 0))
+    return (
+        row.get("readiness_score", 0) + status_bonus,
+        -row.get("overdue_items", 0),
+        -row.get("unscheduled_items", 0),
+    )
 
 
 def _actions(recommended: dict, baseline: dict) -> list[str]:
     if not recommended:
         return ["Create prevention items before release plan recommendation."]
-    actions = [f"Recommended plan: {recommended['name']} ({recommended['status']}, score {recommended['readiness_score']}/100)."]
+    actions = [
+        f"Recommended plan: {recommended['name']} ({recommended['status']}, score {recommended['readiness_score']}/100)."
+    ]
     if recommended.get("scope_adjustment", 0) > 0:
         actions.append("Record explicit scope decisions for items moved out by the recommended scenario.")
     if baseline.get("overdue_items", 0):
@@ -62,5 +68,7 @@ def _markdown(data: dict) -> str:
     lines.extend(f"- {hint}" for hint in data["action_hints"])
     lines.extend(["", "## Ranked scenarios"])
     for row in data["ranked_scenarios"]:
-        lines.append(f"- {row['name']}: {row['status']} · score {row['readiness_score']} · scope adjustment {row['scope_adjustment']}")
+        lines.append(
+            f"- {row['name']}: {row['status']} · score {row['readiness_score']} · scope adjustment {row['scope_adjustment']}"
+        )
     return "\n".join(lines).strip() + "\n"
