@@ -7,6 +7,32 @@ def read_static(name: str) -> str:
     return (STATIC_ROOT / name).read_text(encoding="utf-8")
 
 
+def test_head_has_favicon_and_metadata():
+    html = read_static("index.html")
+
+    assert '<link rel="icon" href="/static/favicon.svg"' in html
+    assert 'name="description"' in html
+    assert 'name="color-scheme"' in html
+    assert (STATIC_ROOT / "favicon.svg").exists()
+
+
+def test_form_inputs_are_labelled_for_accessibility():
+    html = read_static("index.html")
+
+    # Login labels are programmatically associated with their inputs.
+    assert 'for="email"' in html
+    assert 'for="password"' in html
+    # Placeholder-only inputs expose an accessible name via aria-label.
+    for aria in (
+        'id="newProjectName" placeholder="New project name" aria-label=',
+        'id="sqlFile" type="file" aria-label=',
+        'id="logFile" type="file" aria-label=',
+        'id="testFile" type="file" aria-label=',
+        'id="apiBefore" type="file" aria-label=',
+    ):
+        assert aria in html, f"missing accessible label: {aria}"
+
+
 def test_auth_toggle_targets_existing_button_id():
     html = read_static("index.html")
 

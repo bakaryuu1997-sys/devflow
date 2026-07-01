@@ -3,7 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevFlow Guard</title>
+  <title>DevFlow Guard — Release Governance OS</title>
+  <meta name="description" content="Offline-first release governance console for release risk, traceability, evidence checks, and operator handoff." />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#1e6f59" media="(prefers-color-scheme: light)" />
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/flow.css" />
   <link rel="stylesheet" href="/static/results.css" />
@@ -45,11 +50,11 @@
       </div>
       <div class="login-form">
         <div class="input-group">
-          <label data-i18n="login_email">Email address</label>
+          <label for="email" data-i18n="login_email">Email address</label>
           <input id="email" type="email" placeholder="admin@example.com" autocomplete="email" />
         </div>
         <div class="input-group">
-          <label data-i18n="login_password">Password</label>
+          <label for="password" data-i18n="login_password">Password</label>
           <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" />
         </div>
         <button id="authButton" onclick="login()" data-i18n="login_submit">Sign In</button>
@@ -83,10 +88,10 @@
       <details class="sidebar-group">
         <summary data-i18n="sidebar_create_workspace">Create Workspace</summary>
         <div class="sidebar-group-content">
-          <input id="newProjectName" placeholder="New project name" />
-          <input id="newProjectDescription" placeholder="Project description" />
+          <input id="newProjectName" placeholder="New project name" aria-label="New project name" />
+          <input id="newProjectDescription" placeholder="Project description" aria-label="New project description" />
           <button class="soft-wide" onclick="createProjectFromSidebar()" data-i18n="sidebar_create_project_btn">Create project</button>
-          <input id="newReleaseVersion" placeholder="New release version" />
+          <input id="newReleaseVersion" placeholder="New release version" aria-label="New release version" />
           <button class="soft-wide" onclick="createReleaseFromSidebar()" data-i18n="sidebar_create_release_btn">Create release</button>
         </div>
       </details>
@@ -185,10 +190,10 @@
             </div>
           </div>
           <div class="upload-grid">
-            <div class="upload-card danger-card"><div class="upload-icon">SQL</div><h4>SQL Migration</h4><p>Find destructive database changes.</p><input id="sqlFile" type="file" /><button class="danger-btn" onclick="uploadGuard('sqlFile','/guards/sql')" data-i18n="step2_btn_sql">Scan SQL</button></div>
-            <div class="upload-card warn-card"><div class="upload-icon">LOG</div><h4>Logs</h4><p>Find errors, exceptions, timeouts.</p><input id="logFile" type="file" /><button class="warn-btn" onclick="uploadGuard('logFile','/guards/logs')" data-i18n="step2_btn_logs">Scan Logs</button></div>
-            <div class="upload-card success-card"><div class="upload-icon">TST</div><h4>Tests</h4><p>Find failed tests and errors.</p><input id="testFile" type="file" /><button class="success-btn" onclick="uploadGuard('testFile','/guards/tests')" data-i18n="step2_btn_tests">Scan Tests</button></div>
-            <div class="upload-card info-card"><div class="upload-icon">API</div><h4>API Diff</h4><p>Find removed OpenAPI paths.</p><input id="apiBefore" type="file" /><input id="apiAfter" type="file" /><button class="info-btn" onclick="uploadApiDiff()" data-i18n="step2_btn_api">Scan API Diff</button></div>
+            <div class="upload-card danger-card"><div class="upload-icon">SQL</div><h4>SQL Migration</h4><p>Find destructive database changes.</p><input id="sqlFile" type="file" aria-label="SQL migration file" /><button class="danger-btn" onclick="uploadGuard('sqlFile','/guards/sql')" data-i18n="step2_btn_sql">Scan SQL</button></div>
+            <div class="upload-card warn-card"><div class="upload-icon">LOG</div><h4>Logs</h4><p>Find errors, exceptions, timeouts.</p><input id="logFile" type="file" aria-label="Log file" /><button class="warn-btn" onclick="uploadGuard('logFile','/guards/logs')" data-i18n="step2_btn_logs">Scan Logs</button></div>
+            <div class="upload-card success-card"><div class="upload-icon">TST</div><h4>Tests</h4><p>Find failed tests and errors.</p><input id="testFile" type="file" aria-label="Test results file" /><button class="success-btn" onclick="uploadGuard('testFile','/guards/tests')" data-i18n="step2_btn_tests">Scan Tests</button></div>
+            <div class="upload-card info-card"><div class="upload-icon">API</div><h4>API Diff</h4><p>Find removed OpenAPI paths.</p><input id="apiBefore" type="file" aria-label="OpenAPI spec before" /><input id="apiAfter" type="file" aria-label="OpenAPI spec after" /><button class="info-btn" onclick="uploadApiDiff()" data-i18n="step2_btn_api">Scan API Diff</button></div>
           </div>
           <div class="action-row">
             <button onclick="loadGuards()" data-i18n="step2_btn_review">Review Guard Findings</button>
@@ -206,7 +211,7 @@
             </div>
           </div>
           
-          <input type="text" class="action-search-bar" placeholder="🔍 Search step 3 actions (e.g. sql, verify, v11)..." oninput="filterActions(this, 'step3-groups')">
+          <input type="text" class="action-search-bar" aria-label="Search step 3 actions" placeholder="🔍 Search step 3 actions (e.g. sql, verify, v11)..." oninput="filterActions(this, 'step3-groups')">
           
           <div id="step3-groups">
             <!-- Group 1: Core Traceability & Risk Audit -->
@@ -474,7 +479,7 @@ REQ-001,Login by email or phone,Critical</textarea></label><label>OpenAPI before
             </div>
           </div>
           
-          <input type="text" class="action-search-bar" placeholder="🔍 Search step 6 actions (e.g. signoff, deploy, manifest)..." oninput="filterActions(this, 'step6-groups')">
+          <input type="text" class="action-search-bar" aria-label="Search step 6 actions" placeholder="🔍 Search step 6 actions (e.g. signoff, deploy, manifest)..." oninput="filterActions(this, 'step6-groups')">
           
           <div id="step6-groups">
             <!-- Group 1: Core Evidence Preview & Export -->
