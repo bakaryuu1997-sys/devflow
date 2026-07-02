@@ -9,21 +9,41 @@ DevFlow Guard is an offline-first release governance demo. It shows release risk
 - Final tag: devflow-guard-demo-v11.9
 - Focus: production deployment checklist and hosting decision
 
-## Beginner install
+## Run locally (recommended)
+
+DevFlow Guard is offline-first: it runs great on your own machine with SQLite —
+no external database or hosting needed. One command sets up everything (creates
+the virtualenv on first run, installs dependencies, seeds a default admin, and
+starts the server):
+
+```bash
+# Windows
+run.bat
+
+# macOS / Linux
+./run.sh
+```
+
+Then open <http://127.0.0.1:8000> and sign in with:
+
+- **Email:** `admin@example.com`
+- **Password:** `password123`  *(change it after your first login)*
+
+Useful flags: `run.bat --reload` (auto-reload while editing), `run.bat --port 9000`.
+
+### Manual install (if you prefer step by step)
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-python -m compileall app scripts
-pytest tests/test_v120_production_deployment_checklist.py
-uvicorn app.main:app --reload
+python scripts/serve.py         # seeds admin + starts http://127.0.0.1:8000
 ```
 
-On macOS or Linux, activate with:
+You can also start the server directly (no auto-seed) with the classic command:
 
 ```bash
-source .venv/bin/activate
+uvicorn app.main:app --reload
 ```
 
 ## Development & code quality
