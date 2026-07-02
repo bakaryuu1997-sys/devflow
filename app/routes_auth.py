@@ -8,6 +8,7 @@ from app.auth_audit_service import (
     record_login_success,
     record_logout,
 )
+from app.auth_mode import current_auth_mode, local_auth_disabled
 from app.auth_service import authenticate, create_user, token_for_user
 from app.config import settings
 from app.database import get_db
@@ -43,9 +44,26 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     return {"access_token": token_for_user(user), "token_type": "bearer"}
 
 
+@router.get("/config")
+def auth_config():
+    """Public: tells the UI whether it must show a login screen."""
+    disabled = local_auth_disabled()
+    return {
+        "no_auth": disabled,
+        "login_required": not disabled,
+        "auth_mode": current_auth_mode(),
+        "allow_public_register": settings.allow_public_register and not disabled,
+    }
+
+
 @router.post("/logout")
-def logout(token: str = Depends(oauth2_scheme), user: User = Depends(current_user), db: Session = Depends(get_db)):
-    blacklist_token(token)
+def logout(
+    token: str | None = Depends(oauth2_scheme),
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db),
+):
+    if token:
+        blacklist_token(token)
     record_logout(db, user.email)
     return {"message": "Logged out"}
 

@@ -7,6 +7,20 @@ def read_static(name: str) -> str:
     return (STATIC_ROOT / name).read_text(encoding="utf-8")
 
 
+def test_on_page_usage_guide_and_no_auth_wiring():
+    html = read_static("index.html")
+    css = read_static("professional.css")
+    app_js = read_static("app.js")
+
+    # The on-page "How to use" guide is present.
+    assert 'id="howToUse"' in html
+    assert "How to use DevFlow Guard" in html
+    assert ".how-to-use" in css
+    # The front-end can detect and enter local no-auth mode.
+    assert "enterNoAuthMode" in app_js
+    assert "/api/auth/config" in app_js
+
+
 def test_governance_ui_ships_as_single_bundle():
     html = read_static("index.html")
     bundle = read_static("governance_bundle.js")

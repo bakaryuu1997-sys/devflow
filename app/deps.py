@@ -1,8 +1,9 @@
 from fastapi import Depends, Header, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.auth_mode import is_production_mode
+from app.auth_mode import is_production_mode, local_auth_disabled
 from app.config import settings
 from app.database import get_db
 from app.models import User
@@ -10,10 +11,31 @@ from app.rbac import PERMISSION_MANAGE_USERS, PERMISSION_RELEASE, PERMISSION_WRI
 from app.security import decode_access_token
 from app.token_blacklist_service import is_token_blacklisted
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+# auto_error=False so requests without a token reach our handlers, which decide
+# whether that is allowed (it is when local_auth_disabled() is on).
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 
-def current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+def _default_local_user(db: Session) -> User:
+    """Return the account used when login is disabled for local personal use.
+
+    Prefers an active admin, then any active user. Raises 401 if the database
+    has no account yet (the launcher seeds one, so this is only a safety net).
+    """
+    admin = db.scalars(
+        select(User).where(User.role == "admin", User.is_active.is_(True)).order_by(User.id)
+    ).first()
+    user = admin or db.scalars(select(User).where(User.is_active.is_(True)).order_by(User.id)).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="No local account exists; start the app via the launcher.")
+    return user
+
+
+def current_user(token: str | None = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+    if local_auth_disabled():
+        return _default_local_user(db)
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     if is_token_blacklisted(token):
         raise HTTPException(status_code=401, detail="Token has been logged out")
     subject = decode_access_token(token)
@@ -54,6 +76,8 @@ def require_unsafe_api_auth(
     db: Session = Depends(get_db),
 ) -> User | None:
     if request.method not in UNSAFE_METHODS:
+        return None
+    if local_auth_disabled():
         return None
 
     path = request.url.path

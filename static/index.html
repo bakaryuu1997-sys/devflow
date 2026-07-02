@@ -145,6 +145,20 @@
         </div>
       </section>
 
+      <details class="how-to-use" id="howToUse" open>
+        <summary><span class="how-to-use-badge">Guide</span> How to use DevFlow Guard</summary>
+        <div class="how-to-use-body">
+          <ol>
+            <li><strong>Create data:</strong> click <em>Initialize Local Sample Workspace</em> above to generate demo projects, releases, and requirements.</li>
+            <li><strong>Pick context:</strong> choose a <em>Project</em> and <em>Release</em> in the left sidebar (Workspace Context).</li>
+            <li><strong>Follow the rail:</strong> walk the six steps below — Start → Artifacts → Traceability → Impact → Gate → Report.</li>
+            <li><strong>Scan artifacts:</strong> in Step 2, upload SQL / log / test / OpenAPI files to run the risk guards.</li>
+            <li><strong>Review history:</strong> open the <em>Operations Workspace</em> (sidebar) for browser-local notes and the audit timeline.</li>
+          </ol>
+          <p class="how-to-use-note">Everything runs locally on SQLite — no internet or login required. Close this panel with the arrow; it stays collapsed for the session.</p>
+        </div>
+      </details>
+
       <section class="stepper">
         <button id="stepBtn1" class="step active" onclick="goStep(1)"><b>1</b><span>Start</span></button>
         <button id="stepBtn2" class="step" onclick="goStep(2)"><b>2</b><span>Artifacts</span></button>

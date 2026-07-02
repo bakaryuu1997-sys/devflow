@@ -42,6 +42,26 @@ function logout() {
   setLoginStatus("Logged out", "neutral");
 }
 
+async function loadRuntimeConfig() {
+  try {
+    return await api("/api/auth/config");
+  } catch {
+    return { no_auth: false, login_required: true };
+  }
+}
+
+// Local personal-use mode: the server accepts requests as the default admin,
+// so we skip the login overlay entirely and go straight into the app.
+function enterNoAuthMode() {
+  accessToken = "local-no-auth"; // sentinel so client-side gates pass; server ignores the value
+  const overlay = document.getElementById("loginOverlay");
+  if (overlay) overlay.classList.add("hidden");
+  const loggedIn = document.getElementById("authLoggedIn");
+  if (loggedIn) loggedIn.classList.add("hidden");
+  const guide = document.getElementById("howToUse");
+  if (guide) guide.hidden = false;
+}
+
 async function checkSession() {
   if (!accessToken) return setLoginStatus("Not logged in", "neutral");
   try {

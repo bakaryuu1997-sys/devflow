@@ -24,12 +24,15 @@ run.bat
 ./run.sh
 ```
 
-Then open <http://127.0.0.1:8000> and sign in with:
+Then open <http://127.0.0.1:8000>. For local personal use **login is disabled**
+— you land straight in the app, and an on-page **How to use** guide walks you
+through the workflow.
 
-- **Email:** `admin@example.com`
-- **Password:** `password123`  *(change it after your first login)*
+Want the login screen back? Start with `run.bat --auth` (default admin is
+`admin@example.com` / `password123`).
 
-Useful flags: `run.bat --reload` (auto-reload while editing), `run.bat --port 9000`.
+Useful flags: `run.bat --reload` (auto-reload while editing), `run.bat --port 9000`,
+`run.bat --auth` (require login).
 
 ### Manual install (if you prefer step by step)
 

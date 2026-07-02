@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     auth_mode: str = "local"
     local_write_auth_required: bool = False
     require_secure_production: bool = True
+    # When true (and not in production), the UI skips login and the API treats
+    # every request as the default local admin. Intended for personal localhost
+    # use; the local launcher (scripts/serve.py) enables this by default.
+    local_no_auth: bool = False
 
     model_config = SettingsConfigDict(env_file=".env")
 

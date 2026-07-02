@@ -16,6 +16,14 @@ def is_production_mode() -> bool:
     return current_auth_mode() == PRODUCTION_AUTH_MODE
 
 
+def local_auth_disabled() -> bool:
+    """True when login is bypassed for local personal use.
+
+    Only honoured outside production so the security posture there is unaffected.
+    """
+    return settings.local_no_auth and not is_production_mode()
+
+
 def security_checklist() -> list[dict]:
     production = is_production_mode()
     checks = [

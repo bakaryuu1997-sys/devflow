@@ -1470,3 +1470,76 @@ details.action-group summary {
     padding: 18px;
   }
 }
+
+/* On-page usage guide */
+.how-to-use {
+  margin: 0 0 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.how-to-use > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 18px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.how-to-use > summary::-webkit-details-marker {
+  display: none;
+}
+
+.how-to-use > summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+
+.how-to-use[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+.how-to-use-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+.how-to-use-body {
+  padding: 0 18px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.how-to-use-body ol {
+  margin: 14px 0 10px;
+  padding-left: 20px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.how-to-use-body li {
+  margin-bottom: 6px;
+}
+
+.how-to-use-body strong {
+  color: var(--text);
+}
+
+.how-to-use-note {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}

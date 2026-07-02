@@ -8,8 +8,14 @@ function openReleaseNotes() {
 
 async function initDevFlow() {
   if (typeof loadAuthSurface === "function") await loadAuthSurface();
-  await checkSession();
+  const config = typeof loadRuntimeConfig === "function" ? await loadRuntimeConfig() : { no_auth: false };
+  if (config.no_auth && typeof enterNoAuthMode === "function") {
+    enterNoAuthMode();
+  } else {
+    await checkSession();
+  }
   await loadProjectSelector();
+  if (typeof loadOperationalHistory === "function") loadOperationalHistory();
 }
 
 initDevFlow();
