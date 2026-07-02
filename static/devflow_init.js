@@ -16,6 +16,7 @@ async function initDevFlow() {
   }
   await loadProjectSelector();
   if (typeof loadOperationalHistory === "function") loadOperationalHistory();
+  if (typeof loadLocalStats === "function") loadLocalStats();
 }
 
 initDevFlow();

@@ -96,6 +96,16 @@
         </div>
       </details>
 
+      <!-- Local Data Management -->
+      <details class="sidebar-group">
+        <summary data-i18n="sidebar_local_data">Local Data</summary>
+        <div class="sidebar-group-content">
+          <div id="localStats" class="sidebar-note"><span data-i18n="local_data_loading">Loading data stats…</span></div>
+          <a class="soft-wide" href="/api/local/backup" download data-i18n="local_data_backup">Download backup (.db)</a>
+          <button class="soft-wide danger-soft" onclick="resetAllData()" data-i18n="local_data_reset">Reset all data</button>
+        </div>
+      </details>
+
       <div class="progress-box">
         <span class="progress-label" data-i18n="sidebar_flow_label">Recommended flow</span>
         <ol>
@@ -113,7 +123,7 @@
         <div class="topbar-info">
           <span class="eyebrow" data-i18n="topbar_eyebrow">DevFlow Governance OS</span>
           <h2 data-i18n="topbar_title">Release Compliance Control Center</h2>
-          <p>One focused surface for release risk, traceability, evidence, and operator history.</p>
+          <p data-i18n="topbar_desc">One focused surface for release risk, traceability, evidence, and operator history.</p>
         </div>
         <div class="topbar-actions-auth">
           <div class="header-auth">
@@ -129,9 +139,9 @@
 
       <section class="dashboard-command" aria-label="Release command overview">
         <div class="command-copy">
-          <span class="panel-kicker">Today command</span>
-          <h3>Start with the release gate, then move evidence forward.</h3>
-          <p>Use the primary action to initialize or refresh the workspace, then follow the six-step rail only when the previous checkpoint is clear.</p>
+          <span class="panel-kicker" data-i18n="cmd_kicker">Today command</span>
+          <h3 data-i18n="cmd_title">Start with the release gate, then move evidence forward.</h3>
+          <p data-i18n="cmd_desc">Use the primary action to initialize or refresh the workspace, then follow the six-step rail only when the previous checkpoint is clear.</p>
         </div>
         <div class="command-primary">
           <button id="resetDemoButton" class="primary command-cta" onclick="resetDemo()" data-i18n="step1_btn_init">Initialize Local Sample Workspace</button>
@@ -146,16 +156,16 @@
       </section>
 
       <details class="how-to-use" id="howToUse" open>
-        <summary><span class="how-to-use-badge">Guide</span> How to use DevFlow Guard</summary>
+        <summary><span class="how-to-use-badge" data-i18n="guide_badge">Guide</span> <span data-i18n="guide_summary">How to use DevFlow Guard</span></summary>
         <div class="how-to-use-body">
           <ol>
-            <li><strong>Create data:</strong> click <em>Initialize Local Sample Workspace</em> above to generate demo projects, releases, and requirements.</li>
-            <li><strong>Pick context:</strong> choose a <em>Project</em> and <em>Release</em> in the left sidebar (Workspace Context).</li>
-            <li><strong>Follow the rail:</strong> walk the six steps below — Start → Artifacts → Traceability → Impact → Gate → Report.</li>
-            <li><strong>Scan artifacts:</strong> in Step 2, upload SQL / log / test / OpenAPI files to run the risk guards.</li>
-            <li><strong>Review history:</strong> open the <em>Operations Workspace</em> (sidebar) for browser-local notes and the audit timeline.</li>
+            <li data-i18n="guide_step1_desc"><strong>Create data:</strong> click <em>Initialize Local Sample Workspace</em> above to generate demo projects, releases, and requirements.</li>
+            <li data-i18n="guide_step2_desc"><strong>Pick context:</strong> choose a <em>Project</em> and <em>Release</em> in the left sidebar (Workspace Context).</li>
+            <li data-i18n="guide_step3_desc"><strong>Follow the rail:</strong> walk the six steps below — Start → Artifacts → Traceability → Impact → Gate → Report.</li>
+            <li data-i18n="guide_step4_desc"><strong>Scan artifacts:</strong> in Step 2, upload SQL / log / test / OpenAPI files to run the risk guards.</li>
+            <li data-i18n="guide_step5_desc"><strong>Review history:</strong> open the <em>Operations Workspace</em> (sidebar) for browser-local notes and the audit timeline.</li>
           </ol>
-          <p class="how-to-use-note">Everything runs locally on SQLite — no internet or login required. Close this panel with the arrow; it stays collapsed for the session.</p>
+          <p class="how-to-use-note" data-i18n="guide_note_desc">Everything runs locally on SQLite — no internet or login required. Close this panel with the arrow; it stays collapsed for the session.</p>
         </div>
       </details>
 

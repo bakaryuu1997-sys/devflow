@@ -1543,3 +1543,13 @@ details.action-group summary {
   font-size: 13px;
   color: var(--muted);
 }
+
+.danger-soft {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.danger-soft:hover {
+  background: var(--danger);
+  color: #fff;
+}

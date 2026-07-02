@@ -4,8 +4,8 @@
     {
       "name": "devflow",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["scripts/serve.py", "--port", "8010"],
-      "port": 8010
+      "runtimeArgs": ["scripts/serve.py", "--port", "8011"],
+      "port": 8011
     }
   ]
 }

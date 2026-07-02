@@ -42,6 +42,32 @@ function logout() {
   setLoginStatus("Logged out", "neutral");
 }
 
+async function loadLocalStats() {
+  const el = document.getElementById("localStats");
+  if (!el) return;
+  try {
+    const stats = await api("/api/local/stats");
+    const tableCount = Object.keys(stats.tables || {}).length;
+    el.innerHTML = `<strong>Local database</strong><span>${stats.total_rows} rows across ${tableCount} tables</span>`;
+  } catch {
+    el.innerHTML = "<span>Data stats unavailable.</span>";
+  }
+}
+
+async function resetAllData() {
+  const ok = confirm(
+    "This deletes ALL local data (projects, releases, history) and re-seeds the default admin. Continue?",
+  );
+  if (!ok) return;
+  try {
+    await api("/api/local/reset-all", { method: "POST" });
+    toast("All local data was reset.");
+    setTimeout(() => window.location.reload(), 800);
+  } catch (error) {
+    toast("Reset failed: " + (error.message || error));
+  }
+}
+
 async function loadRuntimeConfig() {
   try {
     return await api("/api/auth/config");

@@ -21,6 +21,20 @@ def test_on_page_usage_guide_and_no_auth_wiring():
     assert "/api/auth/config" in app_js
 
 
+def test_local_data_panel_and_bilingual_keys():
+    html = read_static("index.html")
+    app_js = read_static("app.js")
+    i18n = read_static("i18n.js")
+
+    # Local data-management controls are wired in the sidebar.
+    assert 'id="localStats"' in html
+    assert "/api/local/backup" in html
+    assert "resetAllData" in app_js
+    # New UI strings are translated in both English and Vietnamese.
+    for key in ("sidebar_local_data", "guide_summary", "cmd_title", "topbar_desc"):
+        assert i18n.count(f'"{key}"') >= 2, f"{key} missing an en/vi translation"
+
+
 def test_governance_ui_ships_as_single_bundle():
     html = read_static("index.html")
     bundle = read_static("governance_bundle.js")
