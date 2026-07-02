@@ -22,9 +22,7 @@ def _default_local_user(db: Session) -> User:
     Prefers an active admin, then any active user. Raises 401 if the database
     has no account yet (the launcher seeds one, so this is only a safety net).
     """
-    admin = db.scalars(
-        select(User).where(User.role == "admin", User.is_active.is_(True)).order_by(User.id)
-    ).first()
+    admin = db.scalars(select(User).where(User.role == "admin", User.is_active.is_(True)).order_by(User.id)).first()
     user = admin or db.scalars(select(User).where(User.is_active.is_(True)).order_by(User.id)).first()
     if not user:
         raise HTTPException(status_code=401, detail="No local account exists; start the app via the launcher.")

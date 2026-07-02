@@ -34,6 +34,12 @@ Want the login screen back? Start with `run.bat --auth` (default admin is
 Useful flags: `run.bat --reload` (auto-reload while editing), `run.bat --port 9000`,
 `run.bat --auth` (require login).
 
+**One-click desktop shortcut** (Windows): create a Desktop icon that launches the app:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\create_shortcut.ps1
+```
+
 ### Manual install (if you prefer step by step)
 
 ```bash
