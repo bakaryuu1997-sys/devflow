@@ -41,7 +41,7 @@ def test_v115_operator_package_docs_ui_and_cli(tmp_path):
     assert "v11.5 Operator Release Candidate Package" in package["content"]
     assert Path("docs/V11_5_DEMO_RELEASE_CANDIDATE_FREEZE.md").exists()
     assert "routes_v115" in " ".join(wired_route_modules())
-    assert "governance_v115_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
+    assert "governance_v115_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     out = tmp_path / "v11_5.md"
     result = subprocess.run(
         [sys.executable, "scripts/export_v11_5_operator_release_candidate_package.py", str(out)],

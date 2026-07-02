@@ -42,7 +42,7 @@ def test_v120_operator_package_docs_ui_and_cli(tmp_path):
     assert "v12.0 Operator Deployment Package" in package["content"]
     assert Path("docs/V12_0_PRODUCTION_DEPLOYMENT_CHECKLIST.md").exists()
     assert "routes_v120" in " ".join(wired_route_modules())
-    assert "governance_v120_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
+    assert "governance_v120_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     out = tmp_path / "v12_0.md"
     result = subprocess.run(
         [sys.executable, "scripts/export_v12_0_deployment_package.py", str(out)],

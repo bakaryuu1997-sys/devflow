@@ -41,7 +41,7 @@ def test_v102_operator_package_routes_ui_and_cli_exports(tmp_path):
     index = Path("static/index.html").read_text(encoding="utf-8")
     assert "routes_v102" in routes
     assert "v10.2 First-run Wizard" in index
-    assert "governance_v102_ui.js" in index
+    assert "governance_v102_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     outputs = [
         ("scripts/export_v10_2_first_run_wizard.py", "Guided First-run Wizard"),
         ("scripts/export_v10_2_demo_reset_safety.py", "Demo Reset Safety Check"),

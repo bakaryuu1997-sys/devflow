@@ -41,7 +41,7 @@ def test_v103_package_routes_ui_and_cli_exports(tmp_path):
     index = Path("static/index.html").read_text(encoding="utf-8")
     assert "routes_v103" in routes
     assert "v10.3 Demo Profiles" in index
-    assert "governance_v103_ui.js" in index
+    assert "governance_v103_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     outputs = [
         ("scripts/export_v10_3_demo_profiles.py", "Demo Data Profiles"),
         ("scripts/export_v10_3_tutorial_progress.py", "Tutorial Mode Progress"),

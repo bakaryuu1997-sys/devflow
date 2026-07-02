@@ -7,6 +7,20 @@ def read_static(name: str) -> str:
     return (STATIC_ROOT / name).read_text(encoding="utf-8")
 
 
+def test_governance_ui_ships_as_single_bundle():
+    html = read_static("index.html")
+    bundle = read_static("governance_bundle.js")
+
+    # The page loads exactly the one governance bundle, not per-version scripts.
+    assert "/static/governance_bundle.js" in html
+    assert "governance_v10_ui.js" not in html
+    assert "governance_v120_ui.js" not in html
+    # The bundle still contains every version section and shared renderer.
+    assert "renderGenericGovernanceCard" in bundle
+    assert "// ==== governance_v10_ui.js ====" in bundle
+    assert "// ==== governance_v120_ui.js ====" in bundle
+
+
 def test_head_has_favicon_and_metadata():
     html = read_static("index.html")
 

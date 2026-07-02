@@ -45,7 +45,7 @@ def test_v111_routes_ui_docs_and_cli_export(tmp_path):
     assert package["version"] == "11.1"
     assert "Operator Recovery Fixture Package" in package["content"]
     assert "routes_v111" in " ".join(wired_route_modules())
-    assert "governance_v111_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
+    assert "governance_v111_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     assert Path("docs/V11_1_RECOVERY_UX_FIXTURE_EXAMPLES.md").exists()
     out = tmp_path / "fixtures.md"
     result = subprocess.run(

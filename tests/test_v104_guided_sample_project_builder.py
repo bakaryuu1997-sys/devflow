@@ -44,7 +44,7 @@ def test_v104_routes_ui_docs_and_cli_export(tmp_path):
     assert package["ready"] is True
     assert "Operator Sample Builder Package" in package["content"]
     assert "routes_v104" in " ".join(wired_route_modules())
-    assert "governance_v104_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
+    assert "governance_v104_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     assert Path("docs/V10_4_GUIDED_SAMPLE_PROJECT_BUILDER.md").exists()
     out = tmp_path / "builder.md"
     result = subprocess.run(

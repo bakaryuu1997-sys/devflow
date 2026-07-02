@@ -47,7 +47,7 @@ def test_v106_routes_ui_docs_and_cli_export(tmp_path):
     assert package["ready"] is True
     assert "Operator Rollback Snapshot Package" in package["content"]
     assert "routes_v106" in " ".join(wired_route_modules())
-    assert "governance_v106_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
+    assert "governance_v106_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     assert Path("docs/V10_6_PROFILE_RESET_AUDIT_ROLLBACK.md").exists()
     out = tmp_path / "rollback.md"
     result = subprocess.run(

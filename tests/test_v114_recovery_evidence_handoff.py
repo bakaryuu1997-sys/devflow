@@ -43,7 +43,7 @@ def test_v114_operator_package_docs_ui_and_cli(tmp_path):
     assert "v11.4 Operator Demo Handoff Package" in package["content"]
     assert Path("docs/V11_4_RECOVERY_EVIDENCE_HANDOFF.md").exists()
     assert "routes_v114" in " ".join(wired_route_modules())
-    assert "governance_v114_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
+    assert "governance_v114_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
     out = tmp_path / "v11_4.md"
     result = subprocess.run(
         [sys.executable, "scripts/export_v11_4_operator_demo_handoff_package.py", str(out)],

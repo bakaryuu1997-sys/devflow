@@ -50,7 +50,7 @@ def test_v112_walkthrough_exposes_copy_targets_and_routes():
     assert data["copy_targets"]["restore_phrase"] == "RESTORE DEMO PROFILE: core-risk"
     assert any("v11.2 validation" in step for step in data["walkthrough_steps"])
     assert "routes_v112" in " ".join(wired_route_modules())
-    assert "governance_v112_ui.js" in Path("static/index.html").read_text(encoding="utf-8")
+    assert "governance_v112_ui.js" in Path("static/governance_bundle.js").read_text(encoding="utf-8")
 
 
 def test_v112_docs_and_cli_export(tmp_path):
