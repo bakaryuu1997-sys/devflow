@@ -1,0 +1,14 @@
+# Keep the serverless bundle small and under the size limit.
+tests/
+docs/
+examples/
+fixtures/
+.pytest_cache/
+.ruff_cache/
+*.db
+*.sqlite
+*.log
+*.md
+!README.md
+.venv/
+.git/
