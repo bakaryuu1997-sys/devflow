@@ -323,7 +323,7 @@ const TRANSLATIONS = {
   }
 };
 
-let currentLang = localStorage.getItem("devflow_lang") || "en";
+let currentLang = localStorage.getItem("devflow_lang") || "vi";
 
 function t(key) {
   return TRANSLATIONS[currentLang][key] || key;
@@ -338,6 +338,304 @@ function setLanguage(lang) {
 function toggleLanguage() {
   const nextLang = currentLang === "en" ? "vi" : "en";
   setLanguage(nextLang);
+}
+
+// Auto-translated phrase dictionaries for text without data-i18n attributes.
+const PHRASE_MAP = {
+  "Production control room": "Phòng điều khiển vận hành",
+  "Run release governance, evidence checks, traceability review, and audit history from one operator workspace.": "Chạy quản trị phát hành, kiểm tra bằng chứng, rà soát truy vết và lịch sử kiểm toán từ một không gian vận hành.",
+  "governance steps": "bước quản trị",
+  "Live": "Trực tiếp",
+  "risk and evidence gates": "cổng rủi ro và bằng chứng",
+  "Audit": "Kiểm toán",
+  "history ledger visible": "hiển thị sổ lịch sử",
+  "Protected API session required before operational actions.": "Cần phiên API được bảo vệ trước khi thao tác vận hành.",
+  "Sign in with a real account. Local sample credentials are available only for isolated QA mode.": "Đăng nhập bằng tài khoản thật. Thông tin mẫu cục bộ chỉ dùng cho chế độ QA riêng biệt.",
+  "Use local sample admin": "Dùng admin mẫu cục bộ",
+  "Sample credentials only seed the isolated local QA account.": "Thông tin mẫu chỉ tạo tài khoản QA cục bộ riêng biệt.",
+  "Local QA auth": "Xác thực QA cục bộ",
+  "Not logged in": "Chưa đăng nhập",
+  "Initialize sample": "Khởi tạo mẫu",
+  "Upload artifacts": "Tải tài liệu lên",
+  "Traceability": "Truy vết",
+  "Impact": "Tác động",
+  "Release gate": "Cổng phát hành",
+  "Evidence": "Bằng chứng",
+  "View history timeline": "Xem dòng thời gian lịch sử",
+  "Local database": "Cơ sở dữ liệu cục bộ",
+  "Review history": "Xem lịch sử",
+  "Dashboard": "Bảng điều khiển",
+  "Today focus": "Trọng tâm hôm nay",
+  "Audit integrity": "Kiểm tra toàn vẹn",
+  "Workspace": "Không gian làm việc",
+  "Start": "Bắt đầu",
+  "Artifacts": "Tài liệu",
+  "Gate": "Cổng duyệt",
+  "Report": "Báo cáo",
+  "From guards/readiness": "Từ guard/sẵn sàng",
+  "Not run": "Chưa chạy",
+  "Requirement links": "Liên kết yêu cầu",
+  "Runs locally": "Chạy cục bộ",
+  "Step 1": "Bước 1",
+  "Step 2": "Bước 2",
+  "Step 3": "Bước 3",
+  "Step 4": "Bước 4",
+  "Step 5": "Bước 5",
+  "Step 6": "Bước 6",
+  "SQL Migration": "Di trú SQL",
+  "Find destructive database changes.": "Tìm thay đổi CSDL mang tính phá hủy.",
+  "Logs": "Nhật ký",
+  "Find errors, exceptions, timeouts.": "Tìm lỗi, ngoại lệ, hết thời gian.",
+  "Tests": "Kiểm thử",
+  "Find failed tests and errors.": "Tìm test thất bại và lỗi.",
+  "API Diff": "So sánh API",
+  "Find removed OpenAPI paths.": "Tìm các đường dẫn OpenAPI bị xóa.",
+  "🔬 Core Analysis & Risk Audit": "🔬 Phân tích cốt lõi & Kiểm toán rủi ro",
+  "Analyze traceability matrix, scan for bugs, and view requirements risk.": "Phân tích ma trận truy vết, quét lỗi và xem rủi ro yêu cầu.",
+  "Bug Patterns": "Mẫu lỗi",
+  "Risk Dashboard by Requirement": "Bảng rủi ro theo yêu cầu",
+  "📈 Planning & Analytics Control": "📈 Điều khiển Lập kế hoạch & Phân tích",
+  "View historical metrics, burndown rates, prevention logs, and timelines.": "Xem chỉ số lịch sử, tốc độ burndown, nhật ký phòng ngừa và dòng thời gian.",
+  "Snapshot Analytics": "Phân tích ảnh chụp",
+  "Risk Delta": "Chênh lệch rủi ro",
+  "Recurring Risk Trends": "Xu hướng rủi ro lặp lại",
+  "Risk Prevention Backlog": "Tồn đọng phòng ngừa rủi ro",
+  "Next Release Readiness": "Sẵn sàng phát hành kế tiếp",
+  "Prevention Execution Board": "Bảng thực thi phòng ngừa",
+  "Overdue Escalations": "Leo thang quá hạn",
+  "Prevention Burndown": "Burndown phòng ngừa",
+  "Owner Workload Balance": "Cân bằng khối lượng chủ sở hữu",
+  "Prevention Calendar": "Lịch phòng ngừa",
+  "Readiness Timeline": "Dòng thời gian sẵn sàng",
+  "Scenario Planning": "Lập kế hoạch kịch bản",
+  "Plan Recommendation": "Đề xuất kế hoạch",
+  "Scope Audit": "Kiểm toán phạm vi",
+  "🗄️ Database & Migration Governance": "🗄️ Quản trị CSDL & Di trú",
+  "Verify local schema health, review checklist protocols, and check migrations.": "Kiểm tra sức khỏe schema cục bộ, rà soát quy trình và kiểm tra di trú.",
+  "Migration Notes": "Ghi chú di trú",
+  "Migration Check": "Kiểm tra di trú",
+  "Upgrade Safety": "An toàn nâng cấp",
+  "Dry-run SQL": "Chạy thử SQL",
+  "Backup Checklist": "Danh mục sao lưu",
+  "🔐 Signature & Cryptography Gates": "🔐 Cổng Chữ ký & Mật mã",
+  "Verify package integrity adapters and run local public key dry-run decode.": "Kiểm tra adapter toàn vẹn gói và chạy thử giải mã khóa công khai cục bộ.",
+  "Verification Policy": "Chính sách xác minh",
+  "Signature Adapters": "Adapter chữ ký",
+  "Adapter Contracts": "Hợp đồng adapter",
+  "Sample Fixtures": "Fixture mẫu",
+  "Public-key Verifier": "Bộ xác minh khóa công khai",
+  "Real Verify Dry-run": "Chạy thử xác minh thật",
+  "Verifier Evidence": "Bằng chứng bộ xác minh",
+  "Verified Gate": "Cổng đã xác minh",
+  "Hardened Evidence Gate": "Cổng bằng chứng gia cố",
+  "Verifier Profiles": "Hồ sơ bộ xác minh",
+  "Policy Presets": "Cấu hình chính sách sẵn",
+  "Final Signed Evidence": "Bằng chứng ký cuối cùng",
+  "E2E Governance Rehearsal": "Diễn tập quản trị E2E",
+  "Adapter Dry-run": "Chạy thử adapter",
+  "📋 Releases & Approval History": "📋 Phát hành & Lịch sử phê duyệt",
+  "Inspect final approval signatures, review retrospectives, and track audit history.": "Kiểm tra chữ ký phê duyệt cuối, xem hồi cứu và theo dõi lịch sử kiểm toán.",
+  "Export Release Review Checklist": "Xuất danh mục rà soát phát hành",
+  "Release Review Completion": "Hoàn tất rà soát phát hành",
+  "Final Sign-off Snapshot": "Ảnh chụp phê duyệt cuối",
+  "Approval Records": "Hồ sơ phê duyệt",
+  "Compare Approvals": "So sánh phê duyệt",
+  "Retrospectives": "Hồi cứu",
+  "Learning Loop": "Vòng học hỏi",
+  "Governance Readiness": "Sẵn sàng quản trị",
+  "🛠️ Developer Rehearsals & Milestone Verification (v10 - v12)": "🛠️ Diễn tập Lập trình viên & Xác minh Cột mốc (v10 - v12)",
+  "Inspect runbooks and build package assets for milestone versions (v10.0 to v12.0).": "Kiểm tra runbook và tạo tài nguyên gói cho các phiên bản cột mốc (v10.0 đến v12.0).",
+  "Stable Milestone": "Cột mốc ổn định",
+  "Installer Checklist": "Danh mục cài đặt",
+  "Quick Requirements": "Yêu cầu nhanh",
+  "Requirement Management": "Quản lý yêu cầu",
+  "Create and review requirements for the selected project.": "Tạo và xem yêu cầu cho dự án đã chọn.",
+  "Key": "Khóa",
+  "Title": "Tiêu đề",
+  "Priority": "Ưu tiên",
+  "Status": "Trạng thái",
+  "Create": "Tạo",
+  "Refresh Requirements": "Làm mới yêu cầu",
+  "Refresh Traceability": "Làm mới truy vết",
+  "Requirement key": "Khóa yêu cầu",
+  "Old requirement": "Yêu cầu cũ",
+  "New requirement": "Yêu cầu mới",
+  "Changed files": "Tệp thay đổi",
+  "Environment config": "Cấu hình môi trường",
+  "Quick Work Items": "Hạng mục công việc nhanh",
+  "Task / Test / Bug Management": "Quản lý Task / Test / Bug",
+  "Create and update work items for the selected project.": "Tạo và cập nhật hạng mục công việc cho dự án đã chọn.",
+  "Kind": "Loại",
+  "Severity": "Mức độ",
+  "Requirement": "Yêu cầu",
+  "Filter by requirement": "Lọc theo yêu cầu",
+  "Refresh Work Items": "Làm mới hạng mục",
+  "Goal Completion": "Hoàn thành mục tiêu",
+  "Git, Requirement Diff, Deep API, Workload": "Git, So sánh yêu cầu, API sâu, Khối lượng",
+  "Extra deterministic project-risk checks.": "Kiểm tra rủi ro dự án bổ sung, xác định.",
+  "Git/PR CSV": "CSV Git/PR",
+  "Old requirement CSV": "CSV yêu cầu cũ",
+  "New requirement CSV": "CSV yêu cầu mới",
+  "OpenAPI before/after JSON": "JSON OpenAPI trước/sau",
+  "Import Git": "Nhập Git",
+  "Compare Req": "So sánh yêu cầu",
+  "Deep API": "API sâu",
+  "Workload": "Khối lượng",
+  "📋 Core Evidence Preview & Export": "📋 Xem trước & Xuất bằng chứng cốt lõi",
+  "Preview release evidence report, compile notes, and review operators sign-off.": "Xem trước báo cáo bằng chứng phát hành, biên soạn ghi chú và rà soát phê duyệt.",
+  "Final Sign-off": "Phê duyệt cuối",
+  "Operator Sign-off": "Phê duyệt vận hành",
+  "Evidence Manifest": "Bảng kê bằng chứng",
+  "Bundle Integrity": "Toàn vẹn gói",
+  "API Docs": "Tài liệu API",
+  "🗄️ Database & Migration Handoff": "🗄️ Bàn giao CSDL & Di trú",
+  "Audit SQL migration plans, dry-run transactions, and run deployment upgrades.": "Kiểm toán kế hoạch di trú SQL, chạy thử giao dịch và nâng cấp triển khai.",
+  "Apply Assistant": "Trợ lý áp dụng",
+  "Post-migration Verify": "Xác minh sau di trú",
+  "Safe Copy Apply": "Áp dụng sao chép an toàn",
+  "Rollback Drill": "Diễn tập hoàn tác",
+  "Real Migration Gate": "Cổng di trú thật",
+  "Production Checklist": "Danh mục sản xuất",
+  "Upgrade Runbook": "Sổ tay nâng cấp",
+  "Rehearsal Report": "Báo cáo diễn tập",
+  "Operator Handoff": "Bàn giao vận hành",
+  "🔐 Cryptographic Signing Handoff": "🔐 Bàn giao Ký mật mã",
+  "Digitally sign evidence bundles, verify cryptographic checksums, and confirm handoffs.": "Ký số các gói bằng chứng, xác minh checksum mật mã và xác nhận bàn giao.",
+  "Signing Readiness": "Sẵn sàng ký",
+  "Timestamp Handoff": "Bàn giao dấu thời gian",
+  "Timestamp Integrity": "Toàn vẹn dấu thời gian",
+  "Signed Payload Import": "Nhập payload đã ký",
+  "Timestamp Token Evidence": "Bằng chứng token thời gian",
+  "Signed+Timestamp Verify": "Xác minh ký+thời gian",
+  "Verifier Evidence Records": "Hồ sơ bằng chứng xác minh",
+  "Signed Artifact Package": "Gói tài liệu đã ký",
+  "Signed Artifacts": "Tài liệu đã ký",
+  "Final Operator Approval": "Phê duyệt vận hành cuối",
+  "📈 Prevention & Risk Analytics": "📈 Phân tích Phòng ngừa & Rủi ro",
+  "Track remaining backlog items, recurring trends, escalations, calendar.": "Theo dõi tồn đọng còn lại, xu hướng lặp, leo thang, lịch.",
+  "New Retrospective": "Hồi cứu mới",
+  "Prevention Checklist": "Danh mục phòng ngừa",
+  "Inspect runbooks and release packages for historical versions (v10.0 to v12.0).": "Kiểm tra runbook và gói phát hành cho các phiên bản lịch sử (v10.0 đến v12.0).",
+  "Context": "Ngữ cảnh",
+  "OS Panel": "Bảng OS",
+  "Dashboard and today focus.": "Bảng điều khiển và trọng tâm hôm nay.",
+  "Initialize a local sample workspace or load existing release data to begin.": "Khởi tạo không gian mẫu cục bộ hoặc tải dữ liệu phát hành hiện có để bắt đầu.",
+  "Risk": "Rủi ro",
+  "Risk / Trace / Activity": "Rủi ro / Truy vết / Hoạt động",
+  "Findings appear here.": "Kết quả hiển thị ở đây.",
+  "No findings yet.": "Chưa có kết quả.",
+  "Release": "Phát hành",
+  "Readiness / Evidence": "Sẵn sàng / Bằng chứng",
+  "Gate and evidence report.": "Báo cáo cổng và bằng chứng.",
+  "No readiness yet.": "Chưa sẵn sàng.",
+  "History": "Lịch sử",
+  "Operational Timeline": "Dòng thời gian vận hành",
+  "Activity, signoff, and retrospective trail.": "Nhật ký hoạt động, phê duyệt và hồi cứu.",
+  "Refresh": "Làm mới",
+  "Return to Governance Dashboard": "Quay lại Bảng quản trị",
+  "Browser-local state": "Trạng thái cục bộ trình duyệt"
+};
+const VNN_SUFFIX = {
+  "Walkthrough": "Hướng dẫn",
+  "Demo Script": "Kịch bản demo",
+  "Deployment Guide": "Hướng dẫn triển khai",
+  "Quickstart": "Bắt đầu nhanh",
+  "First-run Wizard": "Trình hướng dẫn lần đầu",
+  "Reset Safety": "An toàn đặt lại",
+  "Reset Plan": "Kế hoạch đặt lại",
+  "First-run Package": "Gói chạy lần đầu",
+  "Demo Profiles": "Hồ sơ demo",
+  "Profile Plan": "Kế hoạch hồ sơ",
+  "Tutorial Progress": "Tiến độ hướng dẫn",
+  "Mark Profile Done": "Đánh dấu hồ sơ xong",
+  "Tutorial Package": "Gói hướng dẫn",
+  "Sample Builder": "Trình tạo mẫu",
+  "Build Sample": "Tạo mẫu",
+  "Completion Badge": "Huy hiệu hoàn thành",
+  "Builder Package": "Gói trình tạo",
+  "Execute Reset": "Thực thi đặt lại",
+  "Reset Package": "Gói đặt lại",
+  "Rollback Snapshot": "Ảnh chụp hoàn tác",
+  "Reset With Audit": "Đặt lại kèm kiểm toán",
+  "Audit Trail": "Nhật ký kiểm toán",
+  "Rollback Package": "Gói hoàn tác",
+  "Import Rehearsal": "Diễn tập nhập",
+  "Restore Checklist": "Danh mục khôi phục",
+  "Restore Package": "Gói khôi phục",
+  "Restore Plan": "Kế hoạch khôi phục",
+  "Execute Restore": "Thực thi khôi phục",
+  "Restore Audit": "Kiểm toán khôi phục",
+  "Conflict Report": "Báo cáo xung đột",
+  "Digest Plan": "Kế hoạch digest",
+  "Digest Audit": "Kiểm toán digest",
+  "Recovery Stability": "Ổn định phục hồi",
+  "Recovery Runbook": "Sổ tay phục hồi",
+  "Recovery Package": "Gói phục hồi",
+  "Recovery UX": "Trải nghiệm phục hồi",
+  "Export Fixture": "Xuất fixture",
+  "Import Fixture": "Nhập fixture",
+  "Fixture Package": "Gói fixture",
+  "Fixture Validation": "Kiểm định fixture",
+  "Walkthrough Package": "Gói hướng dẫn",
+  "Smoke Test": "Kiểm tra khói",
+  "Post-Restore Verify": "Xác minh sau khôi phục",
+  "Smoke Package": "Gói kiểm tra khói",
+  "Evidence Bundle": "Gói bằng chứng",
+  "Demo Handoff": "Bàn giao demo",
+  "Handoff Package": "Gói bàn giao",
+  "RC Freeze": "Đóng băng RC",
+  "Acceptance": "Nghiệm thu",
+  "RC Package": "Gói RC",
+  "Packaging Cleanup": "Dọn đóng gói",
+  "Install Verify": "Xác minh cài đặt",
+  "Final Package": "Gói cuối",
+  "Archive Manifest": "Bảng kê lưu trữ",
+  "Release Notes": "Ghi chú phát hành",
+  "Release Package": "Gói phát hành",
+  "Checksum Handoff": "Bàn giao checksum",
+  "Checksum Package": "Gói checksum",
+  "Release Tag": "Thẻ phát hành",
+  "Portfolio Script": "Kịch bản portfolio",
+  "Baseline Freeze": "Đóng băng nền",
+  "Deploy Checklist": "Danh mục triển khai",
+  "Deploy Package": "Gói triển khai"
+};
+
+
+const _origTextStore = new WeakMap();
+const _SKIP_TAGS = new Set(["SCRIPT", "STYLE", "TEXTAREA", "CODE", "PRE", "OPTION", "SELECT"]);
+
+function _translatePhrase(en) {
+  if (Object.prototype.hasOwnProperty.call(PHRASE_MAP, en)) return PHRASE_MAP[en];
+  const m = en.match(/^(v\d+\.\d+)\s+(.+)$/);
+  if (m && Object.prototype.hasOwnProperty.call(VNN_SUFFIX, m[2])) return m[1] + " " + VNN_SUFFIX[m[2]];
+  return null;
+}
+
+// Translate visible text that is not wrapped in a [data-i18n] element.
+// Original English is captured per text node so switching back to EN restores it.
+function translateTextNodes() {
+  const toVi = currentLang === "vi";
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  for (const node of nodes) {
+    const parent = node.parentElement;
+    if (!parent || _SKIP_TAGS.has(parent.tagName) || parent.closest("[data-i18n]")) continue;
+    if (!_origTextStore.has(node)) {
+      const trimmed = node.textContent.trim();
+      if (!trimmed || !/[A-Za-z]/.test(trimmed) || _translatePhrase(trimmed) === null) continue;
+      _origTextStore.set(node, node.textContent);
+    }
+    const original = _origTextStore.get(node);
+    const trimmed = original.trim();
+    if (toVi) {
+      const vi = _translatePhrase(trimmed);
+      node.textContent = vi !== null ? original.replace(trimmed, vi) : original;
+    } else {
+      node.textContent = original;
+    }
+  }
 }
 
 function applyTranslations() {
@@ -394,6 +692,7 @@ function applyTranslations() {
       textEl.textContent = descriptions[currentStep];
     }
   }
+  translateTextNodes();
 }
 
 // Auto apply on load

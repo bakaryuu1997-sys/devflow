@@ -11,6 +11,21 @@ def test_i18n_file_exists():
     assert "sidebar_title" in content
 
 
+def test_phrase_dictionary_and_default_vietnamese():
+    content = Path("static/i18n.js").read_text(encoding="utf-8")
+
+    # Phrase dictionaries + text-node translator power full-page Vietnamese
+    # for strings that do not carry a data-i18n attribute.
+    assert "PHRASE_MAP" in content
+    assert "VNN_SUFFIX" in content
+    assert "function translateTextNodes" in content
+    # A few representative translations are present.
+    assert "Mẫu lỗi" in content  # Bug Patterns
+    assert "Cổng Chữ ký" in content  # Signature gates
+    # The app defaults to Vietnamese.
+    assert 'localStorage.getItem("devflow_lang") || "vi"' in content
+
+
 def test_index_html_includes_i18n():
     html_path = Path("static/index.html")
     assert html_path.exists()
